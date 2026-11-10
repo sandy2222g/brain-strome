@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: lost-and-found-matcher
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+models/
+.pytest_cache/
+.ruff_cache/
+.env
+.claude/
+.claude/
+models/

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lost and Found Desk</title>
+<meta name="description" content="Describe what you lost and see the best matches among items handed in, with the reasons for each match.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap">
+<style>
+/* Visual system dealt with taste-skill: palette "limewash-ochre", type "outfit" (Outfit), soft radius. Layout: desk form on the left, luggage-tag results on the right. */
+:root {
+  --bg:#f4efe5; --surface:#e7dfcf; --card:#fbf8f1; --ink:#29251e; --muted:#665f52; --accent:#8c6418; --on-accent:#ffffff; --line:#d8cfba;
+  --good:#2f6b43; --warn:#8f5a00; --sans:"Outfit", system-ui, sans-serif; --ease:cubic-bezier(.2,.8,.2,1); --r:10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#1d1a14; --surface:#2a251c; --card:#241f17; --ink:#f1eadb; --muted:#aa9f8a; --accent:#e0a93f; --on-accent:#241a05; --line:#3d3526;
+  --good:#7bc795; --warn:#e8b25a; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg:#1d1a14; --surface:#2a251c; --card:#241f17; --ink:#f1eadb; --muted:#aa9f8a; --accent:#e0a93f; --on-accent:#241a05; --line:#3d3526;
+  --good:#7bc795; --warn:#e8b25a; color-scheme: dark; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:400 16px/1.5 var(--sans); }
+.wrap { max-width:1120px; margin:0 auto; padding-block:28px 56px; padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); }
+.eyebrow { font-weight:600; font-size:.8rem; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin:0 0 6px; }
+h1 { font:500 clamp(2rem,4.8vw,3.1rem)/1.04 var(--sans); letter-spacing:-.035em; margin:0 0 10px; text-wrap:balance; max-width:20ch; }
+h2 { font:500 1.2rem var(--sans); letter-spacing:-.01em; margin:0 0 6px; }
+.lead { color:var(--muted); max-width:54ch; margin:0 0 26px; }
+.desk { display:grid; grid-template-columns:minmax(0,360px) minmax(0,1fr); gap:28px; align-items:start; }
+@media (max-width:860px) { .desk { grid-template-columns:minmax(0,1fr); } }
+.panel { background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:18px; }
+.tabs { display:flex; gap:6px; margin-bottom:12px; }
+.tab { flex:1; min-height:44px; border:1px solid var(--line); background:transparent; color:var(--muted); border-radius:var(--r); font:500 1rem var(--sans); cursor:pointer; transition:background 150ms var(--ease), color 150ms var(--ease); }
+.tab[aria-selected="true"] { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+label.f { display:block; margin-top:12px; font-size:.9rem; font-weight:500; }
+textarea, input, select { width:100%; min-height:44px; padding:9px 10px; margin-top:4px; background:var(--bg); color:var(--ink); border:1px solid var(--line); border-radius:var(--r); font:inherit; }
+textarea { min-height:84px; resize:vertical; }
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.btn { width:100%; margin-top:14px; min-height:44px; border-radius:var(--r); border:1px solid var(--accent); background:var(--accent); color:var(--on-accent); font:600 1rem var(--sans); cursor:pointer; transition:transform 150ms var(--ease), filter 150ms var(--ease); }
+.btn:hover { filter:brightness(1.1); transform:translateY(-1px); } .btn:active { transform:translateY(1px); transition-duration:90ms; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 4px; }
+.chip { min-height:36px; padding:0 12px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--ink); font:400 .88rem var(--sans); cursor:pointer; text-align:left; transition:border-color 150ms var(--ease), transform 150ms var(--ease); }
+.chip:hover { border-color:var(--accent); transform:translateY(-1px); }
+.verdict { font-size:1.1rem; margin:0 0 14px; }
+.verdict b { color:var(--good); } .verdict.no b { color:var(--warn); }
+.tags { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; padding-top:16px; }
+.tag { position:relative; background:var(--surface); border:1px solid var(--line); border-radius:6px 6px 14px 14px; padding:34px 14px 14px; clip-path:polygon(14% 0, 86% 0, 100% 18px, 100% 100%, 0 100%, 0 18px); transition:transform 150ms var(--ease); }
+.tag:hover { transform:translateY(-2px); }
+.tag::before { content:""; position:absolute; top:7px; left:50%; width:12px; height:12px; margin-left:-6px; border-radius:50%; background:var(--bg); border:2px solid var(--line); }
+.tag.best { background:var(--card); box-shadow:inset 0 0 0 2px var(--accent); }
+.score { display:flex; align-items:baseline; gap:6px; margin-bottom:4px; } .score b { font:500 1.9rem/1 var(--sans); letter-spacing:-.03em; } .score span { color:var(--muted); font-size:.85rem; }
+.meter { height:5px; background:var(--line); border-radius:3px; overflow:hidden; margin-bottom:10px; } .meter i { display:block; height:100%; background:var(--accent); width:var(--w); }
+.tag h3 { font:500 1rem/1.3 var(--sans); margin:0 0 4px; overflow-wrap:anywhere; }
+.tag .where { color:var(--muted); font-size:.85rem; margin:0 0 8px; }
+.tag ul { margin:0; padding-left:1.1em; font-size:.88rem; } .tag li { margin-bottom:2px; }
+.tag .id { font:500 .72rem ui-monospace, monospace; color:var(--muted); position:absolute; top:10px; right:12px; }
+.recent { margin-top:30px; } .recent ul { list-style:none; margin:8px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:8px 20px; }
+.recent li { padding:8px 0; border-bottom:1px solid var(--line); font-size:.92rem; } .recent li span { color:var(--muted); display:block; font-size:.8rem; }
+.note { color:var(--muted); font-size:.88rem; margin-top:10px; } .note a { color:var(--accent); }
+.enter { animation:enter 900ms cubic-bezier(.22,1,.36,1) both; } @keyframes enter { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) { .enter { animation:none; } * { transition:none !important; } }
+[hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="enter">
+    <p class="eyebrow">Campus lost property</p>
+    <h1>Describe it, and see what was handed in</h1>
+    <p class="lead">The matcher compares your description with every item at the desk: what it is, its colour and brand, where and when it turned up. Each result says why it matches.</p>
+  </header>
+  <div class="desk">
+    <section class="panel">
+      <div class="tabs" role="tablist"><button class="tab" role="tab" id="t-lost" aria-selected="true" type="button">I lost something</button><button class="tab" role="tab" id="t-found" aria-selected="false" type="button">I found something</button></div>
+      <p class="note" style="margin:0 0 6px" id="ex-label">Try an example</p>
+      <div class="chips" id="chips"></div>
+      <form id="form" autocomplete="off">
+        <label class="f" for="desc">What does it look like?<textarea id="desc" maxlength="300"></textarea></label>
+        <div class="row2">
+          <label class="f" for="place">Where<select id="place"></select></label>
+          <label class="f" for="when">Date<input id="when" type="date" required></label>
+        </div>
+        <button class="btn" id="submit" type="submit">Find my item</button>
+      </form>
+      <p class="note" id="status" role="status"></p>
+    </section>
+    <section aria-live="polite">
+      <p class="verdict" id="verdict"></p>
+      <div class="tags" id="tags"></div>
+    </section>
+  </div>
+  <section class="recent"><h2>Handed in recently</h2><ul id="recent"></ul></section>
+  <p class="note">Synthetic campus data. Items handed in here stay in memory only. <a href="/docs">API docs</a> · <a href="/metrics">Matcher metrics</a></p>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; };
+let mode = "lost", chipsData = [];
+function setMode(m) {
+  mode = m; $("t-lost").setAttribute("aria-selected", m === "lost"); $("t-found").setAttribute("aria-selected", m === "found");
+  $("submit").textContent = m === "lost" ? "Find my item" : "Hand in this item";
+  $("ex-label").hidden = $("chips").hidden = m !== "lost";
+}
+function fillChips() { const c = $("chips"); c.textContent = ""; chipsData.forEach((s) => { const b = el("button", "chip", s.description.replace(/^(Lost my|I lost a|Missing:)\s*/i, "")); b.type = "button"; b.addEventListener("click", () => { $("desc").value = s.description; $("place").value = s.place; $("when").value = s.date; search(); }); c.append(b); }); }
+function show(d) {
+  const v = $("verdict"); v.className = "verdict " + (d.confident ? "yes" : "no"); v.textContent = "";
+  const top = d.candidates[0];
+  if (!top) { v.textContent = "Nothing has been handed in yet."; $("tags").textContent = ""; return; }
+  if (d.confident) { v.append(el("b", "", "Likely match: "), document.createTextNode(top.description + " (" + Math.round(top.score * 100) + "% sure).")); }
+  else { v.append(el("b", "", "No confident match yet. "), document.createTextNode("These are the closest items. Check back as more are handed in.")); }
+  const box = $("tags"); box.textContent = "";
+  d.candidates.forEach((c, i) => {
+    const t = el("article", "tag" + (i === 0 && d.confident ? " best" : "")); t.append(el("span", "id", c.found_id));
+    const s = el("div", "score"); s.append(el("b", "", Math.round(c.score * 100) + "%"), el("span", "", "match")); t.append(s);
+    const m = el("div", "meter"); const f = el("i"); f.style.setProperty("--w", Math.round(c.score * 100) + "%"); m.append(f); t.append(m);
+    t.append(el("h3", "", c.description.replace(/^(Found a|Handed in a|Picked up a)\s*/i, "")), el("p", "where", c.place + " · " + c.date));
+    const ul = el("ul"); (c.reasons.length ? c.reasons : ["little in common"]).forEach((r) => ul.append(el("li", "", r))); t.append(ul); box.append(t);
+  });
+}
+async function search() {
+  const body = { description: $("desc").value.trim(), place: $("place").value, date: $("when").value };
+  if (body.description.length < 3) { $("status").textContent = "Describe the item in a few words."; return; }
+  $("status").textContent = "";
+  const r = await fetch("/match", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body) });
+  if (!r.ok) { $("status").textContent = "Check the description and date."; return; } show(await r.json());
+}
+async function handIn() {
+  const body = { description: $("desc").value.trim(), place: $("place").value, date: $("when").value };
+  const r = await fetch("/found", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body) });
+  $("status").textContent = r.ok ? "Thank you. Logged as " + (await r.json()).id + ". Owners searching now will see it." : "Check the description and date.";
+  if (r.ok) recent();
+}
+async function recent() { const d = await (await fetch("/found?limit=6")).json(); const ul = $("recent"); ul.textContent = ""; d.items.forEach((i) => { const li = el("li", "", i.description.replace(/^(Found a|Handed in a|Picked up a)\s*/i, "")); li.append(el("span", "", i.id + " · " + i.place + " · " + i.date)); ul.append(li); }); }
+$("form").addEventListener("submit", (e) => { e.preventDefault(); (mode === "lost" ? search : handIn)(); });
+$("t-lost").addEventListener("click", () => setMode("lost")); $("t-found").addEventListener("click", () => setMode("found"));
+(async () => {
+  const places = await (await fetch("/places")).json(); places.forEach((p) => { const o = el("option", "", p); o.value = p; $("place").append(o); });
+  chipsData = await (await fetch("/sample-lost")).json(); fillChips();
+  const s = chipsData[0]; $("desc").value = s.description; $("place").value = s.place; $("when").value = s.date;
+  setMode("lost"); recent(); search();
+})();
+</script>
+</body>
+</html>

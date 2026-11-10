@@ -1,0 +1,241 @@
+id,date,place,description,match_id
+L0000,2026-10-08,bus stop,Lost my Haverly silver umbrella very worn,
+L0001,2026-09-19,dorm lobby,I lost a Orbyt cream drink bottle slightly scratched,F0112
+L0002,2026-09-23,main gate,I lost a yellow school bag with a name tag,F0042
+L0003,2026-08-27,lecture hall,Missing: silver smartphone almost new,F0054
+L0004,2026-09-04,lab block,Lost my Zenmark green glasses,
+L0005,2026-09-17,dorm lobby,Lost my blue muffler slightly scratched,F0052
+L0006,2026-09-22,gym,Missing: Alder cream laptop in a plastic cover,F0266
+L0007,2026-09-16,main gate,I lost a Zenmark white headphones with a cracked corner,
+L0008,2026-10-06,gym,I lost a blue earphones,
+L0009,2026-10-03,cafeteria,Missing: chocolate glasses with a small tear,F0073
+L0010,2026-09-30,gym,Lost my chocolate textbook,F0113
+L0011,2026-09-12,cafeteria,Lost my gray textbook,
+L0012,2026-09-25,dorm lobby,Missing: charcoal headphones very worn,F0010
+L0013,2026-10-02,lab block,Lost my brown keychain,
+L0014,2026-09-15,car park,Lost my Tamsin yellow scarf,F0084
+L0015,2026-09-27,sports field,I lost a off-white earphones,
+L0016,2026-10-02,lab block,Missing: Quillon maroon muffler with a cracked corner,F0136
+L0017,2026-09-17,car park,Missing: cream glasses with a cracked corner,
+L0018,2026-09-04,sports field,I lost a Quillon dark green power adapter very worn,
+L0019,2026-09-12,sports field,Missing: green flask,F0271
+L0020,2026-10-07,lecture hall,Missing: pink backpack with a small tear,F0293
+L0021,2026-10-08,car park,I lost a olive watch,F0247
+L0022,2026-09-16,lab block,Missing: Orbyt pink cellphone almost new,F0021
+L0023,2026-09-28,bus stop,Lost my Haverly off-white scarf with a name tag,F0289
+L0024,2026-09-18,lecture hall,I lost a Norvik green spectacles with a cracked corner,F0127
+L0025,2026-09-20,car park,I lost a off-white coat,F0161
+L0026,2026-09-20,sports field,Missing: jet black rucksack,F0093
+L0027,2026-09-19,library,I lost a Haverly brown book with a blue lanyard,
+L0028,2026-10-05,car park,Lost my charcoal keys,F0015
+L0029,2026-09-04,cafeteria,Missing: dark green flask with a blue lanyard,
+L0030,2026-09-29,bus stop,Missing: silver scarf with a small tear,F0221
+L0031,2026-10-05,library,Missing: navy textbook very worn,F0025
+L0032,2026-10-06,car park,I lost a Tamsin white mobile with a small tear,F0101
+L0033,2026-09-29,cafeteria,Lost my Alder pink flask,
+L0034,2026-09-17,lecture hall,Missing: Orbyt brown notebook computer,
+L0035,2026-09-18,bus stop,Missing: navy muffler slightly scratched,F0052
+L0036,2026-09-02,library,Missing: cream keychain,F0070
+L0037,2026-09-12,dorm lobby,Missing: yellow muffler almost new,
+L0038,2026-09-27,sports field,Missing: Haverly navy coat with a cracked corner,
+L0039,2026-09-19,dorm lobby,Missing: rose brolly with a cracked corner,F0238
+L0040,2026-09-10,lecture hall,Missing: Pico rose notebook computer almost new,
+L0041,2026-09-25,lab block,I lost a grey laptop with a small tear,F0226
+L0042,2026-09-20,lecture hall,Lost my pink umbrella with a cracked corner,F0238
+L0043,2026-09-02,library,I lost a pink school bag with a keyring attached,F0018
+L0044,2026-09-17,library,Lost my Orbyt rose charging cable slightly scratched,F0231
+L0045,2026-09-10,bus stop,I lost a mustard wristwatch in a plastic cover,F0028
+L0046,2026-09-18,gym,Lost my rose jacket,
+L0047,2026-09-21,gym,Missing: blue scarf,F0227
+L0048,2026-09-14,lecture hall,I lost a Haverly brown hoodie with a sticker on it,F0109
+L0049,2026-09-12,main gate,Lost my charcoal spectacles,F0099
+L0050,2026-10-02,bus stop,Missing: white textbook,
+L0051,2026-09-23,main gate,Missing: crimson keychain very worn,F0285
+L0052,2026-10-04,main gate,Lost my rose school bag with a small tear,F0293
+L0053,2026-09-17,car park,Missing: mustard charging cable almost new,F0242
+L0054,2026-10-08,lab block,Lost my tan mobile,F0167
+L0055,2026-08-31,bus stop,Lost my mustard earphones in a plastic cover,F0141
+L0056,2026-10-01,gym,Missing: rose notebook computer,F0146
+L0057,2026-09-01,lab block,I lost a Quillon tan glasses with a sticker on it,
+L0058,2026-09-25,lecture hall,I lost a Haverly navy charging cable,F0244
+L0059,2026-09-03,bus stop,Missing: Orbyt black key ring slightly scratched,F0262
+L0060,2026-09-02,library,I lost a white notebook with a blue lanyard,
+L0061,2026-09-21,cafeteria,Lost my rose scarf with a blue lanyard,F0128
+L0062,2026-09-11,bus stop,Lost my mustard wristwatch in a plastic cover,F0028
+L0063,2026-09-10,library,I lost a Haverly brown keychain slightly scratched,F0121
+L0064,2026-09-19,cafeteria,I lost a Kestrel tan glasses in a plastic cover,F0303
+L0065,2026-10-11,car park,Missing: pink laptop with a blue lanyard,F0071
+L0066,2026-10-04,lab block,Lost my red glasses slightly scratched,F0019
+L0067,2026-09-07,main gate,Missing: brown textbook very worn,F0211
+L0068,2026-10-01,bus stop,Lost my cream notebook,F0092
+L0069,2026-09-15,sports field,Missing: pink hoodie with a sticker on it,F0140
+L0070,2026-10-11,lab block,I lost a white eyeglasses with a name tag,
+L0071,2026-09-29,bus stop,I lost a yellow wallet with a sticker on it,
+L0072,2026-09-01,cafeteria,I lost a charcoal billfold,
+L0073,2026-09-24,gym,I lost a crimson keychain very worn,F0285
+L0074,2026-09-24,lab block,I lost a chocolate wallet with a name tag,F0098
+L0075,2026-08-30,lab block,I lost a chocolate backpack with a small tear,F0202
+L0076,2026-09-20,gym,I lost a charcoal keys,F0222
+L0077,2026-10-06,dorm lobby,Lost my green wristwatch almost new,F0247
+L0078,2026-10-11,dorm lobby,Missing: blue wristwatch with a small tear,
+L0079,2026-10-11,car park,I lost a rose hoodie with a name tag,F0056
+L0080,2026-10-01,dorm lobby,Lost my mustard notebook with a cracked corner,
+L0081,2026-09-09,sports field,Missing: jet black water bottle,F0234
+L0082,2026-10-08,main gate,Missing: Kestrel rose notebook computer,F0071
+L0083,2026-09-25,lab block,Lost my Quillon red power adapter with a blue lanyard,F0096
+L0084,2026-09-15,cafeteria,Missing: green umbrella with a name tag,
+L0085,2026-08-30,library,Missing: Orbyt dark blue notebook very worn,F0290
+L0086,2026-09-21,library,Missing: Orbyt white water bottle slightly scratched,F0112
+L0087,2026-09-02,lab block,Lost my Alder mustard earbuds with a blue lanyard,
+L0088,2026-09-06,sports field,Missing: silver coat with a small tear,
+L0089,2026-09-23,lecture hall,I lost a Pico cream glasses,
+L0090,2026-10-09,lab block,Lost my brown cellphone with a blue lanyard,
+L0091,2026-09-23,bus stop,Missing: yellow book slightly scratched,F0278
+L0092,2026-10-07,lab block,Lost my Orbyt blue rucksack in a plastic cover,F0194
+L0093,2026-09-26,lecture hall,Missing: brown backpack,
+L0094,2026-10-05,bus stop,I lost a Kestrel sky blue textbook very worn,F0025
+L0095,2026-09-27,library,Missing: Brightline charcoal water bottle with a name tag,F0319
+L0096,2026-09-28,lecture hall,I lost a olive charger with a sticker on it,
+L0097,2026-09-05,lab block,Lost my yellow brolly slightly scratched,
+L0098,2026-09-26,main gate,I lost a Orbyt green earbuds,
+L0099,2026-09-10,lecture hall,Lost my Pico tan coat with a name tag,F0117
+L0100,2026-10-07,bus stop,Lost my gray scarf slightly scratched,F0044
+L0101,2026-10-07,sports field,I lost a navy water bottle very worn,
+L0102,2026-09-06,cafeteria,Lost my Tamsin pink eyeglasses with a sticker on it,
+L0103,2026-09-15,lecture hall,Lost my sky blue wallet very worn,
+L0104,2026-10-10,bus stop,I lost a black school bag with a small tear,F0111
+L0105,2026-10-09,car park,Lost my gray brolly,
+L0106,2026-10-04,dorm lobby,Missing: brown laptop,F0130
+L0107,2026-10-02,library,Lost my rose umbrella,F0158
+L0108,2026-09-02,lab block,Missing: mustard charger with a keyring attached,F0058
+L0109,2026-09-01,sports field,Missing: Brightline sky blue notebook computer with a keyring attached,F0241
+L0110,2026-10-07,gym,Missing: yellow cellphone almost new,F0007
+L0111,2026-10-01,dorm lobby,Lost my white book with a cracked corner,
+L0112,2026-09-26,bus stop,I lost a yellow notebook computer very worn,
+L0113,2026-09-29,dorm lobby,Lost my maroon drink bottle,F0296
+L0114,2026-09-03,cafeteria,Lost my dark green backpack,F0236
+L0115,2026-09-24,bus stop,Lost my dark green brolly,
+L0116,2026-10-07,sports field,Lost my red backpack in a plastic cover,F0133
+L0117,2026-10-05,main gate,I lost a mustard spectacles slightly scratched,F0032
+L0118,2026-09-09,library,Lost my yellow book with a name tag,F0097
+L0119,2026-09-24,lecture hall,I lost a Pico jet black laptop with a name tag,F0269
+L0120,2026-09-21,lab block,Lost my Alder cream laptop in a plastic cover,F0266
+L0121,2026-10-03,sports field,Missing: olive earbuds with a sticker on it,F0193
+L0122,2026-09-12,dorm lobby,I lost a white school bag with a name tag,F0029
+L0123,2026-09-10,main gate,Lost my pink key ring very worn,F0013
+L0124,2026-09-09,bus stop,Missing: navy backpack slightly scratched,F0072
+L0125,2026-09-17,library,Lost my Pico grey glasses very worn,
+L0126,2026-08-30,car park,Lost my crimson billfold with a blue lanyard,F0260
+L0127,2026-09-30,lab block,Missing: maroon scarf with a blue lanyard,
+L0128,2026-10-01,main gate,I lost a off-white keys with a small tear,F0020
+L0129,2026-09-22,bus stop,I lost a mustard book with a name tag,
+L0130,2026-10-01,library,Lost my gray muffler,
+L0131,2026-09-17,cafeteria,I lost a gray earbuds,F0170
+L0132,2026-10-10,library,Lost my Pico pink muffler slightly scratched,
+L0133,2026-09-06,sports field,Lost my black keys with a small tear,
+L0134,2026-09-26,lecture hall,Lost my Kestrel rose scarf with a blue lanyard,F0128
+L0135,2026-09-04,library,Lost my charcoal wristwatch with a small tear,
+L0136,2026-09-20,library,Lost my Quillon rose wristwatch with a name tag,
+L0137,2026-09-29,dorm lobby,Lost my red muffler,F0168
+L0138,2026-10-02,library,Missing: olive earbuds with a sticker on it,F0193
+L0139,2026-09-26,sports field,Missing: Quillon navy notebook computer,F0100
+L0140,2026-09-23,sports field,Lost my mustard rucksack with a sticker on it,
+L0141,2026-09-26,main gate,Missing: olive mobile,
+L0142,2026-09-29,sports field,I lost a Zenmark dark blue muffler with a keyring attached,F0189
+L0143,2026-10-04,gym,I lost a Norvik pink charging cable in a plastic cover,F0157
+L0144,2026-09-03,dorm lobby,I lost a dark blue headphones with a name tag,
+L0145,2026-09-07,car park,Lost my charcoal key ring very worn,F0040
+L0146,2026-09-25,main gate,Lost my chocolate wristwatch with a name tag,F0160
+L0147,2026-09-03,car park,I lost a Pico charcoal keychain,F0110
+L0148,2026-09-30,sports field,Lost my Orbyt crimson spectacles very worn,
+L0149,2026-09-11,dorm lobby,Lost my Haverly olive backpack with a small tear,F0086
+L0150,2026-09-11,gym,Missing: white earphones with a small tear,F0138
+L0151,2026-10-04,lecture hall,I lost a rose keys with a cracked corner,
+L0152,2026-09-02,sports field,I lost a Quillon jet black watch with a keyring attached,F0002
+L0153,2026-09-07,library,Lost my black wristwatch with a sticker on it,
+L0154,2026-09-29,lab block,Missing: jet black notebook,
+L0155,2026-09-18,car park,I lost a pink jacket with a sticker on it,F0140
+L0156,2026-09-05,main gate,Lost my tan hoodie almost new,F0313
+L0157,2026-09-23,lecture hall,Missing: dark blue cellphone slightly scratched,F0295
+L0158,2026-09-25,lab block,Missing: maroon charging cable with a blue lanyard,F0096
+L0159,2026-09-24,sports field,Lost my Brightline charcoal flask with a name tag,F0319
+L0160,2026-09-27,main gate,I lost a Quillon blue coat with a blue lanyard,F0204
+L0161,2026-09-27,main gate,Lost my gray book,F0224
+L0162,2026-09-23,main gate,Missing: Alder dark green power adapter very worn,
+L0163,2026-09-19,sports field,Lost my charcoal rucksack very worn,
+L0164,2026-09-08,bus stop,Missing: black brolly,
+L0165,2026-09-29,lecture hall,Lost my tan keychain,F0000
+L0166,2026-09-29,car park,Lost my crimson charger,F0176
+L0167,2026-09-05,main gate,Lost my Norvik charcoal charger with a cracked corner,
+L0168,2026-09-29,cafeteria,Lost my chocolate glasses with a small tear,F0073
+L0169,2026-09-09,main gate,I lost a Kestrel chocolate eyeglasses,
+L0170,2026-09-29,main gate,Missing: Alder maroon key ring in a plastic cover,F0016
+L0171,2026-09-07,main gate,I lost a brown umbrella with a small tear,F0064
+L0172,2026-10-08,library,Missing: Pico gray flask with a keyring attached,F0279
+L0173,2026-09-26,gym,Missing: red keychain very worn,F0285
+L0174,2026-09-23,lab block,Lost my Haverly cream earphones slightly scratched,
+L0175,2026-09-17,dorm lobby,I lost a Norvik gray earphones,F0170
+L0176,2026-08-29,dorm lobby,Missing: sky blue eyeglasses slightly scratched,F0039
+L0177,2026-09-13,bus stop,Lost my black muffler almost new,
+L0178,2026-09-07,bus stop,Missing: grey eyeglasses almost new,
+L0179,2026-10-10,bus stop,I lost a pink jacket,F0056
+L0180,2026-09-01,lab block,Lost my black rucksack,F0139
+L0181,2026-10-08,lecture hall,Missing: Brightline off-white spectacles with a cracked corner,F0031
+L0182,2026-09-14,dorm lobby,Lost my Norvik white backpack with a name tag,F0029
+L0183,2026-10-05,lecture hall,Lost my Norvik pink key ring,F0001
+L0184,2026-09-18,main gate,Missing: yellow school bag with a name tag,F0042
+L0185,2026-09-30,bus stop,Missing: mustard hoodie with a cracked corner,
+L0186,2026-09-30,library,Missing: chocolate textbook,F0113
+L0187,2026-10-05,dorm lobby,Lost my olive wristwatch,F0247
+L0188,2026-09-10,bus stop,Missing: pink billfold,
+L0189,2026-09-27,lab block,I lost a tan earphones very worn,
+L0190,2026-09-16,lab block,I lost a Norvik yellow smartphone,
+L0191,2026-10-10,sports field,Missing: red school bag in a plastic cover,F0133
+L0192,2026-09-27,gym,Missing: red textbook slightly scratched,F0137
+L0193,2026-09-05,cafeteria,Missing: black water bottle with a small tear,F0234
+L0194,2026-10-04,gym,I lost a black key ring,F0015
+L0195,2026-09-11,car park,I lost a pink cellphone almost new,F0264
+L0196,2026-09-04,lab block,I lost a Orbyt charcoal keys,F0262
+L0197,2026-09-05,lecture hall,Missing: silver drink bottle with a small tear,F0076
+L0198,2026-09-06,lecture hall,Lost my gray water bottle with a small tear,F0076
+L0199,2026-10-08,bus stop,Lost my Zenmark brown smartphone,F0167
+L0200,2026-09-18,lecture hall,Lost my mustard wristwatch with a sticker on it,
+L0201,2026-10-01,cafeteria,Lost my pink purse,F0250
+L0202,2026-09-28,lab block,Lost my red flask very worn,F0297
+L0203,2026-09-12,main gate,I lost a Orbyt maroon laptop with a blue lanyard,
+L0204,2026-09-11,dorm lobby,Lost my chocolate key ring slightly scratched,F0121
+L0205,2026-09-04,dorm lobby,Missing: Alder maroon power adapter in a plastic cover,F0060
+L0206,2026-09-27,lecture hall,Lost my blue watch,F0174
+L0207,2026-09-26,car park,Missing: sky blue laptop,F0100
+L0208,2026-09-05,gym,Missing: grey rucksack with a cracked corner,
+L0209,2026-10-04,main gate,Lost my crimson water bottle with a cracked corner,
+L0210,2026-10-05,gym,Lost my Pico silver water bottle,F0279
+L0211,2026-08-31,dorm lobby,Missing: rose school bag with a keyring attached,F0018
+L0212,2026-09-25,lab block,I lost a mustard purse almost new,F0185
+L0213,2026-09-10,lab block,I lost a pink hoodie slightly scratched,F0192
+L0214,2026-09-11,bus stop,Lost my yellow charger with a blue lanyard,F0179
+L0215,2026-09-19,lab block,I lost a black muffler almost new,F0251
+L0216,2026-09-09,lecture hall,Lost my Pico mustard purse with a keyring attached,
+L0217,2026-09-03,sports field,I lost a Tamsin rose eyeglasses,F0230
+L0218,2026-10-02,dorm lobby,Missing: Haverly green power adapter almost new,F0035
+L0219,2026-09-07,main gate,Lost my Zenmark maroon watch with a keyring attached,F0294
+L0220,2026-09-17,lab block,Missing: Tamsin dark green headphones with a blue lanyard,F0079
+L0221,2026-08-31,dorm lobby,Missing: maroon power adapter with a name tag,F0116
+L0222,2026-09-20,gym,Missing: rose hoodie with a sticker on it,F0140
+L0223,2026-08-31,dorm lobby,Lost my Brightline dark blue eyeglasses slightly scratched,F0039
+L0224,2026-09-23,car park,I lost a Brightline white glasses almost new,F0284
+L0225,2026-10-01,lecture hall,Lost my Alder jet black drink bottle with a cracked corner,
+L0226,2026-09-19,lab block,Missing: Tamsin green earbuds with a blue lanyard,F0079
+L0227,2026-10-02,cafeteria,I lost a Quillon rose purse with a keyring attached,F0214
+L0228,2026-09-23,sports field,Missing: Pico mustard scarf almost new,
+L0229,2026-09-03,main gate,Missing: Haverly off-white wallet,F0258
+L0230,2026-09-13,library,Lost my Norvik rose charging cable,F0143
+L0231,2026-09-01,car park,Missing: maroon power adapter in a plastic cover,
+L0232,2026-10-01,lecture hall,Lost my Pico dark blue flask with a small tear,
+L0233,2026-09-09,gym,Lost my Kestrel rose scarf,
+L0234,2026-09-17,gym,Lost my chocolate drink bottle,F0108
+L0235,2026-10-08,cafeteria,Missing: dark green key ring with a blue lanyard,
+L0236,2026-10-01,dorm lobby,Lost my cream keychain with a small tear,F0020
+L0237,2026-09-26,bus stop,Missing: maroon power adapter with a name tag,F0132
+L0238,2026-09-26,lab block,Missing: sky blue water bottle,
+L0239,2026-09-12,dorm lobby,I lost a red notebook computer,F0009
