@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Waiting Room Console</title>
+<meta name="description" content="Simulate a walk-in clinic day, see how long patients wait, and find the smallest team that keeps your waiting-time promise.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Visual system dealt with taste-skill: palette "graphite-safety-orange" (dark first, light set below), type "geist" (Geist + Geist Mono), sharp radius. Layout: three-column operations console. */
+:root {
+  --bg:#18191b; --surface:#222427; --card:#1e2022; --ink:#eff0f1; --muted:#9a9ea5; --accent:#ff4a1f; --on-accent:#1a0a05; --line:#34373b;
+  --ok:#5fcf8c; --warn:#f0b43c; --bad:#ff6a4a; --urgent:#ff4a1f; --routine:#8fa3b8;
+  --sans:"Geist", system-ui, sans-serif; --mono:"Geist Mono", ui-monospace, monospace; --ease:cubic-bezier(.2,.8,.2,1); --r:2px; color-scheme:dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg:#f3f3f1; --surface:#e6e6e2; --card:#fbfbf9; --ink:#18191b; --muted:#5d6066; --accent:#c93a14; --on-accent:#ffffff; --line:#d3d3cd;
+  --ok:#1f7a45; --warn:#9a6a00; --bad:#b3261e; --urgent:#c93a14; --routine:#5f7894; color-scheme:light; } }
+:root[data-theme="light"] {
+  --bg:#f3f3f1; --surface:#e6e6e2; --card:#fbfbf9; --ink:#18191b; --muted:#5d6066; --accent:#c93a14; --on-accent:#ffffff; --line:#d3d3cd;
+  --ok:#1f7a45; --warn:#9a6a00; --bad:#b3261e; --urgent:#c93a14; --routine:#5f7894; color-scheme:light; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:400 15px/1.5 var(--sans); }
+.wrap { max-width:1280px; margin:0 auto; padding-block:20px 48px; padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); }
+.top { display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; padding-bottom:14px; border-bottom:1px solid var(--line); margin-bottom:18px; }
+h1 { font:500 clamp(1.5rem,3.4vw,2.2rem)/1.1 var(--sans); letter-spacing:-.03em; margin:0; }
+h2 { font:600 .72rem var(--mono); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.sub { color:var(--muted); margin:4px 0 0; max-width:60ch; }
+.console { display:grid; grid-template-columns:260px minmax(0,1fr) 300px; gap:16px; align-items:start; }
+@media (max-width:1050px) { .console { grid-template-columns:minmax(0,1fr) minmax(0,1fr); } .floor { grid-column:1 / -1; order:3; } }
+@media (max-width:640px) { .console { grid-template-columns:minmax(0,1fr); } }
+.panel { background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:14px; }
+.ctl { margin-bottom:14px; } .ctl label { display:flex; justify-content:space-between; font-size:.85rem; margin-bottom:4px; } .ctl output { font-family:var(--mono); color:var(--accent); }
+input[type=range] { width:100%; min-height:44px; accent-color:var(--accent); }
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.kpi { display:grid; grid-template-columns:1fr auto; gap:2px 12px; padding:8px 0; border-bottom:1px solid var(--line); align-items:baseline; }
+.kpi:last-child { border-bottom:0; } .kpi span { color:var(--muted); font-size:.85rem; } .kpi b { font:500 1.3rem var(--mono); letter-spacing:-.03em; }
+.kpi b.ok { color:var(--ok); } .kpi b.warn { color:var(--warn); } .kpi b.bad { color:var(--bad); }
+.verdict { font:500 1.05rem/1.35 var(--sans); margin:0 0 12px; } .verdict em { font-style:normal; color:var(--accent); font-family:var(--mono); }
+table { width:100%; border-collapse:collapse; font:400 .82rem var(--mono); } th, td { padding:6px 4px; text-align:right; border-bottom:1px solid var(--line); } th:first-child, td:first-child { text-align:left; }
+th { color:var(--muted); font-weight:500; } tr.rec td { color:var(--accent); font-weight:500; } tr.cur td:first-child::after { content:" (now)"; color:var(--muted); }
+.floor canvas { width:100%; height:300px; display:block; background:var(--surface); border-radius:var(--r); }
+.bar { display:flex; gap:10px; align-items:center; margin-top:10px; flex-wrap:wrap; }
+.btn { min-height:44px; padding:0 16px; border:1px solid var(--accent); background:var(--accent); color:var(--on-accent); border-radius:var(--r); font:600 .9rem var(--sans); cursor:pointer; transition:transform 150ms var(--ease), filter 150ms var(--ease); }
+.btn:hover { filter:brightness(1.1); transform:translateY(-1px); } .btn:active { transform:translateY(1px); transition-duration:90ms; } .btn.ghost { background:transparent; color:var(--accent); }
+.clock { font:500 1.2rem var(--mono); min-width:5ch; } .bar input[type=range] { flex:1; min-width:140px; }
+.hours { display:grid; grid-template-columns:repeat(24, minmax(0,1fr)); gap:2px; align-items:end; height:90px; margin-top:12px; }
+.hours i { display:block; background:var(--accent); min-height:2px; border-radius:1px 1px 0 0; opacity:.9; } .hours i.zero { background:var(--line); }
+.axis { display:flex; justify-content:space-between; font:400 .7rem var(--mono); color:var(--muted); margin-top:4px; }
+.legend { display:flex; gap:14px; flex-wrap:wrap; font-size:.8rem; color:var(--muted); margin-top:8px; } .legend b { display:inline-block; width:10px; height:10px; margin-right:6px; vertical-align:-1px; }
+.enter { animation:enter 900ms cubic-bezier(.22,1,.36,1) both; } @keyframes enter { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) { .enter { animation:none; } * { transition:none !important; } }
+.note { color:var(--muted); font-size:.82rem; margin-top:14px; } .note a { color:var(--accent); }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="top enter"><div><h1>Waiting room console</h1><p class="sub">Move the sliders and watch a clinic day replay. The recommendation finds the smallest team that keeps your promise, checked by simulation.</p></div></div>
+  <div class="console">
+    <section class="panel" aria-label="Controls">
+      <h2>Clinic</h2>
+      <div class="ctl"><label for="rate">Patients per hour (average)<output id="o-rate"></output></label><input id="rate" type="range" min="2" max="40" step="1" value="12"></div>
+      <div class="ctl"><label for="svc">Minutes per patient<output id="o-svc"></output></label><input id="svc" type="range" min="4" max="40" step="1" value="12"></div>
+      <div class="ctl"><label for="srv">Staff on duty<output id="o-srv"></output></label><input id="srv" type="range" min="1" max="10" step="1" value="3"></div>
+      <div class="ctl"><label for="urg">Urgent patients<output id="o-urg"></output></label><input id="urg" type="range" min="0" max="40" step="5" value="15"></div>
+      <div class="ctl"><label for="pat">Patients leave after<output id="o-pat"></output></label><input id="pat" type="range" min="0" max="180" step="15" value="90"></div>
+      <h2 style="margin-top:20px">Promise</h2>
+      <div class="ctl"><label for="tgt">Wait no longer than<output id="o-tgt"></output></label><input id="tgt" type="range" min="5" max="60" step="5" value="30"></div>
+      <div class="ctl"><label for="lvl">For this share of patients<output id="o-lvl"></output></label><input id="lvl" type="range" min="50" max="99" step="1" value="90"></div>
+    </section>
+    <section class="panel floor" aria-label="Floor view">
+      <h2>Floor, one simulated day</h2>
+      <canvas id="cv" role="img" aria-label="Patients waiting on the left, staff lanes on the right"></canvas>
+      <div class="bar"><button class="btn" id="play" type="button">Play</button><span class="clock" id="clock">08:00</span><input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Time of day"></div>
+      <div class="legend"><span><b style="background:var(--urgent)"></b>urgent</span><span><b style="background:var(--routine)"></b>routine</span><span><b style="background:var(--ok)"></b>being seen</span></div>
+      <h2 style="margin-top:18px">Average wait by arrival hour</h2>
+      <div class="hours" id="hours" role="img" aria-label="Average wait by hour"></div><div class="axis"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
+    </section>
+    <section class="panel" aria-live="polite">
+      <h2>Result</h2>
+      <p class="verdict" id="verdict"></p>
+      <div id="kpis"></div>
+      <h2 style="margin-top:18px">Staffing options</h2>
+      <table><thead><tr><th>Staff</th><th>Within</th><th>p95</th><th>Busy</th></tr></thead><tbody id="rec"></tbody></table>
+      <p class="note">Synthetic, simulated patients. Checked against Erlang C in tests. <a href="/docs">API docs</a></p>
+    </section>
+  </div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; };
+const PROFILE = [0,0,0,0,0,0,0,0,0.8,1.3,1.6,1.4,0.8,0.9,1.2,1.1,0,0,0,0,0,0,0,0];
+const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let trace = null, t = 480, playing = false, timer = null, debounce = null;
+const cfg = () => ({ arrivals_per_hour: +$("rate").value, mean_service_min: +$("svc").value, servers: +$("srv").value, open_hour: 8, close_hour: 16, hourly_profile: PROFILE,
+  urgent_share: +$("urg").value / 100, mean_patience_min: +$("pat").value, service_cv: 1 });
+const body = () => ({ config: cfg(), replications: 25, seed: 1, target_min: +$("tgt").value, level: +$("lvl").value / 100 });
+function labels() { $("o-rate").textContent = $("rate").value; $("o-svc").textContent = $("svc").value + " min"; $("o-srv").textContent = $("srv").value; $("o-urg").textContent = $("urg").value + "%";
+  $("o-pat").textContent = +$("pat").value === 0 ? "never" : $("pat").value + " min"; $("o-tgt").textContent = $("tgt").value + " min"; $("o-lvl").textContent = $("lvl").value + "%"; }
+const hhmm = (m) => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(Math.floor(m % 60)).padStart(2, "0");
+const post = async (p, b) => (await fetch(p, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(b) })).json();
+function draw() {
+  const cv = $("cv"), dpr = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight; cv.width = w * dpr; cv.height = h * dpr;
+  const g = cv.getContext("2d"); g.scale(dpr, dpr); g.clearRect(0, 0, w, h); if (!trace) return;
+  const split = Math.min(w * 0.42, 260), lanes = trace.servers, laneH = Math.min(36, (h - 30) / lanes);
+  g.font = "11px " + css("--mono"); g.fillStyle = css("--muted"); g.fillText("WAITING", 12, 16); g.fillText("STAFF", split + 16, 16);
+  const waiting = trace.patients.filter((p) => p.arrive <= t && p.start > t).sort((a, b) => (b.urgent - a.urgent) || (a.arrive - b.arrive));
+  const cols = Math.max(1, Math.floor((split - 20) / 14));
+  waiting.slice(0, cols * 18).forEach((p, i) => { g.fillStyle = p.urgent ? css("--urgent") : css("--routine"); g.beginPath(); g.arc(18 + (i % cols) * 14, 34 + Math.floor(i / cols) * 14, 5, 0, 7); g.fill(); });
+  if (waiting.length > cols * 18) { g.fillStyle = css("--ink"); g.fillText("+" + (waiting.length - cols * 18) + " more", 12, h - 8); }
+  g.strokeStyle = css("--line"); g.beginPath(); g.moveTo(split, 24); g.lineTo(split, h - 8); g.stroke();
+  for (let s = 0; s < lanes; s++) {
+    const y = 30 + s * laneH; g.fillStyle = css("--card"); g.fillRect(split + 12, y, w - split - 24, laneH - 6);
+    const cur = trace.patients.find((p) => p.server === s && p.start <= t && p.end > t);
+    g.fillStyle = css("--muted"); g.fillText("#" + (s + 1), split + 18, y + laneH / 2 + 1);
+    if (cur) { const frac = (t - cur.start) / (cur.end - cur.start), bw = w - split - 70; g.fillStyle = css("--ok"); g.fillRect(split + 48, y + 6, bw * frac, laneH - 18); g.fillStyle = cur.urgent ? css("--urgent") : css("--routine"); g.beginPath(); g.arc(split + 48 + bw * frac, y + laneH / 2 - 3, 6, 0, 7); g.fill(); }
+  }
+  $("clock").textContent = hhmm(t);
+}
+function setT(v) { t = v; $("scrub").value = String(Math.round(((t - trace.open) / (trace.close - trace.open)) * 1000)); draw(); }
+function tick() { if (!playing) return; const nt = t + 2; if (nt >= trace.close + 60) { playing = false; $("play").textContent = "Play"; return; } setT(nt); timer = setTimeout(tick, 33); }
+$("play").addEventListener("click", () => { if (!trace) return; playing = !playing; $("play").textContent = playing ? "Pause" : "Play"; if (playing) { if (t >= trace.close) setT(trace.open); tick(); } });
+$("scrub").addEventListener("input", () => { playing = false; $("play").textContent = "Play"; if (trace) { t = trace.open + (+$("scrub").value / 1000) * (trace.close - trace.open); draw(); } });
+function tone(v, good, bad) { return v <= good ? "ok" : v <= bad ? "warn" : "bad"; }
+function show(sim, rec) {
+  const s = sim.summary, level = +$("lvl").value / 100, tgt = +$("tgt").value;
+  const ok = s.share_within_target >= level; const v = $("verdict"); v.textContent = "";
+  v.append(document.createTextNode(Math.round(s.share_within_target * 100) + "% of patients wait " + tgt + " min or less. "));
+  v.append(el("em", "", ok ? "Promise kept." : "Promise missed: aim for " + rec.recommended_servers + " staff."));
+  const k = $("kpis"); k.textContent = "";
+  [["Average wait", s.mean_wait_min.toFixed(1) + " min", tone(s.mean_wait_min, tgt / 3, tgt)], ["95th percentile wait", s.p95_wait_min + " min", tone(s.p95_wait_min, tgt, tgt * 2)],
+   ["Staff busy", Math.round(s.utilization * 100) + "%", s.utilization > 0.9 ? "bad" : s.utilization > 0.8 ? "warn" : "ok"], ["Leave before being seen", Math.round(s.abandon_rate * 100) + "%", tone(s.abandon_rate, 0.02, 0.08)],
+   ["Urgent / routine wait", s.mean_urgent_wait_min.toFixed(0) + " / " + s.mean_routine_wait_min.toFixed(0) + " min", ""], ["Stay open late by", s.overtime_min.toFixed(0) + " min", tone(s.overtime_min, 10, 45)], ["Patients a day", String(Math.round(s.patients_per_day)), ""]]
+    .forEach(([l, val, c]) => { const r = el("div", "kpi"); r.append(el("span", "", l), el("b", c, val)); k.append(r); });
+  const hs = s.hourly_wait_min, mx = Math.max(...hs, 1), hb = $("hours"); hb.textContent = "";
+  hs.forEach((x) => { const i = el("i", x === 0 ? "zero" : ""); i.style.height = Math.max(2, (x / mx) * 100) + "%"; i.title = x.toFixed(1) + " min"; hb.append(i); });
+  const tb = $("rec"); tb.textContent = ""; const cur = +$("srv").value;
+  rec.options.forEach((o) => { const r = el("tr", (o.servers === rec.recommended_servers ? "rec " : "") + (o.servers === cur ? "cur" : "")); [o.servers, Math.round(o.share_within_target * 100) + "%", o.p95_wait_min, Math.round(o.utilization * 100) + "%"].forEach((c) => r.append(el("td", "", String(c)))); tb.append(r); });
+}
+async function refresh() {
+  labels(); const b = body();
+  const [sim, rec, tr] = await Promise.all([post("/simulate", b), post("/recommend", b), post("/trace", b)]);
+  trace = tr; show(sim, rec); setT(Math.min(Math.max(t, tr.open), tr.close)); if (t === 480 && !playing) setT(tr.open + (tr.close - tr.open) * 0.3);
+}
+document.querySelectorAll(".panel input[type=range]").forEach((i) => { if (i.id !== "scrub") i.addEventListener("input", () => { labels(); clearTimeout(debounce); debounce = setTimeout(refresh, 250); }); });
+addEventListener("resize", draw); refresh();
+</script>
+</body>
+</html>

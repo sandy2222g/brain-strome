@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: waiting-room-simulator
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
