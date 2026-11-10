@@ -1,0 +1,24 @@
+{
+  "name": "Worked example: a household of three",
+  "answers": {
+    "household_size": 3,
+    "home_size_m2": 95,
+    "heating": "gas",
+    "insulation": "average",
+    "thermostat_c": 21,
+    "electricity_kwh_month": null,
+    "green_tariff": false,
+    "commute_mode": "car",
+    "car_km_week": 190,
+    "car_type": "petrol",
+    "transit_km_week": null,
+    "flights_short": 2,
+    "flights_long": 1,
+    "diet": "average",
+    "meat_free_days": 0,
+    "shopping_level": "average",
+    "clothes_items_year": null,
+    "recycling": "some",
+    "waste_kg_week": null
+  }
+}

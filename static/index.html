@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="en" data-radius="soft">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Household Carbon Coach</title>
+<meta name="description" content="A two-minute household carbon footprint calculator that ranks the changes worth making.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --p-bg: #ecebe7; --p-surface: #e1dfd9; --p-ink: #38450f; --p-muted: #5a6537;
+  --p-accent: #38450f; --p-accent-ink: #ecebe7; --p-action: #38450f; --p-action-ink: #ecebe7;
+  --font-display: "Epilogue", system-ui, sans-serif;
+  --font-text: "Epilogue", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --display-weight: 400;
+  --display-tracking: -0.035em;
+
+  --bg: var(--p-bg); --surface: var(--p-surface); --ink: var(--p-ink); --muted: var(--p-muted);
+  --card: #f5f4f1; --line: rgba(56, 69, 15, 0.18); --accent: var(--p-accent); --on-accent: var(--p-accent-ink);
+  --focus: #38450f; --good: #2f6b2a; --warn: #8a5a00; --shadow: 0 6px 18px rgba(56, 69, 15, 0.12);
+  --c-heating: #38450f; --c-electricity: #8a9b3a; --c-travel: #b27a1e; --c-flights: #5f6670;
+  --c-food: #cdbf8c; --c-shopping: #8a5f45; --c-waste: #a8a79c;
+  --radius: 14px; --radius-sm: 9px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12150a; --surface: #1c2111; --ink: #ecebe7; --muted: #b5bb9c; --card: #181c0e;
+    --line: rgba(236, 235, 231, 0.2); --accent: #b9cb6e; --on-accent: #12150a; --focus: #d3e28c;
+    --good: #9fcf8a; --warn: #e0b15a; --shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+    --c-heating: #a9bd5a; --c-electricity: #6d7f2b; --c-travel: #d09a3c; --c-flights: #8e97a3;
+    --c-food: #8a7f55; --c-shopping: #b98466; --c-waste: #6b6d62;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12150a; --surface: #1c2111; --ink: #ecebe7; --muted: #b5bb9c; --card: #181c0e;
+  --line: rgba(236, 235, 231, 0.2); --accent: #b9cb6e; --on-accent: #12150a; --focus: #d3e28c;
+  --good: #9fcf8a; --warn: #e0b15a; --shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  --c-heating: #a9bd5a; --c-electricity: #6d7f2b; --c-travel: #d09a3c; --c-flights: #8e97a3;
+  --c-food: #8a7f55; --c-shopping: #b98466; --c-waste: #6b6d62;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-text); font-size: 16px; line-height: 1.5;
+  overflow-x: hidden;
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: var(--display-weight); letter-spacing: var(--display-tracking); margin: 0; }
+p { margin: 0; }
+button, input { font: inherit; color: inherit; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
+header.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding: 20px 0 8px; }
+.brand { font-family: var(--font-display); font-size: 1.05rem; letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; }
+.brand i { display: inline-block; width: 28px; height: 10px; border-radius: 99px; background: linear-gradient(90deg, var(--c-heating) 0 40%, var(--c-electricity) 40% 65%, var(--c-travel) 65% 85%, var(--c-food) 85%); }
+.top-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.note { font-size: 0.8125rem; color: var(--muted); }
+
+.intro { padding: 20px 0 24px; max-width: 760px; }
+.intro h1 { font-size: clamp(2rem, 6vw, 3.4rem); line-height: 1.04; letter-spacing: var(--display-tracking); }
+.intro p { margin-top: 12px; color: var(--muted); font-size: 1.0625rem; max-width: 56ch; }
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; align-items: start; padding-bottom: 96px; }
+.result-col { order: -1; }
+@media (min-width: 960px) {
+  .layout { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 32px; padding-bottom: 56px; }
+  .result-col { order: 0; position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; scrollbar-width: thin; border-radius: var(--radius); }
+}
+
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 16px; }
+@media (min-width: 480px) { .card { padding: 24px; } }
+.card + .card { margin-top: 24px; }
+.card > h2 { font-size: 1.5rem; line-height: 1.15; }
+.card > .lede { margin-top: 6px; color: var(--muted); font-size: 0.9375rem; }
+
+button, .btn { cursor: pointer; transition: transform 150ms ease-out, box-shadow 150ms ease-out, background-color 150ms ease-out, border-color 150ms ease-out; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 18px; border-radius: 99px; border: 1px solid var(--accent); background: transparent; color: var(--ink); font-weight: 500; text-decoration: none; }
+.btn.primary { background: var(--accent); color: var(--on-accent); }
+.btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow); }
+.btn:active:not(:disabled) { transform: translateY(0) scale(0.97); box-shadow: none; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* wizard */
+.steps { display: flex; gap: 6px; list-style: none; margin: 20px 0 0; padding: 0; }
+.steps li { flex: 1 1 0; min-width: 0; }
+.steps button { width: 100%; min-height: 44px; border: 1px solid var(--line); background: transparent; border-radius: var(--radius-sm); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 4px 2px; }
+.steps button .n { font-family: var(--font-mono); font-size: 0.8125rem; }
+.steps button .t { font-size: 0.6875rem; color: var(--muted); display: none; }
+@media (min-width: 480px) { .steps button .t { display: block; } .steps button { min-height: 52px; } }
+.steps button:hover { transform: translateY(-2px); border-color: var(--accent); }
+.steps button:active { transform: translateY(0) scale(0.97); }
+.steps button[aria-current="step"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.steps button[aria-current="step"] .t { color: var(--on-accent); }
+.panel[hidden] { display: none; }
+.panel h3 { font-size: 1.25rem; margin: 24px 0 4px; }
+.field { margin-top: 18px; border: 0; padding: 0; min-width: 0; }
+.field > label, .field > legend { display: block; font-weight: 500; padding: 0; margin-bottom: 6px; }
+.field .hint { color: var(--muted); font-size: 0.8125rem; margin-top: 6px; }
+.field .opt { font-weight: 400; color: var(--muted); font-size: 0.8125rem; margin-left: 6px; }
+.input-row { display: flex; align-items: center; gap: 10px; }
+input[type="number"] { width: 100%; max-width: 12rem; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); transition: border-color 150ms ease-out, transform 150ms ease-out; }
+input[type="number"]:hover { border-color: var(--accent); }
+.unit { color: var(--muted); font-size: 0.875rem; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { position: relative; }
+.pill input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.pill span { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 99px; background: transparent; transition: transform 150ms ease-out, border-color 150ms ease-out, background-color 150ms ease-out; }
+.pill:hover span { transform: translateY(-2px); border-color: var(--accent); }
+.pill:active span { transform: translateY(0) scale(0.97); }
+.pill input:checked + span { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.pill input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 2px; }
+.nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+
+/* result */
+.result { animation: enter 420ms ease-out both; }
+@keyframes enter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.kicker { font-size: 0.8125rem; color: var(--muted); text-transform: none; }
+.total { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; margin-top: 4px; }
+.total .big { font-family: var(--font-display); font-size: clamp(3rem, 11vw, 4.5rem); line-height: 1; letter-spacing: var(--display-tracking-xl, -0.045em); }
+.total .unit-l { font-size: 1rem; color: var(--muted); }
+.facts { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; font-size: 0.9375rem; }
+.facts b { font-weight: 600; }
+.ribbon-block { margin-top: 18px; }
+.ribbon-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 0.875rem; margin-bottom: 6px; }
+.ribbon-head strong { font-weight: 600; }
+.ribbon-wrap { position: relative; padding-top: 22px; }
+.ribbon { display: flex; height: 36px; border-radius: 10px; overflow: hidden; background: color-mix(in srgb, var(--ink) 8%, transparent); gap: 2px; }
+.seg { height: 100%; flex: 0 0 auto; width: 0; background: var(--c); transition: width 250ms ease-out; transform-origin: left; }
+.ribbon.entering .seg { animation: grow 700ms ease-out both; }
+@keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.ribbon.ghost { opacity: 0.45; }
+.tick { position: absolute; top: 0; bottom: -4px; width: 0; border-left: 2px dashed var(--ink); transition: left 250ms ease-out; pointer-events: none; }
+.tick span { position: absolute; top: -1px; left: 6px; font-size: 0.6875rem; white-space: nowrap; color: var(--ink); background: var(--card); padding: 0 4px; border-radius: 4px; transform: translateY(-2px); }
+.tick.flip span { left: auto; right: 6px; }
+.legend { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 2px; }
+.legend li { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto auto; gap: 4px 10px; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--line); font-size: 0.9375rem; }
+.legend .dot { width: 12px; height: 12px; border-radius: 4px; background: var(--c); }
+.legend .v { text-align: right; font-size: 0.875rem; }
+.legend .d { text-align: right; font-size: 0.75rem; min-width: 4.4rem; color: var(--muted); }
+.legend .d.up { color: var(--warn); }
+.legend .d.down { color: var(--good); }
+.small { font-size: 0.875rem; color: var(--muted); }
+.peer { margin-top: 12px; padding: 10px 14px; border-radius: var(--radius-sm); background: var(--surface); font-size: 0.9375rem; }
+.peer .scale { position: relative; height: 8px; margin-top: 10px; border-radius: 99px; background: color-mix(in srgb, var(--ink) 14%, transparent); }
+.peer .scale i { position: absolute; top: -4px; width: 4px; height: 16px; background: var(--accent); border-radius: 2px; transform: translateX(-2px); transition: left 250ms ease-out; }
+details.filled { margin-top: 12px; font-size: 0.875rem; }
+details.filled summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--ink); }
+details.filled ul { margin: 0 0 8px; padding-left: 18px; color: var(--muted); }
+
+.plan { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.plan h3 { font-size: 1.25rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; min-height: 44px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 8px 6px 14px; border-radius: 99px; background: var(--accent); color: var(--on-accent); border: 0; max-width: 100%; text-align: left; }
+.chip:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.chip:active { transform: scale(0.97); }
+.chip .x { font-size: 1.1rem; line-height: 1; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: color-mix(in srgb, var(--on-accent) 22%, transparent); flex: none; }
+.chip .l { min-width: 0; overflow-wrap: anywhere; font-size: 0.875rem; }
+.empty { color: var(--muted); font-size: 0.9375rem; align-self: center; }
+.plan-sum { margin-top: 12px; font-size: 1rem; }
+.plan-sum b { font-weight: 600; }
+.plan-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.status { margin-top: 12px; color: var(--warn); font-size: 0.875rem; min-height: 1.2em; }
+
+/* levers */
+.lever-list { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 10px; counter-reset: rank; }
+.lever { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 4px 12px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); transition: transform 150ms ease-out, box-shadow 150ms ease-out, border-color 150ms ease-out; }
+.lever:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--accent); }
+.lever.picked { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, var(--bg)); }
+.lever .rank { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--muted); padding-top: 3px; }
+.lever h3 { font-size: 1.0625rem; font-weight: 500; letter-spacing: -0.015em; line-height: 1.25; }
+.lever .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 8px; }
+.impact { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1 1 11rem; }
+.impact .bar { flex: 1 1 auto; height: 10px; max-width: 140px; border-radius: 99px; background: color-mix(in srgb, var(--ink) 10%, transparent); overflow: hidden; }
+.impact .bar i { display: block; height: 100%; background: var(--c); border-radius: 99px; transition: width 250ms ease-out; }
+.impact .v { font-size: 0.875rem; white-space: nowrap; }
+.effort { display: inline-flex; align-items: center; gap: 8px; font-size: 0.8125rem; color: var(--muted); }
+.dots { display: inline-grid; grid-template-columns: repeat(5, 8px); gap: 4px; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--muted); }
+.dots i.on { background: var(--ink); border-color: var(--ink); }
+.lever .costs { margin-top: 8px; font-size: 0.8125rem; color: var(--muted); }
+.lever .add { margin-top: 10px; justify-self: start; }
+.lever-body { grid-column: 2; min-width: 0; }
+
+footer { border-top: 1px solid var(--line); padding: 20px 0 32px; color: var(--muted); font-size: 0.8125rem; display: flex; flex-wrap: wrap; gap: 8px 20px; }
+footer a { color: var(--ink); min-height: 44px; display: inline-flex; align-items: center; }
+
+.dock { position: fixed; left: 0; right: 0; bottom: 0; background: var(--card); border-top: 1px solid var(--line); padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); display: flex; align-items: center; justify-content: space-between; gap: 12px; z-index: 5; font-size: 0.875rem; }
+.dock b { font-family: var(--font-mono); font-weight: 500; }
+@media (min-width: 960px) { .dock { display: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .btn:hover:not(:disabled), .lever:hover, .pill:hover span, .chip:hover, .steps button:hover { transform: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><i aria-hidden="true"></i>Household Carbon Coach</div>
+    <div class="top-actions">
+      <span class="note">Illustrative factors, not certified</span>
+      <button class="btn" id="theme" type="button" aria-label="Switch colour theme">Switch theme</button>
+    </div>
+  </header>
+
+  <section class="intro">
+    <h1>Household carbon footprint calculator</h1>
+    <p>Answer a few questions about your home and routines. You get a yearly footprint, a comparison with a typical household, and the changes that save the most for the least effort.</p>
+  </section>
+
+  <div class="layout">
+    <div class="left-col">
+      <section class="card" aria-labelledby="wiz-h">
+        <h2 id="wiz-h">Your answers</h2>
+        <p class="lede">Takes about two minutes. Leave an optional box blank and we will estimate it from your other answers.</p>
+        <ol class="steps" id="steps" aria-label="Questionnaire steps"></ol>
+        <form id="form" autocomplete="off" novalidate></form>
+        <div class="nav">
+          <button class="btn" type="button" id="back">Back</button>
+          <button class="btn primary" type="button" id="next">Continue</button>
+        </div>
+        <p class="status" id="status" role="status"></p>
+      </section>
+
+      <section class="card" aria-labelledby="lev-h" id="levers">
+        <h2 id="lev-h">What-if levers, ranked</h2>
+        <p class="lede">Ordered by tonnes saved a year for each point of effort. Add up to three to your plan.</p>
+        <ol class="lever-list" id="lever-list"></ol>
+      </section>
+    </div>
+
+    <aside class="result-col" id="result" aria-label="Your result">
+      <div class="card result">
+        <p class="kicker" id="kicker">Your yearly footprint</p>
+        <div class="total" aria-live="polite">
+          <span class="big num" id="total">0.0</span>
+          <span class="unit-l">tonnes CO2e a year</span>
+        </div>
+        <div class="facts" id="facts"></div>
+
+        <div class="ribbon-block">
+          <div class="ribbon-head"><strong>Now</strong><span class="num" id="now-v"></span></div>
+          <div class="ribbon-wrap">
+            <div class="tick" id="tick-now"><span>Typical</span></div>
+            <div class="ribbon entering" id="ribbon-now" role="img" aria-label="Footprint by category"></div>
+          </div>
+        </div>
+        <div class="ribbon-block" style="margin-top:14px">
+          <div class="ribbon-head"><strong>After your plan</strong><span class="num" id="after-v"></span></div>
+          <div class="ribbon-wrap">
+            <div class="tick" id="tick-after"><span>Typical</span></div>
+            <div class="ribbon entering ghost" id="ribbon-after" role="img" aria-label="Footprint after your plan"></div>
+          </div>
+        </div>
+
+        <ul class="legend" id="legend"></ul>
+        <div class="peer" id="peer"></div>
+        <details class="filled" id="filled"></details>
+
+        <div class="plan" id="plan">
+          <h3>Your plan</h3>
+          <div class="chips" id="chips" aria-label="Levers in your plan"></div>
+          <p class="plan-sum" id="plan-sum"></p>
+          <div class="plan-actions">
+            <button class="btn" type="button" id="suggest">Pick the best three for me</button>
+            <button class="btn" type="button" id="clear">Clear the plan</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    <span>Factors are illustrative and rounded; they are not certified. Survey data is synthetic (CC0).</span>
+    <a href="/factors">See the factors</a>
+    <a href="/metrics">See model metrics</a>
+  </footer>
+</div>
+
+<div class="dock">
+  <span>Now <b id="dock-now">-</b> t</span>
+  <span>With plan <b id="dock-after">-</b> t</span>
+  <a class="btn" href="#result">View result</a>
+</div>
+
+<script>
+"use strict";
+const CATS = ["heating", "electricity", "travel", "flights", "food", "shopping", "waste"];
+const MAX_PLAN = 3;
+const STEPS = [
+  { title: "Your home", short: "Home", fields: [
+    { k: "household_size", label: "People in your household", type: "number", min: 1, max: 12, step: 1 },
+    { k: "home_size_m2", label: "Home size", type: "number", min: 15, max: 600, step: 1, unit: "m2" },
+    { k: "heating", label: "How you heat your home", type: "choice", options: [["gas", "Gas"], ["oil", "Oil"], ["electric", "Electric heaters"], ["heat_pump", "Heat pump"], ["district", "District heat"], ["wood", "Wood"]] },
+    { k: "insulation", label: "How well insulated is it?", type: "choice", options: [["poor", "Poor"], ["average", "Average"], ["good", "Good"]] },
+    { k: "thermostat_c", label: "Usual thermostat setting", type: "number", min: 14, max: 26, step: 0.5, unit: "degrees C" },
+  ]},
+  { title: "Electricity", short: "Power", fields: [
+    { k: "electricity_kwh_month", label: "Electricity you use", type: "number", min: 0, max: 5000, step: 10, unit: "kWh a month", optional: true, hint: "Your bill shows this. Leave blank to estimate." },
+    { k: "green_tariff", label: "Are you on a green electricity tariff?", type: "choice", bool: true, options: [["false", "No"], ["true", "Yes"]] },
+  ]},
+  { title: "Getting around", short: "Travel", fields: [
+    { k: "commute_mode", label: "Your main way of getting around", type: "choice", options: [["car", "Car"], ["bus_rail", "Bus or rail"], ["mixed", "A mix"], ["bike_walk", "Bike or walk"]] },
+    { k: "car_km_week", label: "Distance by car, all drivers", type: "number", min: 0, max: 3000, step: 10, unit: "km a week", optional: true, hint: "Leave blank to estimate." },
+    { k: "car_type", label: "Type of car", type: "choice", options: [["petrol", "Petrol"], ["diesel", "Diesel"], ["hybrid", "Hybrid"], ["ev", "Electric"]] },
+    { k: "transit_km_week", label: "Distance by bus or rail, all people", type: "number", min: 0, max: 3000, step: 10, unit: "km a week", optional: true, hint: "Leave blank to estimate." },
+    { k: "flights_short", label: "Short-haul return flights a year", type: "number", min: 0, max: 60, step: 1, hint: "Up to about 4 hours each way, all people together." },
+    { k: "flights_long", label: "Long-haul return flights a year", type: "number", min: 0, max: 30, step: 1 },
+  ]},
+  { title: "Food and shopping", short: "Food", fields: [
+    { k: "diet", label: "How you usually eat", type: "choice", options: [["meat_heavy", "Meat most days"], ["average", "Mixed"], ["low_meat", "Little meat"], ["vegetarian", "Vegetarian"], ["vegan", "Vegan"]] },
+    { k: "meat_free_days", label: "Meat-free days you already have each week", type: "number", min: 0, max: 7, step: 1 },
+    { k: "shopping_level", label: "How much you buy new", type: "choice", options: [["low", "Less than most"], ["average", "About average"], ["high", "More than most"]] },
+    { k: "clothes_items_year", label: "New clothes bought", type: "number", min: 0, max: 400, step: 1, unit: "items a year, whole household", optional: true, hint: "Leave blank to estimate." },
+  ]},
+  { title: "Waste", short: "Waste", fields: [
+    { k: "recycling", label: "How much of your waste you recycle", type: "choice", options: [["none", "Almost none"], ["some", "Some"], ["most", "Most"]] },
+    { k: "waste_kg_week", label: "Waste you throw out and recycle", type: "number", min: 0, max: 300, step: 1, unit: "kg a week", optional: true, hint: "Leave blank to estimate." },
+  ]},
+];
+
+const $ = (s, r = document) => r.querySelector(s);
+const fmt = (n, d = 1) => Number(n).toFixed(d);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+let answers = {};
+let plan = [];
+let step = 0;
+let levers = [];
+let timer = null;
+let seq = 0;
+let cats = [];
+let typicalT = 0;
+let nowT = 0;
+let afterT = null;
+let afterCats = null;
+
+/* ---------- form ---------- */
+function buildForm() {
+  const steps = $("#steps"), form = $("#form");
+  STEPS.forEach((s, i) => {
+    const li = el("li");
+    const b = el("button");
+    b.type = "button";
+    b.append(el("span", "n", String(i + 1)), el("span", "t", s.short));
+    b.setAttribute("aria-label", `Step ${i + 1} of ${STEPS.length}: ${s.title}`);
+    b.addEventListener("click", () => goStep(i));
+    li.append(b); steps.append(li);
+
+    const panel = el("div", "panel");
+    panel.dataset.step = i;
+    panel.append(el("h3", null, s.title));
+    s.fields.forEach(f => panel.append(buildField(f)));
+    form.append(panel);
+  });
+  form.addEventListener("submit", e => e.preventDefault());
+}
+
+function buildField(f) {
+  if (f.type === "choice") {
+    const fs = el("fieldset", "field");
+    fs.append(el("legend", null, f.label));
+    const row = el("div", "pills");
+    f.options.forEach(([v, text]) => {
+      const lab = el("label", "pill");
+      const inp = el("input");
+      inp.type = "radio"; inp.name = f.k; inp.value = v;
+      inp.addEventListener("change", () => { answers[f.k] = f.bool ? v === "true" : v; queue(); });
+      lab.append(inp, el("span", null, text));
+      row.append(lab);
+    });
+    fs.append(row);
+    return fs;
+  }
+  const wrap = el("div", "field");
+  const lab = el("label", null, f.label);
+  lab.htmlFor = "f-" + f.k;
+  if (f.optional) lab.append(el("span", "opt", "optional"));
+  const row = el("div", "input-row");
+  const inp = el("input");
+  Object.assign(inp, { type: "number", id: "f-" + f.k, min: f.min, max: f.max, step: f.step, inputMode: "decimal" });
+  inp.dataset.k = f.k;
+  if (f.optional) inp.placeholder = "Estimate for me";
+  inp.addEventListener("input", () => {
+    if (inp.value === "") answers[f.k] = f.optional ? null : answers[f.k];
+    else if (!isNaN(parseFloat(inp.value))) answers[f.k] = parseFloat(inp.value);
+    queue();
+  });
+  row.append(inp);
+  if (f.unit) row.append(el("span", "unit", f.unit));
+  wrap.append(lab, row);
+  if (f.hint) wrap.append(el("p", "hint", f.hint));
+  return wrap;
+}
+
+function fillForm() {
+  STEPS.forEach(s => s.fields.forEach(f => {
+    const v = answers[f.k];
+    if (f.type === "choice") {
+      document.querySelectorAll(`input[name="${f.k}"]`).forEach(i => { i.checked = i.value === String(v); });
+    } else {
+      $("#f-" + f.k).value = v == null ? "" : v;
+    }
+  }));
+}
+
+function goStep(i) {
+  step = Math.max(0, Math.min(STEPS.length - 1, i));
+  document.querySelectorAll(".panel").forEach(p => { p.hidden = Number(p.dataset.step) !== step; });
+  document.querySelectorAll("#steps button").forEach((b, n) => {
+    if (n === step) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+  });
+  $("#back").disabled = step === 0;
+  const next = $("#next");
+  next.textContent = step === STEPS.length - 1 ? "See the ranked levers" : "Continue to " + STEPS[step + 1].title.toLowerCase();
+}
+
+/* ---------- api ---------- */
+async function api(path, body) {
+  const res = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : undefined);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const d = data.detail;
+    const msg = Array.isArray(d) ? d.map(x => `${(x.loc || []).slice(-1)[0]}: ${x.msg}`).join("; ") : d || res.statusText;
+    throw new Error(msg);
+  }
+  return data;
+}
+
+function queue() {
+  clearTimeout(timer);
+  timer = setTimeout(refresh, 220);
+}
+
+async function refresh() {
+  const my = ++seq;
+  const status = $("#status");
+  try {
+    const [fp, lv] = await Promise.all([api("/footprint", { answers }), api("/levers", { answers })]);
+    if (my !== seq) return;
+    status.textContent = "";
+    levers = lv.levers;
+    plan = plan.filter(id => levers.some(l => l.id === id));
+    renderFootprint(fp);
+    renderLevers();
+    await refreshPlan(my);
+  } catch (e) {
+    if (my === seq) status.textContent = "Could not calculate: " + e.message;
+  }
+}
+
+async function refreshPlan(my) {
+  if (!plan.length) { afterT = null; afterCats = null; renderPlan(null); renderRibbons(); return; }
+  try {
+    const p = await api("/plan", { answers, lever_ids: plan });
+    if (my !== undefined && my !== seq) return;
+    afterT = p.after_t; afterCats = p.after_categories.map(c => c.t);
+    renderPlan(p); renderRibbons();
+  } catch (e) {
+    $("#status").textContent = "Could not build the plan: " + e.message;
+  }
+}
+
+/* ---------- render ---------- */
+function renderFootprint(fp) {
+  cats = fp.categories; typicalT = fp.typical_t; nowT = fp.total_t;
+  $("#total").textContent = fmt(fp.total_t);
+  const facts = $("#facts"); facts.replaceChildren();
+  const diff = fp.vs_typical_pct;
+  const f1 = el("span"); f1.append(el("b", "num", fmt(fp.per_person_t)), " t per person");
+  const f2 = el("span"); f2.append(el("b", "num", (diff > 0 ? "+" : "") + fmt(diff, 0) + "%"), ` against a typical household of ${fp.answers_used.household_size} (${fmt(fp.typical_t)} t)`);
+  facts.append(f1, f2);
+
+  const lg = $("#legend"); lg.replaceChildren();
+  cats.forEach(c => {
+    const li = el("li");
+    li.style.setProperty("--c", `var(--c-${c.key})`);
+    const d = c.diff_t;
+    const dv = el("span", "d num " + (d > 0.05 ? "up" : d < -0.05 ? "down" : ""), (Math.abs(d) < 0.05 ? "about typical" : (d > 0 ? "+" : "") + fmt(d, 1) + " vs typical"));
+    li.append(el("span", "dot"), el("span", null, c.label), el("span", "v num", fmt(c.t, 1) + " t"), dv);
+    lg.append(li);
+  });
+
+  const pc = fp.peers.percentile;
+  const peer = $("#peer"); peer.replaceChildren();
+  const msg = el("p");
+  msg.append("Per person you are at the ", el("b", "num", String(Math.round(pc))), `th percentile of ${fp.peers.n.toLocaleString()} synthetic households. Higher means more CO2e.`);
+  const sc = el("div", "scale"); const mark = el("i"); mark.style.left = pc + "%"; sc.append(mark);
+  peer.append(msg, sc);
+
+  const fd = $("#filled"); fd.replaceChildren();
+  const est = fp.estimate;
+  const sum = el("summary", null, fp.uses_estimates ? `${fp.filled.length} answers estimated for you` : "All answers came from you");
+  const ul = el("ul");
+  fp.filled.forEach(x => ul.append(el("li", null, `${x.label}: about ${x.value} ${x.unit}`)));
+  ul.append(el("li", null, `Quick-answers estimate: ${fmt(est.tonnes)} t, likely between ${fmt(est.low_t)} and ${fmt(est.high_t)} t (80% band)`));
+  fd.append(sum, ul);
+  renderRibbons();
+}
+
+function ensureSegs(ribbon) {
+  if (ribbon.children.length) return;
+  CATS.forEach(k => { const s = el("div", "seg"); s.style.setProperty("--c", `var(--c-${k})`); s.dataset.k = k; ribbon.append(s); });
+}
+
+function setRibbon(ribbon, values, scale) {
+  ensureSegs(ribbon);
+  [...ribbon.children].forEach((s, i) => { s.style.width = (values[i] / scale * 100) + "%"; });
+}
+
+function setTick(tick, typical, scale) {
+  const pos = typical / scale * 100;
+  tick.style.left = pos + "%";
+  tick.classList.toggle("flip", pos > 62);
+  tick.firstChild.textContent = `Typical ${fmt(typical)} t`;
+}
+
+function renderRibbons() {
+  if (!cats.length) return;
+  const now = cats.map(c => c.t);
+  const afterTotal = afterT == null ? nowT : afterT;
+  const scale = Math.max(nowT, typicalT, afterTotal) * 1.06;
+  setRibbon($("#ribbon-now"), now, scale);
+  setTick($("#tick-now"), typicalT, scale);
+  const rb = $("#ribbon-after");
+  rb.classList.toggle("ghost", afterT == null);
+  setRibbon(rb, afterCats || now, scale);
+  setTick($("#tick-after"), typicalT, scale);
+  $("#now-v").textContent = fmt(nowT) + " t";
+  $("#after-v").textContent = afterT == null ? "Add levers to see it" : `${fmt(afterT)} t (${fmt(afterT - nowT)} t)`;
+  $("#ribbon-now").setAttribute("aria-label", "Footprint by category: " + cats.map(c => `${c.label} ${fmt(c.t)} tonnes`).join(", "));
+  $("#dock-now").textContent = fmt(nowT);
+  $("#dock-after").textContent = afterT == null ? "-" : fmt(afterT);
+}
+
+let lastPlan = null;
+function renderPlan(p) {
+  lastPlan = p;
+  const chips = $("#chips"); chips.replaceChildren();
+  if (!plan.length) chips.append(el("span", "empty", "No levers yet. Add one from the list, or let us pick."));
+  plan.forEach(id => {
+    const lv = levers.find(l => l.id === id);
+    if (!lv) return;
+    const b = el("button", "chip");
+    b.type = "button";
+    b.setAttribute("aria-label", "Remove " + lv.title + " from the plan");
+    b.append(el("span", "l", lv.title), el("span", "x", "×"));
+    b.addEventListener("click", () => togglePlan(id));
+    chips.append(b);
+  });
+  const sum = $("#plan-sum"); sum.replaceChildren();
+  if (p) {
+    sum.append("Saves ", el("b", "num", fmt(p.saved_t) + " t"), ` a year (${fmt(p.saved_pct, 0)}% of your footprint). `);
+    if (p.interaction_t < -0.005) sum.append(el("span", "small", `Some levers overlap, so together they save ${fmt(-p.interaction_t, 2)} t less than adding them up.`));
+    else if (p.interaction_t > 0.005) sum.append(el("span", "small", `Some levers help each other, so together they save ${fmt(p.interaction_t, 2)} t more than adding them up.`));
+    else sum.append(el("span", "small", "These levers do not overlap."));
+  }
+}
+
+function renderLevers() {
+  const list = $("#lever-list"); list.replaceChildren();
+  const max = Math.max(...levers.map(l => l.saved_t), 0.001);
+  const full = plan.length >= MAX_PLAN;
+  levers.forEach((l, i) => {
+    const picked = plan.includes(l.id);
+    const li = el("li", "lever" + (picked ? " picked" : ""));
+    li.append(el("span", "rank", String(i + 1).padStart(2, "0")));
+    const body = el("div", "lever-body");
+    body.append(el("h3", null, l.title));
+    const meta = el("div", "meta");
+    const imp = el("div", "impact");
+    const bar = el("span", "bar"); const fill = el("i"); fill.style.width = (l.saved_t / max * 100) + "%"; fill.style.setProperty("--c", `var(--c-${l.category})`); bar.append(fill);
+    imp.append(bar, el("span", "v num", fmt(l.saved_t, 2) + " t a year"));
+    const eff = el("span", "effort");
+    const dots = el("span", "dots"); dots.setAttribute("role", "img"); dots.setAttribute("aria-label", `Effort ${l.effort} of 5`);
+    for (let n = 1; n <= 5; n++) dots.append(el("i", n <= l.effort ? "on" : ""));
+    eff.append(dots, `Effort ${l.effort} of 5`);
+    meta.append(imp, eff);
+    body.append(meta, el("p", "costs", `${l.cost_note} ${l.payback_note}`));
+    const btn = el("button", "btn add" + (picked ? " primary" : ""));
+    btn.type = "button";
+    btn.setAttribute("aria-pressed", String(picked));
+    btn.disabled = !picked && full;
+    btn.textContent = picked ? "Remove from plan" : full ? "Plan is full" : "Add to plan";
+    btn.addEventListener("click", () => togglePlan(l.id));
+    body.append(btn);
+    li.append(body);
+    list.append(li);
+  });
+}
+
+async function togglePlan(id) {
+  if (plan.includes(id)) plan = plan.filter(x => x !== id);
+  else if (plan.length < MAX_PLAN) plan = [...plan, id];
+  renderLevers();
+  renderPlan(lastPlan);
+  await refreshPlan();
+}
+
+async function suggest() {
+  try {
+    const p = await api("/plan", { answers, lever_ids: [] });
+    plan = p.lever_ids;
+    renderLevers();
+    await refreshPlan();
+  } catch (e) { $("#status").textContent = "Could not suggest a plan: " + e.message; }
+}
+
+/* ---------- start ---------- */
+function setTheme() {
+  const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const nxt = cur === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = nxt;
+  try { localStorage.setItem("hcc-theme", nxt); } catch (e) { /* storage may be blocked */ }
+}
+
+async function start() {
+  try { const t = localStorage.getItem("hcc-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) { /* ignore */ }
+  buildForm();
+  $("#theme").addEventListener("click", setTheme);
+  $("#back").addEventListener("click", () => goStep(step - 1));
+  $("#next").addEventListener("click", () => {
+    if (step === STEPS.length - 1) $("#levers").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    else goStep(step + 1);
+  });
+  $("#suggest").addEventListener("click", suggest);
+  $("#clear").addEventListener("click", async () => { plan = []; renderLevers(); await refreshPlan(); });
+  goStep(0);
+  try {
+    const s = await api("/sample");
+    answers = s.answers;
+    fillForm();
+    levers = (await api("/levers", { answers })).levers;
+    renderFootprint(s.footprint);
+    renderLevers();
+    renderPlan(null);
+    setTimeout(() => document.querySelectorAll(".ribbon.entering").forEach(r => r.classList.remove("entering")), 1000);
+  } catch (e) {
+    $("#status").textContent = "Could not load the example: " + e.message;
+  }
+}
+start();
+</script>
+</body>
+</html>

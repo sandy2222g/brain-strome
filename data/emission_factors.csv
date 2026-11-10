@@ -1,0 +1,34 @@
+key,category,value,unit,note
+grid_kg_per_kwh,electricity,0.20,kg CO2e per kWh,ILLUSTRATIVE grid electricity average
+green_tariff_kg_per_kwh,electricity,0.03,kg CO2e per kWh,ILLUSTRATIVE renewable tariff (life-cycle remainder)
+heat_demand_poor_kwh_per_m2,heating,130,kWh heat per m2 per year,ILLUSTRATIVE poorly insulated home
+heat_demand_average_kwh_per_m2,heating,90,kWh heat per m2 per year,ILLUSTRATIVE average insulation
+heat_demand_good_kwh_per_m2,heating,60,kWh heat per m2 per year,ILLUSTRATIVE well insulated home
+heat_ref_setpoint_c,heating,20,degrees C,Reference thermostat setting for the demand figures
+heat_setpoint_change_per_degc,heating,0.07,share of demand per degree C,ILLUSTRATIVE rule of thumb
+heat_gas_kg_per_kwh,heating,0.23,kg CO2e per kWh of heat,ILLUSTRATIVE gas boiler incl. losses
+heat_oil_kg_per_kwh,heating,0.30,kg CO2e per kWh of heat,ILLUSTRATIVE oil boiler incl. losses
+heat_district_kg_per_kwh,heating,0.15,kg CO2e per kWh of heat,ILLUSTRATIVE district heating average
+heat_wood_kg_per_kwh,heating,0.05,kg CO2e per kWh of heat,ILLUSTRATIVE wood or pellets
+heat_pump_cop,heating,3.0,kWh heat per kWh electricity,ILLUSTRATIVE seasonal efficiency
+car_petrol_kg_per_km,travel,0.17,kg CO2e per km,ILLUSTRATIVE average petrol car
+car_diesel_kg_per_km,travel,0.16,kg CO2e per km,ILLUSTRATIVE average diesel car
+car_hybrid_kg_per_km,travel,0.11,kg CO2e per km,ILLUSTRATIVE full hybrid
+car_ev_kwh_per_km,travel,0.18,kWh per km,ILLUSTRATIVE electric car; emissions follow the electricity factor
+transit_kg_per_km,travel,0.07,kg CO2e per passenger km,ILLUSTRATIVE blended bus and rail
+flight_short_kg_each,flights,250,kg CO2e per return flight,ILLUSTRATIVE short-haul return per person
+flight_long_kg_each,flights,1500,kg CO2e per return flight,ILLUSTRATIVE long-haul return per person
+food_meat_heavy_kg_per_person,food,2200,kg CO2e per person per year,ILLUSTRATIVE meat most days
+food_average_kg_per_person,food,1600,kg CO2e per person per year,ILLUSTRATIVE mixed diet
+food_low_meat_kg_per_person,food,1300,kg CO2e per person per year,ILLUSTRATIVE meat a few times a week
+food_vegetarian_kg_per_person,food,1100,kg CO2e per person per year,ILLUSTRATIVE vegetarian
+food_vegan_kg_per_person,food,900,kg CO2e per person per year,ILLUSTRATIVE vegan
+shopping_low_kg_per_person,shopping,400,kg CO2e per person per year,ILLUSTRATIVE goods other than clothes; low spending
+shopping_average_kg_per_person,shopping,800,kg CO2e per person per year,ILLUSTRATIVE goods other than clothes; average spending
+shopping_high_kg_per_person,shopping,1400,kg CO2e per person per year,ILLUSTRATIVE goods other than clothes; high spending
+clothes_kg_per_item,shopping,15,kg CO2e per new item,ILLUSTRATIVE average garment
+waste_residual_kg_per_kg,waste,0.45,kg CO2e per kg,ILLUSTRATIVE landfill and incineration blend
+waste_recycled_kg_per_kg,waste,0.05,kg CO2e per kg,ILLUSTRATIVE collection and sorting
+recycling_share_none,waste,0.0,share of waste recycled,Assumption behind the recycling answer
+recycling_share_some,waste,0.35,share of waste recycled,Assumption behind the recycling answer
+recycling_share_most,waste,0.65,share of waste recycled,Assumption behind the recycling answer

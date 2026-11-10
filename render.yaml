@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: household-carbon-coach
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
