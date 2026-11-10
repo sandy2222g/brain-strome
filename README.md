@@ -68,7 +68,7 @@ Everything is **synthetic or original**. `data/waste_events.csv` (6000 rows) is 
 - **Minimum plan score**: a day with nothing worthwhile is left open rather than padded with a recipe that needs a full shop.
 - **"Saved" only counts items with 3 days or fewer left**: using a carton with two weeks left does not prevent any waste.
 - **Model trained at build time**: the image starts instantly and is reproducible; the API also trains on first start if no artifact exists.
-- **Visual system dealt with taste-skill**: palette `white-link-blue`, type pair `figtree` (single family), soft radius; the dark theme is the palette's inverse set.
+- **Visual system dealt with taste-skill**: palette `offwhite-bottle-yellow` (bottle-green ink, yellow fills), type pair Gabarito + Figtree, round radius; yellow is only ever a fill, accent text uses the ink green (light) or yellow (dark) for contrast.
 - **Runway bars from real days left**: bar length is days left on a 0 to 14 day scale, so urgency is visible without reading a number.
 - **Plain static page, no build step**: one HTML file with inline CSS and JS, tokens at the top, `prefers-color-scheme` aware, `prefers-reduced-motion` respected.
 
