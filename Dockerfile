@@ -8,7 +8,6 @@ RUN --mount=type=secret,id=cacert,required=false \
     pip install --no-cache-dir -r requirements.txt
 COPY src ./src
 COPY static ./static
-COPY data ./data
 RUN useradd -m app && chown -R app /app
 USER app
 ENV PORT=8000
