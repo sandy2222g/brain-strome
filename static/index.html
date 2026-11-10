@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plant Parent</title>
+<meta name="description" content="Know which houseplants need water today and when each one is due next. Soil checks teach the schedule how your plants behave.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Besley:wght@400;500;600&family=Albert+Sans:wght@400;500;600&display=swap">
+<style>
+/* Visual system dealt with taste-skill: palette "cobalt-on-sand" (two-tone, with an inverse night set), type "besley" (Besley + Albert Sans). Layout: today's checklist beside a month calendar. */
+:root {
+  --bg:#e6dbc7; --surface:#ddd0b9; --card:#efe6d4; --ink:#062b8a; --text:#0b2475; --muted:#4a5a95; --accent:#062b8a; --on-accent:#f3ecdc; --line:#cbbd9f;
+  --warn:#b3261e; --serif:"Besley", Georgia, serif; --sans:"Albert Sans", system-ui, sans-serif; --ease:cubic-bezier(.2,.8,.2,1); --r:12px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0c1330; --surface:#141c42; --card:#111836; --ink:#dbe4ff; --text:#d3ddff; --muted:#93a3d6; --accent:#8fb0ff; --on-accent:#0a1230; --line:#252f5e;
+  --warn:#ff8a7e; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg:#0c1330; --surface:#141c42; --card:#111836; --ink:#dbe4ff; --text:#d3ddff; --muted:#93a3d6; --accent:#8fb0ff; --on-accent:#0a1230; --line:#252f5e;
+  --warn:#ff8a7e; color-scheme: dark; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--text); font:400 16px/1.5 var(--sans); }
+.wrap { max-width:1140px; margin:0 auto; padding-block:26px 56px; padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); }
+h1 { font:500 clamp(2rem,5vw,3.3rem)/1.04 var(--serif); color:var(--ink); letter-spacing:-.025em; margin:0 0 8px; text-wrap:balance; }
+h2 { font:500 1.3rem var(--serif); color:var(--ink); margin:0 0 10px; }
+.eyebrow { font:600 .78rem var(--sans); letter-spacing:.1em; text-transform:uppercase; color:var(--ink); margin:0 0 8px; opacity:.8; }
+.lead { color:var(--muted); max-width:52ch; margin:0 0 22px; }
+.layout { display:grid; grid-template-columns:minmax(0,420px) minmax(0,1fr); gap:26px; align-items:start; }
+@media (max-width:900px) { .layout { grid-template-columns:minmax(0,1fr); } }
+.card { background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:18px; margin-bottom:18px; }
+.due { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px 12px; align-items:center; padding:12px 0; border-bottom:1px solid var(--line); }
+.due:last-child { border-bottom:0; }
+.due .n { font-weight:600; color:var(--ink); } .due .s { color:var(--muted); font-size:.88rem; overflow-wrap:anywhere; }
+.badge { display:inline-block; padding:2px 9px; border-radius:999px; font-size:.75rem; font-weight:600; border:1px solid var(--ink); color:var(--ink); margin-left:6px; }
+.badge.overdue { background:var(--warn); border-color:var(--warn); color:#fff; } .badge.today { background:var(--ink); color:var(--bg); }
+.pet { color:var(--warn); font-size:.82rem; font-weight:500; }
+.btn { min-height:44px; padding:0 16px; border-radius:999px; border:1px solid var(--accent); background:var(--accent); color:var(--on-accent); font:600 .95rem var(--sans); cursor:pointer; transition:transform 150ms var(--ease), filter 150ms var(--ease); }
+.btn:hover { filter:brightness(1.12); transform:translateY(-1px); } .btn:active { transform:translateY(1px); transition-duration:90ms; }
+.btn.ghost { background:transparent; color:var(--accent); }
+.soil { grid-column:1 / -1; display:flex; gap:8px; flex-wrap:wrap; align-items:center; font-size:.9rem; }
+.soil .btn { min-height:44px; }
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.cal { display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:4px; }
+.dow { font:600 .72rem var(--sans); text-align:center; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; padding-bottom:4px; }
+.day { min-height:78px; background:var(--card); border:1px solid var(--line); border-radius:8px; padding:5px; font-size:.78rem; transition:transform 150ms var(--ease); overflow:hidden; }
+.day:hover { transform:translateY(-2px); } .day.off { opacity:.45; } .day.today { border:2px solid var(--ink); }
+.day .d { font-weight:600; color:var(--ink); } .day .dots { display:flex; flex-wrap:wrap; gap:3px; margin-top:3px; }
+.dot { font:600 .66rem var(--sans); width:20px; height:20px; border-radius:50%; background:var(--ink); color:var(--bg); display:grid; place-items:center; }
+.calhead { display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:8px; }
+form.add { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; }
+label.f { display:block; font-size:.85rem; font-weight:600; color:var(--ink); }
+input, select { width:100%; min-height:44px; padding:8px 10px; margin-top:3px; background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:10px; font:inherit; }
+form.add .full { grid-column:1 / -1; }
+.note { color:var(--muted); font-size:.85rem; } .note a { color:var(--accent); }
+.legend { display:flex; gap:12px; flex-wrap:wrap; font-size:.8rem; color:var(--muted); margin-top:8px; }
+.enter { animation:enter 900ms cubic-bezier(.22,1,.36,1) both; } @keyframes enter { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) { .enter { animation:none; } * { transition:none !important; } }
+[hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="enter">
+    <p class="eyebrow">Houseplant care</p>
+    <h1 id="headline">Water 3 plants today</h1>
+    <p class="lead" id="lead">Intervals come from the species, pot size and material, light, season, room temperature and humidity. Each soil check teaches the schedule how your plant really behaves.</p>
+  </header>
+  <div class="layout">
+    <div>
+      <section class="card"><h2>Next up</h2><div id="due"></div></section>
+      <section class="card"><h2>Add a plant</h2>
+        <form class="add" id="form" autocomplete="off">
+          <label class="f full" for="pname">Name<input id="pname" type="text" maxlength="40" required placeholder="Fern Gully"></label>
+          <label class="f full" for="species">Species<select id="species"></select></label>
+          <label class="f" for="pot">Pot width (cm)<input id="pot" type="number" min="4" max="80" value="15"></label>
+          <label class="f" for="mat">Pot material<select id="mat"><option>plastic</option><option>terracotta</option><option>ceramic</option></select></label>
+          <label class="f full" for="last">Last watered<input id="last" type="date" required></label>
+          <button class="btn full" type="submit">Add plant</button>
+        </form>
+        <p class="note" style="margin-top:10px">Your plants stay in this browser. <button class="btn ghost" id="reset" type="button" style="min-height:36px;padding:0 12px">Reset to sample</button></p>
+      </section>
+    </div>
+    <section class="card"><div class="calhead"><h2 id="month" style="margin:0"></h2><span class="note" id="season"></span></div>
+      <div class="cal" id="cal"></div>
+      <div class="legend" id="legend"></div>
+      <p class="note" style="margin-top:12px">Care values are illustrative, not horticultural advice. <a href="/docs">API docs</a> · <a href="/metrics">Model metrics</a></p></section>
+  </div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; };
+const iso = (d) => d.toISOString().slice(0, 10);
+const today = new Date(); const TODAY = iso(new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12));
+let state = { plants: [], pets: true, hemisphere: "north", temp_c: 21, humidity: 45 };
+const KEY = "plant-parent-v1";
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage unavailable */ } };
+const load = () => { try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); return s && s.plants && s.plants.length ? s : null; } catch (e) { return null; } };
+let sched = null;
+async function refresh() {
+  const r = await fetch("/schedule", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ ...state, today: TODAY }) });
+  if (!r.ok) return; sched = await r.json(); render(); save();
+}
+function statusText(i) { return i.days_until_due < 0 ? "overdue by " + (-i.days_until_due) + " d" : i.days_until_due === 0 ? "today" : "in " + i.days_until_due + " d"; }
+function render() {
+  const need = sched.water_today.length;
+  $("headline").textContent = need === 0 ? "Nothing needs water today" : "Water " + need + " plant" + (need > 1 ? "s" : "") + " today";
+  const box = $("due"); box.textContent = "";
+  sched.items.forEach((i) => {
+    const row = el("div", "due"); const left = el("div"); const n = el("div", "n", i.name);
+    if (i.status === "overdue" || i.status === "today") n.append(el("span", "badge " + i.status, i.status));
+    left.append(n, el("div", "s", i.species + " · every " + i.interval_days + " d (±" + i.window_days + ") · " + statusText(i)));
+    if (i.pet_warning) left.append(el("div", "pet", "Toxic to pets: keep out of reach"));
+    row.append(left); const b = el("button", "btn" + (i.days_until_due > 1 ? " ghost" : ""), "Watered"); b.type = "button"; b.addEventListener("click", () => askSoil(row, i)); row.append(b);
+    box.append(row);
+  });
+  drawCal();
+}
+function askSoil(row, item) {
+  if (row.querySelector(".soil")) return; const s = el("div", "soil"); s.append(el("span", "", "How was the soil?"));
+  [["dry", "Bone dry"], ["ok", "Slightly dry"], ["wet", "Still wet"]].forEach(([v, label]) => { const b = el("button", "btn ghost", label); b.type = "button"; b.addEventListener("click", () => watered(item, v)); s.append(b); });
+  row.append(s);
+}
+async function watered(item, soil) {
+  const p = state.plants.find((x) => x.name === item.name); if (!p) return;
+  const fb = await (await fetch("/feedback", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ multiplier: p.multiplier || 1, soil }) })).json();
+  p.multiplier = fb.multiplier; p.last_watered = TODAY; await refresh();
+}
+function drawCal() {
+  const d0 = new Date(today.getFullYear(), today.getMonth(), 1), grid = $("cal"); grid.textContent = "";
+  $("month").textContent = d0.toLocaleDateString(undefined, { month: "long", year: "numeric" }); $("season").textContent = sched.season + " schedule";
+  ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].forEach((n) => grid.append(el("div", "dow", n)));
+  const lead = (d0.getDay() + 6) % 7, days = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+  for (let k = 0; k < lead; k++) grid.append(el("div"));
+  for (let d = 1; d <= days; d++) {
+    const key = iso(new Date(today.getFullYear(), today.getMonth(), d, 12)); const cell = el("div", "day" + (key === TODAY ? " today" : "") + (key < TODAY ? " off" : ""));
+    cell.append(el("div", "d", String(d))); const dots = el("div", "dots");
+    (sched.calendar[key] || []).forEach((n) => { const dot = el("span", "dot", n.slice(0, 1).toUpperCase()); dot.title = n + " needs water"; dots.append(dot); }); cell.append(dots); grid.append(cell);
+  }
+  $("legend").textContent = "Letters are the first letter of each plant's name. Hover a letter for the full name.";
+}
+$("form").addEventListener("submit", async (e) => {
+  e.preventDefault(); state.plants.push({ name: $("pname").value.trim(), species: $("species").value, pot_cm: +$("pot").value, material: $("mat").value, last_watered: $("last").value, multiplier: 1 });
+  $("pname").value = ""; await refresh();
+});
+$("reset").addEventListener("click", async () => { state = await (await fetch("/sample")).json(); await refresh(); });
+(async () => {
+  (await (await fetch("/species")).json()).forEach((s) => { const o = el("option", "", s.species); o.value = s.species; $("species").append(o); });
+  $("last").value = TODAY; state = load() || await (await fetch("/sample")).json(); await refresh();
+})();
+</script>
+</body>
+</html>
