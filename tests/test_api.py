@@ -9,7 +9,7 @@ from noshow.api import app
 def test_health_index_metrics() -> None:
     with TestClient(app) as c:
         assert c.get("/health").json() == {"status": "ok"}
-        assert "No-Show" in c.get("/").text
+        assert "Day Sheet" in c.get("/").text
         assert "test_auc" in c.get("/metrics").json()
 
 

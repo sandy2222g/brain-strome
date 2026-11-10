@@ -1,99 +1,146 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-motion>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Clinic No-Show Predictor</title>
+<title>Day Sheet</title>
+<meta name="description" content="A clinic day sheet that shows which appointments are likely to be missed and what to do about each one.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&display=swap">
 <style>
-  :root { --bg:#f6f7f9; --card:#fff; --fg:#1b1f24; --muted:#5b6672; --accent:#0f766e; --border:#dfe3e8;
-          --low:#2e7d32; --medium:#b26a00; --high:#b3261e; }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg:#0f1318; --card:#181d24; --fg:#e8ecf1; --muted:#9aa5b1; --accent:#2dd4bf; --border:#2a313a;
-            --low:#66bb6a; --medium:#ffb74d; --high:#ff6b62; }
-  }
-  * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, sans-serif; }
-  main { max-width: 900px; margin: 0 auto; padding: 24px 16px 48px; }
-  h1 { font-size:1.6rem; margin:0 0 4px; } p.sub { color:var(--muted); margin:0 0 20px; }
-  .card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px; margin-bottom:16px; }
-  .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:10px 14px; }
-  label { display:block; font-size:.85rem; font-weight:600; margin-bottom:2px; }
-  input, select { width:100%; padding:8px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--fg); font:inherit; }
-  button { background:var(--accent); color:#fff; border:0; padding:10px 16px; border-radius:8px; font:inherit; cursor:pointer; margin-top:12px; }
-  @media (prefers-color-scheme: dark) { button { color:#06231f; } }
-  .badge { display:inline-block; padding:2px 10px; border-radius:999px; font-weight:600; font-size:.85rem; color:#fff; }
-  .badge.low{background:var(--low)} .badge.medium{background:var(--medium)} .badge.high{background:var(--high)}
-  .muted { color:var(--muted); font-size:.9rem; }
-  .kpis { display:flex; gap:24px; flex-wrap:wrap; margin-bottom:8px; }
-  .kpis b { font-size:1.4rem; display:block; }
-  table { width:100%; border-collapse:collapse; font-size:.85rem; } th,td { text-align:left; padding:5px 6px; border-bottom:1px solid var(--border); }
-  .bar { height:8px; border-radius:4px; background:var(--border); min-width:80px; } .bar i { display:block; height:100%; border-radius:4px; background:var(--accent); }
-  [hidden] { display:none !important; }
+/* Visual system dealt with taste-skill: palette "linen-harbour", type "albert" (Albert Sans), soft radius. Layout: timetable with a side desk. */
+:root {
+  --bg:#f3f1ec; --surface:#e6e2d9; --card:#fbfaf7; --ink:#1d2530; --muted:#59626e; --accent:#2c5877; --on-accent:#ffffff; --line:#d6d1c5;
+  --high:#b3261e; --medium:#a8630a; --low:#2c7a54;
+  --sans:"Albert Sans", system-ui, sans-serif; --ease:cubic-bezier(.2,.8,.2,1); --r:8px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#141a21; --surface:#1c242d; --card:#1f2933; --ink:#e9edf2; --muted:#98a3b0; --accent:#8fb8d9; --on-accent:#10202c; --line:#303c48;
+  --high:#ff8277; --medium:#efb05a; --low:#6cc99a; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg:#141a21; --surface:#1c242d; --card:#1f2933; --ink:#e9edf2; --muted:#98a3b0; --accent:#8fb8d9; --on-accent:#10202c; --line:#303c48;
+  --high:#ff8277; --medium:#efb05a; --low:#6cc99a; color-scheme: dark; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:400 16px/1.5 var(--sans); }
+.wrap { max-width:1160px; margin:0 auto; padding-block:28px 56px; padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); }
+h1 { font:500 clamp(1.9rem,4.4vw,2.9rem)/1.06 var(--sans); letter-spacing:-.035em; margin:0 0 8px; text-wrap:balance; }
+.lead { color:var(--muted); margin:0 0 26px; max-width:60ch; }
+.eyebrow { font-weight:600; font-size:.8rem; letter-spacing:.04em; color:var(--accent); margin:0 0 8px; }
+.layout { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:28px; align-items:start; }
+@media (max-width:900px) { .layout { grid-template-columns:minmax(0,1fr); } }
+.summary { display:flex; flex-wrap:wrap; gap:10px 32px; align-items:baseline; padding-bottom:14px; border-bottom:2px solid var(--ink); margin-bottom:6px; }
+.summary b { font-weight:500; font-size:1.7rem; letter-spacing:-.03em; font-feature-settings:"tnum"; margin-right:6px; }
+.summary span { color:var(--muted); font-size:.92rem; }
+.slot { display:grid; grid-template-columns:64px minmax(0,1fr); gap:14px; padding-block:12px; border-bottom:1px solid var(--line); }
+.time { font-weight:500; color:var(--muted); font-feature-settings:"tnum"; padding-top:12px; }
+.appts { display:grid; gap:8px; min-width:0; }
+.appt { display:grid; grid-template-columns:52px minmax(0,1fr); gap:12px; align-items:center; background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:10px 12px; transition:transform 150ms var(--ease), border-color 150ms var(--ease); }
+.appt:hover { transform:translateY(-2px); border-color:var(--c); }
+.ring { width:48px; height:48px; border-radius:50%; display:grid; place-items:center; font-weight:600; font-size:.88rem; font-feature-settings:"tnum"; background:conic-gradient(var(--c) calc(var(--p) * 1%), var(--surface) 0); position:relative; }
+.ring::after { content:attr(data-v); position:absolute; inset:5px; border-radius:50%; background:var(--card); display:grid; place-items:center; color:var(--c); }
+.ring { color:transparent; }
+.who { font-weight:500; }
+.why { color:var(--muted); font-size:.88rem; overflow-wrap:anywhere; }
+.act { font-size:.88rem; margin-top:2px; color:var(--c); font-weight:500; }
+.high { --c:var(--high); } .medium { --c:var(--medium); } .low { --c:var(--low); }
+.desk { background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:18px; position:sticky; top:16px; }
+@media (max-width:900px) { .desk { position:static; } }
+.desk h2 { font:500 1.15rem/1.2 var(--sans); margin:0 0 4px; letter-spacing:-.01em; }
+.desk p.s { color:var(--muted); font-size:.9rem; margin:0 0 10px; }
+.g { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+label.f { display:block; font-size:.85rem; font-weight:500; }
+input, select { width:100%; min-height:44px; padding:8px 10px; margin-top:3px; background:var(--bg); color:var(--ink); border:1px solid var(--line); border-radius:var(--r); font:inherit; }
+input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.btn { width:100%; margin-top:14px; min-height:44px; border-radius:var(--r); border:1px solid var(--accent); background:var(--accent); color:var(--on-accent); font:500 1rem var(--sans); cursor:pointer; transition:transform 150ms var(--ease), filter 150ms var(--ease); }
+.btn:hover { filter:brightness(1.1); transform:translateY(-1px); } .btn:active { transform:translateY(1px); transition-duration:90ms; }
+.answer { margin-top:14px; padding:12px; border-radius:var(--r); background:var(--surface); border-left:4px solid var(--c); }
+.answer b { font-size:1.6rem; font-weight:500; letter-spacing:-.03em; }
+.band { display:inline-block; font-size:.78rem; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--c); margin-left:8px; }
+.enter { animation:enter 900ms cubic-bezier(.22,1,.36,1) both; }
+@keyframes enter { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) { .enter { animation:none; } * { transition:none !important; } }
+footer { margin-top:28px; font-size:.88rem; color:var(--muted); } footer a { color:var(--accent); }
+[hidden] { display:none !important; }
 </style>
 </head>
 <body>
-<main>
-  <h1>Clinic No-Show Predictor</h1>
-  <p class="sub">Calibrated risk that a patient misses an appointment, with a suggested action and an overbooking estimate for the day. Synthetic data only.</p>
-
-  <div class="card">
-    <strong>Single appointment</strong>
-    <div class="grid" style="margin-top:8px">
-      <div><label for="age">Age</label><input id="age" type="number" value="22" min="0" max="120"></div>
-      <div><label for="lead_days">Lead time (days)</label><input id="lead_days" type="number" value="30" min="0"></div>
-      <div><label for="prior_visits">Prior visits</label><input id="prior_visits" type="number" value="4" min="0"></div>
-      <div><label for="prior_noshows">Prior no-shows</label><input id="prior_noshows" type="number" value="2" min="0"></div>
-      <div><label for="hour">Hour (0-23)</label><input id="hour" type="number" value="8" min="0" max="23"></div>
-      <div><label for="weekday">Weekday</label><select id="weekday"><option value="0">Mon</option><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
-      <div><label for="reminder_sent">Reminder sent</label><select id="reminder_sent"><option value="0">No</option><option value="1">Yes</option></select></div>
-      <div><label for="distance_km">Distance (km)</label><input id="distance_km" type="number" value="15" min="0" step="0.5"></div>
-      <div><label for="insurance">Insurance</label><select id="insurance"><option>public</option><option>private</option><option>none</option></select></div>
-    </div>
-    <button id="go">Predict risk</button>
-    <p id="one" class="muted" hidden></p>
+<main class="wrap">
+  <header class="enter">
+    <p class="eyebrow">Outpatient scheduling</p>
+    <h1>Know who will not turn up before the day starts</h1>
+    <p class="lead">Each booking gets a calibrated chance of being missed and one suggested action. The sheet below is a sample day of 20 appointments, made from synthetic records.</p>
+  </header>
+  <div class="layout">
+    <section aria-live="polite">
+      <div class="summary" id="summary"></div>
+      <div id="sheet"></div>
+    </section>
+    <aside class="desk">
+      <h2>Check one booking</h2>
+      <p class="s">Change a value and see how the chance moves.</p>
+      <form id="form" autocomplete="off">
+        <div class="g">
+          <label class="f" for="age">Age<input id="age" type="number" value="22" min="0" max="120"></label>
+          <label class="f" for="lead_days">Booked days ahead<input id="lead_days" type="number" value="30" min="0"></label>
+          <label class="f" for="prior_visits">Past visits<input id="prior_visits" type="number" value="4" min="0"></label>
+          <label class="f" for="prior_noshows">Past no-shows<input id="prior_noshows" type="number" value="2" min="0"></label>
+          <label class="f" for="hour">Hour<input id="hour" type="number" value="8" min="0" max="23"></label>
+          <label class="f" for="weekday">Weekday<select id="weekday"><option value="0">Mon</option><option value="1">Tue</option><option value="2">Wed</option><option value="3">Thu</option><option value="4">Fri</option></select></label>
+          <label class="f" for="reminder_sent">Reminder sent<select id="reminder_sent"><option value="0">No</option><option value="1">Yes</option></select></label>
+          <label class="f" for="distance_km">Distance (km)<input id="distance_km" type="number" value="15" min="0" step="0.5"></label>
+        </div>
+        <label class="f" for="insurance" style="margin-top:10px">Insurance<select id="insurance"><option>public</option><option>private</option><option>none</option></select></label>
+        <button class="btn" type="submit">Check this booking</button>
+      </form>
+      <div class="answer" id="answer" hidden></div>
+    </aside>
   </div>
-
-  <div class="card">
-    <strong>Plan a day</strong> <span class="muted">— sample schedule of 20 appointments, ranked by risk</span><br>
-    <button id="plan">Plan sample day</button>
-    <div id="day" hidden style="margin-top:12px">
-      <div class="kpis"><div><b id="n"></b><span class="muted">appointments</span></div>
-        <div><b id="exp"></b><span class="muted">expected no-shows</span></div>
-        <div><b id="ob"></b><span class="muted">suggested overbook</span></div></div>
-      <div style="overflow-x:auto"><table><thead><tr><th>Risk</th><th></th><th>Band</th><th>Age</th><th>Lead</th><th>Prior NS</th><th>Reminder</th><th>Action</th></tr></thead><tbody id="rows"></tbody></table></div>
-    </div>
-  </div>
-  <p class="muted">API docs: <a href="/docs">/docs</a> · Model metrics &amp; fairness audit: <a href="/metrics">/metrics</a></p>
+  <footer>API docs at <a href="/docs">/docs</a>. Model metrics and the fairness audit are at <a href="/metrics">/metrics</a>.</footer>
 </main>
 <script>
 const $ = (id) => document.getElementById(id);
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; };
+const pct = (x) => Math.round(x * 100);
 const FIELDS = ["age","lead_days","prior_visits","prior_noshows","hour","weekday","reminder_sent","distance_km","insurance"];
-const pct = (x) => (x * 100).toFixed(0) + "%";
-function badge(b) { const s = document.createElement("span"); s.className = "badge " + b; s.textContent = b; return s; }
-$("go").addEventListener("click", async () => {
-  const body = {};
-  FIELDS.forEach((f) => { const v = $(f).value; body[f] = f === "insurance" ? v : Number(v); });
+const hh = (h) => String(h).padStart(2, "0") + ":00";
+function why(a) {
+  const bits = [];
+  if (a.prior_noshows > 0) bits.push(a.prior_noshows + " past no-show" + (a.prior_noshows > 1 ? "s" : ""));
+  if (a.lead_days >= 21) bits.push("booked " + a.lead_days + " days ahead");
+  if (!a.reminder_sent) bits.push("no reminder yet");
+  if (a.age < 25) bits.push("under 25");
+  return bits.join(", ") || "no risk factors";
+}
+function renderDay(d) {
+  const s = $("summary"); s.textContent = "";
+  [[d.appointments, "appointments"], [d.expected_no_shows, "expected no-shows"], [d.suggested_overbook, "extra slots to offer"]].forEach(([v, l]) => { const w = el("div"); w.append(el("b", "", String(v)), el("span", "", l)); s.append(w); });
+  const byHour = new Map(); d.items.forEach((a) => { if (!byHour.has(a.hour)) byHour.set(a.hour, []); byHour.get(a.hour).push(a); });
+  const box = $("sheet"); box.textContent = "";
+  [...byHour.keys()].sort((a, b) => a - b).forEach((h) => {
+    const row = el("div", "slot"); row.append(el("div", "time", hh(h)));
+    const list = el("div", "appts");
+    byHour.get(h).forEach((a) => {
+      const c = el("div", "appt " + a.band); const ring = el("div", "ring"); ring.style.setProperty("--p", pct(a.probability)); ring.dataset.v = pct(a.probability) + "%"; ring.setAttribute("role", "img"); ring.setAttribute("aria-label", pct(a.probability) + " percent chance of a no-show");
+      const t = el("div"); t.append(el("div", "who", "Age " + a.age + ", " + a.insurance + " insurance"), el("div", "why", why(a)), el("div", "act", a.action));
+      c.append(ring, t); list.append(c);
+    });
+    row.append(list); box.append(row);
+  });
+}
+async function check() {
+  const body = {}; FIELDS.forEach((f) => { const v = $(f).value; body[f] = f === "insurance" ? v : Number(v); });
   const r = await fetch("/predict", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body) });
-  const p = $("one"); p.hidden = false;
-  if (!r.ok) { p.textContent = "Invalid input (" + r.status + ")"; return; }
-  const d = await r.json();
-  p.textContent = ""; p.append("No-show probability " + pct(d.probability) + " "); p.append(badge(d.band)); p.append(" — " + d.action);
-});
-$("plan").addEventListener("click", async () => {
+  const a = $("answer"); a.hidden = false; a.textContent = "";
+  if (!r.ok) { a.className = "answer"; a.append("Some values are out of range. Check age, hour and the other numbers."); return; }
+  const d = await r.json(); a.className = "answer " + d.band;
+  const top = el("div"); top.append(el("b", "", pct(d.probability) + "%"), el("span", "band", d.band + " risk")); a.append(top, el("div", "", d.action));
+}
+$("form").addEventListener("submit", (e) => { e.preventDefault(); check(); });
+(async () => {
   const sample = await (await fetch("/sample-day")).json();
   const d = await (await fetch("/plan-day", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(sample) })).json();
-  $("n").textContent = d.appointments; $("exp").textContent = d.expected_no_shows; $("ob").textContent = d.suggested_overbook;
-  const tb = $("rows"); tb.textContent = "";
-  d.items.forEach((x) => {
-    const tr = document.createElement("tr");
-    const add = (node) => { const td = document.createElement("td"); td.append(node); tr.append(td); };
-    add(pct(x.probability));
-    const bar = document.createElement("div"); bar.className = "bar"; const i = document.createElement("i"); i.style.width = pct(x.probability); bar.append(i); add(bar);
-    add(badge(x.band)); add(String(x.age)); add(x.lead_days + "d"); add(x.prior_noshows + "/" + x.prior_visits); add(x.reminder_sent ? "yes" : "no"); add(x.action);
-    tb.append(tr);
-  });
-  $("day").hidden = false;
-});
+  renderDay(d); check();
+})();
 </script>
 </body>
 </html>
