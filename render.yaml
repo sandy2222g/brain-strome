@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: clinic-noshow-predictor
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

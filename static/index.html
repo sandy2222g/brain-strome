@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clinic No-Show Predictor</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --fg:#1b1f24; --muted:#5b6672; --accent:#0f766e; --border:#dfe3e8;
+          --low:#2e7d32; --medium:#b26a00; --high:#b3261e; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0f1318; --card:#181d24; --fg:#e8ecf1; --muted:#9aa5b1; --accent:#2dd4bf; --border:#2a313a;
+            --low:#66bb6a; --medium:#ffb74d; --high:#ff6b62; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, sans-serif; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size:1.6rem; margin:0 0 4px; } p.sub { color:var(--muted); margin:0 0 20px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px; margin-bottom:16px; }
+  .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:10px 14px; }
+  label { display:block; font-size:.85rem; font-weight:600; margin-bottom:2px; }
+  input, select { width:100%; padding:8px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--fg); font:inherit; }
+  button { background:var(--accent); color:#fff; border:0; padding:10px 16px; border-radius:8px; font:inherit; cursor:pointer; margin-top:12px; }
+  @media (prefers-color-scheme: dark) { button { color:#06231f; } }
+  .badge { display:inline-block; padding:2px 10px; border-radius:999px; font-weight:600; font-size:.85rem; color:#fff; }
+  .badge.low{background:var(--low)} .badge.medium{background:var(--medium)} .badge.high{background:var(--high)}
+  .muted { color:var(--muted); font-size:.9rem; }
+  .kpis { display:flex; gap:24px; flex-wrap:wrap; margin-bottom:8px; }
+  .kpis b { font-size:1.4rem; display:block; }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; } th,td { text-align:left; padding:5px 6px; border-bottom:1px solid var(--border); }
+  .bar { height:8px; border-radius:4px; background:var(--border); min-width:80px; } .bar i { display:block; height:100%; border-radius:4px; background:var(--accent); }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Clinic No-Show Predictor</h1>
+  <p class="sub">Calibrated risk that a patient misses an appointment, with a suggested action and an overbooking estimate for the day. Synthetic data only.</p>
+
+  <div class="card">
+    <strong>Single appointment</strong>
+    <div class="grid" style="margin-top:8px">
+      <div><label for="age">Age</label><input id="age" type="number" value="22" min="0" max="120"></div>
+      <div><label for="lead_days">Lead time (days)</label><input id="lead_days" type="number" value="30" min="0"></div>
+      <div><label for="prior_visits">Prior visits</label><input id="prior_visits" type="number" value="4" min="0"></div>
+      <div><label for="prior_noshows">Prior no-shows</label><input id="prior_noshows" type="number" value="2" min="0"></div>
+      <div><label for="hour">Hour (0-23)</label><input id="hour" type="number" value="8" min="0" max="23"></div>
+      <div><label for="weekday">Weekday</label><select id="weekday"><option value="0">Mon</option><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+      <div><label for="reminder_sent">Reminder sent</label><select id="reminder_sent"><option value="0">No</option><option value="1">Yes</option></select></div>
+      <div><label for="distance_km">Distance (km)</label><input id="distance_km" type="number" value="15" min="0" step="0.5"></div>
+      <div><label for="insurance">Insurance</label><select id="insurance"><option>public</option><option>private</option><option>none</option></select></div>
+    </div>
+    <button id="go">Predict risk</button>
+    <p id="one" class="muted" hidden></p>
+  </div>
+
+  <div class="card">
+    <strong>Plan a day</strong> <span class="muted">— sample schedule of 20 appointments, ranked by risk</span><br>
+    <button id="plan">Plan sample day</button>
+    <div id="day" hidden style="margin-top:12px">
+      <div class="kpis"><div><b id="n"></b><span class="muted">appointments</span></div>
+        <div><b id="exp"></b><span class="muted">expected no-shows</span></div>
+        <div><b id="ob"></b><span class="muted">suggested overbook</span></div></div>
+      <div style="overflow-x:auto"><table><thead><tr><th>Risk</th><th></th><th>Band</th><th>Age</th><th>Lead</th><th>Prior NS</th><th>Reminder</th><th>Action</th></tr></thead><tbody id="rows"></tbody></table></div>
+    </div>
+  </div>
+  <p class="muted">API docs: <a href="/docs">/docs</a> · Model metrics &amp; fairness audit: <a href="/metrics">/metrics</a></p>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const FIELDS = ["age","lead_days","prior_visits","prior_noshows","hour","weekday","reminder_sent","distance_km","insurance"];
+const pct = (x) => (x * 100).toFixed(0) + "%";
+function badge(b) { const s = document.createElement("span"); s.className = "badge " + b; s.textContent = b; return s; }
+$("go").addEventListener("click", async () => {
+  const body = {};
+  FIELDS.forEach((f) => { const v = $(f).value; body[f] = f === "insurance" ? v : Number(v); });
+  const r = await fetch("/predict", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body) });
+  const p = $("one"); p.hidden = false;
+  if (!r.ok) { p.textContent = "Invalid input (" + r.status + ")"; return; }
+  const d = await r.json();
+  p.textContent = ""; p.append("No-show probability " + pct(d.probability) + " "); p.append(badge(d.band)); p.append(" — " + d.action);
+});
+$("plan").addEventListener("click", async () => {
+  const sample = await (await fetch("/sample-day")).json();
+  const d = await (await fetch("/plan-day", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(sample) })).json();
+  $("n").textContent = d.appointments; $("exp").textContent = d.expected_no_shows; $("ob").textContent = d.suggested_overbook;
+  const tb = $("rows"); tb.textContent = "";
+  d.items.forEach((x) => {
+    const tr = document.createElement("tr");
+    const add = (node) => { const td = document.createElement("td"); td.append(node); tr.append(td); };
+    add(pct(x.probability));
+    const bar = document.createElement("div"); bar.className = "bar"; const i = document.createElement("i"); i.style.width = pct(x.probability); bar.append(i); add(bar);
+    add(badge(x.band)); add(String(x.age)); add(x.lead_days + "d"); add(x.prior_noshows + "/" + x.prior_visits); add(x.reminder_sent ? "yes" : "no"); add(x.action);
+    tb.append(tr);
+  });
+  $("day").hidden = false;
+});
+</script>
+</body>
+</html>
