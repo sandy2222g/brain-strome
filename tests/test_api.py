@@ -13,7 +13,7 @@ def test_health_and_index() -> None:
     with client() as c:
         assert c.get("/health").json() == {"status": "ok"}
         r = c.get("/")
-        assert r.status_code == 200 and "Support Ticket Triage" in r.text
+        assert r.status_code == 200 and "Inbox Triage" in r.text
 
 
 def test_predict_ok() -> None:
