@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en" data-radius="soft">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>School Bus Route Planner</title>
+<meta name="description" content="Morning bus routes for a fictional school district, with pick-up times, ride-time warnings and a what-if drawer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* walnut-tan, dark first */
+  --bg: #2b2216; --surface: #382d1e; --surface-2: #33291b; --ink: #e4e2da; --muted: #a39a8b;
+  --accent: #bda38b; --accent-ink: #2b2216; --line: #4d3f2c; --road: #6a5840; --river: #4a3d2b; --hatch: #bda38b;
+  --ring: #e9d3b8; --good: #d8cdb8;
+  --r0: #6cb7e8; --r1: #f0a830; --r2: #4fc3a1; --r3: #e8d84f; --r4: #d98bb8; --r5: #ee7a4a; --r6: #a9a0f0; --r7: #f2f2f2;
+  --font-display: "Host Grotesk", system-ui, sans-serif;
+  --font-text: "Host Grotesk", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --radius: 14px; --radius-sm: 9px;
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --bg: #f5efe6; --surface: #fffcf7; --surface-2: #efe6d8; --ink: #2a2118; --muted: #6b5e4d;
+  --accent: #7a5230; --accent-ink: #fffcf7; --line: #dccfbc; --road: #cdbda4; --river: #e3d5bf; --hatch: #7a5230;
+  --ring: #7a5230; --good: #4a3a28;
+  --r0: #0072b2; --r1: #b06a00; --r2: #00795a; --r3: #8a7a00; --r4: #a8467f; --r5: #c24a12; --r6: #5a50b8; --r7: #333333;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f5efe6; --surface: #fffcf7; --surface-2: #efe6d8; --ink: #2a2118; --muted: #6b5e4d;
+    --accent: #7a5230; --accent-ink: #fffcf7; --line: #dccfbc; --road: #cdbda4; --river: #e3d5bf; --hatch: #7a5230;
+    --ring: #7a5230; --good: #4a3a28;
+    --r0: #0072b2; --r1: #b06a00; --r2: #00795a; --r3: #8a7a00; --r4: #a8467f; --r5: #c24a12; --r6: #5a50b8; --r7: #333333;
+    color-scheme: light;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-text); font-size: 16px; line-height: 1.5;
+  overflow-x: hidden;
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.02em; margin: 0; line-height: 1.15; }
+button, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; border-radius: 6px; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* header */
+.top { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: flex-end; justify-content: space-between; padding: 20px 16px 14px; border-bottom: 1px solid var(--line); }
+.top h1 { font-size: clamp(1.5rem, 1.1rem + 2vw, 2.25rem); letter-spacing: -0.035em; }
+.top p { margin: 4px 0 0; color: var(--muted); max-width: 60ch; }
+.btn {
+  min-height: 44px; min-width: 44px; padding: 0 16px; border-radius: var(--radius-sm); border: 1px solid var(--line);
+  background: var(--surface); cursor: pointer; font-weight: 500;
+  transition: transform 150ms ease-out, background-color 150ms ease-out, border-color 150ms ease-out;
+}
+.btn:hover { transform: translateY(-2px); border-color: var(--accent); }
+.btn:active { transform: translateY(0) scale(0.98); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+/* three-part layout: timetable rail | map | what-if drawer */
+.app { display: grid; grid-template-columns: minmax(250px, 300px) minmax(0, 1fr) minmax(250px, 300px); gap: 16px; padding: 16px; align-items: start; }
+.rail, .drawer { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; min-width: 0; }
+.rail { position: sticky; top: 8px; max-height: calc(100vh - 16px); overflow: auto; }
+.rail h2, .drawer h2, .watch h2 { font-size: 1.15rem; margin-bottom: 4px; }
+.note { color: var(--muted); font-size: 0.9rem; margin: 0 0 12px; }
+.center { min-width: 0; display: grid; gap: 16px; }
+
+/* comparison strip */
+.strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px; min-width: 0; }
+.kpi .lab { font-size: 0.8rem; color: var(--muted); }
+.kpi .val { font-family: var(--font-display); font-size: 1.6rem; font-weight: 500; letter-spacing: -0.03em; line-height: 1.2; }
+.kpi .cmp { font-size: 0.8rem; color: var(--muted); }
+.kpi .cmp b { color: var(--ink); font-weight: 500; }
+
+/* map */
+.mapwrap { position: relative; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+svg.map { display: block; width: 100%; height: auto; }
+.map .gridline { stroke: var(--road); stroke-width: 1; vector-effect: non-scaling-stroke; opacity: 0.55; }
+.map .route { fill: none; stroke-linejoin: round; transition: opacity 150ms ease-out, stroke-width 150ms ease-out; }
+.map .dim .route, .map .dim .stop { opacity: 0.16; }
+.map .dim .badge { opacity: 0.3; }
+.map .route.hot { stroke-width: 0.26; }
+.map .stop { stroke: var(--surface-2); stroke-width: 0.06; transition: opacity 150ms ease-out; }
+.map .stop.over { stroke: var(--ink); stroke-width: 0.1; }
+.map .hit { fill: transparent; cursor: pointer; }
+.map text { font-family: var(--font-text); fill: var(--muted); font-size: 0.5px; pointer-events: none; }
+.map .badge text { fill: #111; font-weight: 600; font-size: 0.42px; text-anchor: middle; font-family: var(--font-mono); }
+.map .closed-label { fill: var(--ink); font-weight: 500; }
+@keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.map.anim .reveal { stroke-dasharray: 1; animation: draw 1.4s ease-out both; }
+@media (prefers-reduced-motion: reduce) { .map.anim .reveal { animation: none; stroke-dasharray: none; } .btn, .route, .stop, .row, details > summary { transition: none !important; } }
+.tip {
+  position: absolute; z-index: 3; pointer-events: none; background: var(--bg); color: var(--ink); border: 1px solid var(--accent);
+  border-radius: var(--radius-sm); padding: 8px 10px; font-size: 0.85rem; max-width: 230px; display: none;
+}
+.tip b { font-weight: 500; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 10px 14px; border-top: 1px solid var(--line); font-size: 0.85rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend svg { width: 28px; height: 12px; }
+
+/* timetable */
+details.bus { border: 1px solid var(--line); border-radius: var(--radius-sm); margin-bottom: 8px; background: var(--bg); }
+details.bus > summary {
+  list-style: none; cursor: pointer; min-height: 44px; padding: 8px 10px; display: grid; grid-template-columns: 34px 1fr 18px; gap: 8px; align-items: center;
+  border-radius: var(--radius-sm); transition: transform 150ms ease-out, background-color 150ms ease-out;
+}
+details.bus > summary::-webkit-details-marker { display: none; }
+details.bus > summary:hover { transform: translateY(-2px); background: var(--surface-2); }
+details.bus > summary:active { transform: translateY(0) scale(0.99); }
+details.bus > summary .chev { transition: transform 150ms ease-out; color: var(--muted); }
+details.bus[open] > summary .chev { transform: rotate(90deg); }
+.sw { width: 34px; height: 14px; }
+.sum1 { font-weight: 500; }
+.sum2 { font-size: 0.8rem; color: var(--muted); }
+table.sheet { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+table.sheet th { text-align: left; font-weight: 500; color: var(--muted); padding: 4px 10px; font-size: 0.75rem; }
+table.sheet td { padding: 0 10px; border-top: 1px solid var(--line); }
+.row { cursor: default; transition: background-color 150ms ease-out; }
+.row:hover, .row:focus-within, .row.on { background: var(--surface-2); }
+.row td:last-child { text-align: right; }
+.flag { display: inline-block; font-size: 0.72rem; padding: 0 6px; border: 1px solid var(--ink); border-radius: 99px; margin-left: 4px; }
+.flag.over { background: var(--ink); color: var(--bg); }
+.rowbtn { background: none; border: 0; padding: 0; min-height: 44px; width: 100%; text-align: left; cursor: pointer; }
+
+/* what if drawer */
+.field { margin: 14px 0; }
+.field > .lab { display: block; font-weight: 500; margin-bottom: 6px; }
+.stepper { display: grid; grid-template-columns: 44px 1fr 44px; gap: 8px; align-items: center; }
+.stepper output { text-align: center; font-family: var(--font-display); font-size: 1.4rem; font-weight: 500; }
+.stepper .u { font-size: 0.8rem; color: var(--muted); margin-left: 4px; font-family: var(--font-text); }
+.roads { display: grid; gap: 8px; }
+.roads .btn { text-align: left; justify-content: flex-start; padding: 6px 12px; line-height: 1.25; }
+.result { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 14px; }
+.verdict { font-weight: 500; margin: 0 0 10px; }
+table.delta { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+table.delta th { text-align: left; font-weight: 400; color: var(--muted); padding: 6px 0; border-top: 1px solid var(--line); }
+table.delta td { text-align: right; padding: 6px 0 6px 6px; border-top: 1px solid var(--line); }
+table.delta td.d { font-weight: 500; }
+.status { min-height: 1.4em; color: var(--muted); font-size: 0.85rem; margin: 10px 0 0; }
+
+/* stops to watch */
+.watch { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+.watch ul { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 8px; }
+.watch li { border-left: 3px solid var(--accent); padding: 2px 0 2px 12px; }
+.watch li.over { border-left-color: var(--ink); border-left-width: 6px; }
+.watch li .who { font-weight: 500; }
+.watch li .why { color: var(--muted); font-size: 0.9rem; }
+.foot { padding: 8px 16px 28px; color: var(--muted); font-size: 0.85rem; }
+
+@media (max-width: 1100px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .center { order: 1; } .rail { order: 2; position: static; max-height: none; } .drawer { order: 3; }
+}
+@media (max-width: 640px) {
+  .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .app { padding: 12px 16px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Alderbrook morning bus routes</h1>
+    <p id="lede">A made-up town with 120 stops. Each bus picks up its stops in order and reaches school before the bell.</p>
+  </div>
+  <button class="btn" id="theme" type="button">Switch to light mode</button>
+</header>
+
+<main class="app">
+  <aside class="rail" aria-labelledby="rail-h">
+    <h2 id="rail-h">Timetable</h2>
+    <p class="note">Open a bus to see each pick-up time. Pick-up times count back from the bell.</p>
+    <div id="sheets"></div>
+  </aside>
+
+  <section class="center" aria-label="Plan and map">
+    <div class="strip" id="strip" aria-label="Our plan against the naive plan"></div>
+    <div class="mapwrap" id="mapwrap">
+      <svg class="map anim" id="map" viewBox="-1.2 -1.2 26.4 26.4" role="img" aria-label="Town map with bus routes"></svg>
+      <div class="tip" id="tip" role="status"></div>
+      <div class="legend" id="legend"></div>
+    </div>
+    <section class="watch" aria-labelledby="watch-h">
+      <h2 id="watch-h">Stops to watch</h2>
+      <p class="note" style="margin:0">Stops whose ride is over the limit, or within 10% of it, and the reason.</p>
+      <ul id="watch"></ul>
+    </section>
+  </section>
+
+  <aside class="drawer" aria-labelledby="wi-h">
+    <h2 id="wi-h">What if</h2>
+    <p class="note">Change something and the plan is solved again.</p>
+    <div class="field"><span class="lab" id="l-buses">Buses</span>
+      <div class="stepper" role="group" aria-labelledby="l-buses">
+        <button class="btn" type="button" data-k="buses" data-d="-1" aria-label="Remove one bus">&minus;</button>
+        <output id="v-buses" aria-live="polite"></output>
+        <button class="btn" type="button" data-k="buses" data-d="1" aria-label="Add one bus">+</button>
+      </div></div>
+    <div class="field"><span class="lab" id="l-cap">Seats per bus</span>
+      <div class="stepper" role="group" aria-labelledby="l-cap">
+        <button class="btn" type="button" data-k="capacity" data-d="-2" aria-label="Remove two seats per bus">&minus;</button>
+        <output id="v-capacity" aria-live="polite"></output>
+        <button class="btn" type="button" data-k="capacity" data-d="2" aria-label="Add two seats per bus">+</button>
+      </div></div>
+    <div class="field"><span class="lab" id="l-lim">Longest ride allowed</span>
+      <div class="stepper" role="group" aria-labelledby="l-lim">
+        <button class="btn" type="button" data-k="ride_limit_min" data-d="-5" aria-label="Shorten the ride limit by 5 minutes">&minus;</button>
+        <output id="v-ride_limit_min" aria-live="polite"></output>
+        <button class="btn" type="button" data-k="ride_limit_min" data-d="5" aria-label="Lengthen the ride limit by 5 minutes">+</button>
+      </div></div>
+    <div class="field"><span class="lab">Close a road</span><div class="roads" id="roads"></div></div>
+    <button class="btn" type="button" id="reset">Reset to the sample</button>
+    <p class="status" id="status" role="status"></p>
+    <div class="result" id="result" hidden></div>
+  </aside>
+</main>
+<p class="foot">All data is synthetic and CC0: a fictional town, made-up stop codes and student codes, no names or addresses.</p>
+
+<script>
+"use strict";
+const SVGNS = "http://www.w3.org/2000/svg";
+const $ = (id) => document.getElementById(id);
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) { if (k === "text") n.textContent = v; else n.setAttribute(k, v); }
+  kids.forEach((c) => n.append(c));
+  return n;
+};
+const sv = (tag, attrs = {}, ...kids) => {
+  const n = document.createElementNS(SVGNS, tag);
+  for (const [k, v] of Object.entries(attrs)) { if (k === "text") n.textContent = v; else n.setAttribute(k, v); }
+  kids.forEach((c) => n.append(c));
+  return n;
+};
+const DASH = ["", "0.55 0.28", "0.12 0.24", "0.55 0.22 0.12 0.22"];
+const dashFor = (i) => DASH[i % DASH.length];
+const colorVar = (i) => `var(--r${i % 8})`;
+const fmt = (n, d = 1) => Number(n).toFixed(d);
+
+const state = { base: null, bundle: null, scenario: null, first: true, timer: null, seq: 0 };
+const LIMITS = { buses: [1, 14], capacity: [20, 56], ride_limit_min: [20, 70] };
+
+function swatch(i) {
+  const s = sv("svg", { class: "sw", viewBox: "0 0 34 14", "aria-hidden": "true" });
+  s.append(sv("line", { x1: 2, y1: 7, x2: 32, y2: 7, stroke: colorVar(i), "stroke-width": 4, "stroke-dasharray": dashFor(i) ? dashFor(i).split(" ").map((v) => v * 12).join(" ") : "" }));
+  return s;
+}
+
+function renderStrip(b) {
+  const o = b.plan.summary, n = b.naive, c = b.comparison;
+  const cells = [
+    ["Buses on the road", o.buses_used, `naive plan: <b>${n.buses_used}</b>`],
+    ["Total distance", `${fmt(o.total_km)} km`, `naive plan: <b>${fmt(n.total_km)} km</b>${c.km_saved_pct > 0 ? `, ${fmt(c.km_saved_pct)}% less here` : ""}`],
+    ["Longest ride", `${fmt(o.longest_ride_min, 0)} min`, `naive plan: <b>${fmt(n.longest_ride_min, 0)} min</b>`],
+    ["Stops over the limit", o.stops_over_limit, `naive plan: <b>${n.stops_over_limit}</b>`],
+  ];
+  const strip = $("strip");
+  strip.replaceChildren();
+  for (const [lab, val, cmp] of cells) {
+    const k = el("div", { class: "kpi" }, el("div", { class: "lab", text: lab }), el("div", { class: "val", text: String(val) }));
+    const d = el("div", { class: "cmp" }); d.innerHTML = cmp; k.append(d);
+    strip.append(k);
+  }
+}
+
+function renderMap(b) {
+  const t = b.town, svg = $("map");
+  svg.replaceChildren();
+  const defs = sv("defs");
+  const hatch = sv("pattern", { id: "hatch", width: 0.3, height: 0.3, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" });
+  hatch.append(sv("line", { x1: 0, y1: 0, x2: 0, y2: 0.3, stroke: "var(--hatch)", "stroke-width": 0.09 }));
+  defs.append(hatch);
+  svg.append(defs);
+  for (let x = 0; x < t.grid.w; x++) svg.append(sv("line", { class: "gridline", x1: x, y1: 0, x2: x, y2: t.grid.h - 1 }));
+  for (let y = 0; y < t.grid.h; y++) svg.append(sv("line", { class: "gridline", x1: 0, y1: y, x2: t.grid.w - 1, y2: y }));
+  // river: a wide pale band with hatching on top
+  const pts = t.river_line.map((p) => p.join(",")).join(" ");
+  svg.append(sv("polyline", { points: pts, fill: "none", stroke: "var(--river)", "stroke-width": 1.5, "stroke-linejoin": "round" }));
+  svg.append(sv("polyline", { points: pts, fill: "none", stroke: "url(#hatch)", "stroke-width": 1.5, "stroke-linejoin": "round", opacity: 0.75 }));
+  svg.append(sv("text", { x: t.river_line[1][0] + 0.5, y: 1.2, text: "Linden River" }));
+  const band = (segs, w) => segs.forEach(([x1, y1, x2, y2]) => {
+    svg.append(sv("line", { x1, y1, x2, y2, stroke: "var(--bg)", "stroke-width": w, "stroke-linecap": "round" }));
+    svg.append(sv("line", { x1, y1, x2, y2, stroke: "url(#hatch)", "stroke-width": w, "stroke-linecap": "round" }));
+  });
+  band(t.works, 0.36);
+  svg.append(sv("text", { class: "closed-label", x: 2, y: 7.5, text: "Closed for works" }));
+  svg.append(sv("text", { class: "closed-label", x: 18.3, y: 8.6, text: "Closed for works" }));
+  for (const r of t.roads) {
+    if (r.closed) band(r.segments, 0.42);
+    else if (r.kind === "bridge") r.segments.forEach(([x1, y1, x2, y2]) => svg.append(sv("line", { x1, y1, x2, y2, stroke: "var(--ink)", "stroke-width": 0.2, "stroke-linecap": "round" })));
+    const [x1, y1] = r.segments[0];
+    if (r.kind === "bridge") svg.append(sv("text", { class: r.closed ? "closed-label" : "", x: x1 - 1.4, y: y1 - 0.4, text: r.closed ? `${r.name} closed` : r.name }));
+    else if (r.closed) svg.append(sv("text", { class: "closed-label", x: x1 + 0.5, y: y1 - 0.4, text: `${r.name} closed` }));
+  }
+  const byStop = new Map();
+  const routeGroup = sv("g", { id: "routes" });
+  const stopGroup = sv("g", { id: "stops" });
+  const badges = sv("g");
+  const masks = sv("defs");
+  b.plan.routes.forEach((r, i) => {
+    const d = "M" + r.path.map((p) => p.join(" ")).join(" L");
+    const m = sv("mask", { id: `m${i}`, maskUnits: "userSpaceOnUse", x: -2, y: -2, width: 30, height: 30 });
+    m.append(sv("path", { d, class: "reveal", pathLength: 1, fill: "none", stroke: "#fff", "stroke-width": 0.7, "stroke-linecap": "round", style: `animation-delay:${(i * 0.12).toFixed(2)}s` }));
+    masks.append(m);
+    const g = sv("g", { "data-bus": i, mask: `url(#m${i})` });
+    g.append(sv("path", { d, class: "route", "data-bus": i, stroke: colorVar(i), "stroke-width": 0.16, "stroke-dasharray": dashFor(i) }));
+    routeGroup.append(g);
+    r.stops.forEach((s) => byStop.set(s.id, { s, i, r }));
+    const f = r.stops[0];
+    const bg = sv("g", { class: "badge" });
+    bg.append(sv("circle", { cx: f.x, cy: f.y, r: 0.42, fill: colorVar(i), stroke: "var(--surface-2)", "stroke-width": 0.08 }));
+    bg.append(sv("text", { x: f.x, y: f.y + 0.15, text: String(r.bus) }));
+    badges.append(bg);
+  });
+  svg.prepend(masks);
+  const unassigned = new Set(b.plan.unassigned);
+  t.stops.forEach((st) => {
+    const hit = byStop.get(st.id);
+    const g = sv("g", { "data-bus": hit ? hit.i : -1 });
+    const c = sv("circle", { class: "stop" + (hit && hit.s.status === "over" ? " over" : ""), cx: st.x, cy: st.y, r: 0.2 + 0.03 * st.students, fill: hit ? colorVar(hit.i) : "none" });
+    if (!hit) { c.setAttribute("stroke", "var(--ink)"); c.setAttribute("stroke-width", 0.1); }
+    g.append(c, sv("circle", { class: "hit", cx: st.x, cy: st.y, r: 0.55 }));
+    const info = hit ? hit : { s: { id: st.id, students: st.students, pickup: "", ride_min: 0, status: "none" }, i: -1, r: null };
+    g.addEventListener("pointerenter", (e) => showTip(e, info, unassigned.has(st.id)));
+    g.addEventListener("pointermove", moveTip);
+    g.addEventListener("pointerleave", hideTip);
+    g.addEventListener("pointerdown", (e) => showTip(e, info, unassigned.has(st.id)));
+    stopGroup.append(g);
+  });
+  svg.append(routeGroup, stopGroup, badges);
+  const sc = t.school;
+  svg.append(sv("rect", { x: sc.x - 0.6, y: sc.y - 0.6, width: 1.2, height: 1.2, fill: "var(--ink)", stroke: "var(--bg)", "stroke-width": 0.12 }));
+  svg.append(sv("text", { x: sc.x + 0.9, y: sc.y - 0.8, text: "School", style: "fill:var(--ink);font-weight:500" }));
+  if (state.first) setTimeout(() => svg.classList.remove("anim"), 3200);
+  else svg.classList.remove("anim");
+  // legend
+  const lg = $("legend");
+  lg.replaceChildren();
+  b.plan.routes.forEach((r, i) => { const s = el("span", {}, swatch(i)); s.append(`Bus ${r.bus}`); lg.append(s); });
+  lg.append(el("span", { text: "Square: school. Hatched bands: river and closed roads. Dot size: students at the stop." }));
+}
+
+function highlight(i) {
+  const svg = $("map");
+  svg.classList.toggle("dim", i >= 0);
+  svg.querySelectorAll("[data-bus]").forEach((n) => {
+    const on = Number(n.getAttribute("data-bus")) === i;
+    n.querySelectorAll(".route").forEach((r) => r.classList.toggle("hot", on));
+    if (n.tagName === "g") { n.style.opacity = i >= 0 && !on ? "" : ""; }
+  });
+  svg.querySelectorAll("g[data-bus]").forEach((g) => {
+    const on = Number(g.getAttribute("data-bus")) === i;
+    g.querySelectorAll(".route, .stop").forEach((x) => { x.style.opacity = i < 0 || on ? "" : "0.16"; });
+  });
+  document.querySelectorAll(".row").forEach((r) => r.classList.toggle("on", Number(r.dataset.bus) === i && r.dataset.stop === state.hoverStop));
+}
+
+function showTip(e, info, unserved) {
+  const tip = $("tip");
+  tip.replaceChildren();
+  state.hoverStop = info.s.id;
+  if (info.i < 0) {
+    tip.append(el("b", { text: `${info.s.id}: no bus` }), el("div", { text: `${info.s.students} students left without a seat.` }));
+  } else {
+    tip.append(el("b", { text: `${info.s.id} on Bus ${info.r.bus}` }),
+      el("div", { text: `Pick-up ${info.s.pickup}` }),
+      el("div", { text: `${info.s.students} student${info.s.students === 1 ? "" : "s"}, rides ${fmt(info.s.ride_min, 0)} min` }));
+    if (info.s.status !== "ok") tip.append(el("div", { text: info.s.status === "over" ? "Over the ride limit" : "Close to the ride limit" }));
+  }
+  tip.style.display = "block";
+  moveTip(e);
+  highlight(info.i);
+}
+function moveTip(e) {
+  const tip = $("tip"), box = $("mapwrap").getBoundingClientRect();
+  let x = e.clientX - box.left + 14, y = e.clientY - box.top + 14;
+  x = Math.min(x, box.width - tip.offsetWidth - 8); y = Math.min(y, box.height - tip.offsetHeight - 8);
+  tip.style.left = Math.max(8, x) + "px"; tip.style.top = Math.max(8, y) + "px";
+}
+function hideTip() { $("tip").style.display = "none"; state.hoverStop = null; highlight(-1); }
+
+function renderSheets(b) {
+  const box = $("sheets");
+  box.replaceChildren();
+  b.plan.routes.forEach((r, i) => {
+    const d = el("details", { class: "bus" });
+    if (i === 0) d.open = true;
+    const sum = el("summary", {}, swatch(i),
+      el("div", {}, el("div", { class: "sum1", text: `Bus ${r.bus}: from ${r.first_pickup}` }),
+        el("div", { class: "sum2", text: `${r.load} of ${r.capacity} seats, ${fmt(r.km)} km, ${fmt(r.minutes, 0)} min` })),
+      el("span", { class: "chev", "aria-hidden": "true", text: "›" }));
+    sum.addEventListener("pointerenter", () => highlight(i));
+    sum.addEventListener("pointerleave", () => highlight(-1));
+    sum.addEventListener("focus", () => highlight(i));
+    sum.addEventListener("blur", () => highlight(-1));
+    d.append(sum);
+    const tb = el("table", { class: "sheet" });
+    tb.append(el("thead", {}, el("tr", {}, el("th", { text: "Pick-up" }), el("th", { text: "Stop" }), el("th", { text: "Kids" }), el("th", { text: "Ride" }))));
+    const body = el("tbody");
+    r.stops.forEach((s) => {
+      const tr = el("tr", { class: "row", "data-bus": i, "data-stop": s.id });
+      const flag = s.status === "over" ? el("span", { class: "flag over", text: "over" }) : s.status === "tight" ? el("span", { class: "flag", text: "near" }) : "";
+      const t1 = el("td", { class: "mono", text: s.pickup.replace(" am", "") });
+      tr.append(t1, el("td", { class: "mono", text: s.id }), el("td", { text: String(s.students) }), el("td", { class: "mono" }, `${fmt(s.ride_min, 0)}m`, flag));
+      tr.addEventListener("pointerenter", () => { state.hoverStop = s.id; highlight(i); tr.classList.add("on"); });
+      tr.addEventListener("pointerleave", () => { highlight(-1); tr.classList.remove("on"); });
+      body.append(tr);
+    });
+    tb.append(body);
+    d.append(tb);
+    box.append(d);
+  });
+}
+
+function renderWatch(b) {
+  const ul = $("watch");
+  ul.replaceChildren();
+  const items = [];
+  b.plan.routes.forEach((r) => r.stops.forEach((s) => { if (s.status !== "ok") items.push({ r, s }); }));
+  items.sort((a, c) => c.s.ride_min - a.s.ride_min);
+  items.forEach(({ r, s }) => ul.append(el("li", { class: s.status },
+    el("div", { class: "who", text: `${s.id}, Bus ${r.bus}: ${fmt(s.ride_min, 0)} min, pick-up ${s.pickup}` }),
+    el("div", { class: "why", text: s.reason }))));
+  if (b.plan.unassigned.length) ul.append(el("li", { class: "over" }, el("div", { class: "who", text: `${b.plan.unassigned.length} stops have no bus` }),
+    el("div", { class: "why", text: `Not enough seats. Stops: ${b.plan.unassigned.join(", ")}.` })));
+  if (!ul.children.length) ul.append(el("li", {}, el("div", { class: "who", text: "No stop is near the ride limit." })));
+}
+
+function renderDrawer() {
+  const s = state.scenario;
+  $("v-buses").textContent = s.buses;
+  $("v-capacity").replaceChildren(String(s.capacity), el("span", { class: "u", text: "seats" }));
+  $("v-ride_limit_min").replaceChildren(String(s.ride_limit_min), el("span", { class: "u", text: "min" }));
+  document.querySelectorAll(".stepper .btn").forEach((b) => {
+    const [lo, hi] = LIMITS[b.dataset.k], v = s[b.dataset.k] + Number(b.dataset.d);
+    b.disabled = v < lo || v > hi;
+    b.style.opacity = b.disabled ? "0.4" : "";
+  });
+  const roads = $("roads");
+  roads.replaceChildren();
+  state.base.town.roads.forEach((r) => {
+    const on = s.close_roads.includes(r.id);
+    const btn = el("button", { class: "btn", type: "button", "aria-pressed": String(on), text: `${on ? "Reopen" : "Close"} ${r.name}` });
+    btn.addEventListener("click", () => {
+      s.close_roads = on ? s.close_roads.filter((x) => x !== r.id) : [...s.close_roads, r.id];
+      renderDrawer(); schedule();
+    });
+    roads.append(btn);
+  });
+}
+
+function deltaWord(v, unit, dec = 1) {
+  if (Math.abs(v) < 0.05) return "no change";
+  return `${v > 0 ? "+" : "−"}${fmt(Math.abs(v), dec)}${unit}`;
+}
+function renderResult(w) {
+  const box = $("result");
+  box.hidden = false;
+  box.replaceChildren(el("h3", { text: "Before and after", style: "font-size:1rem;margin-bottom:6px" }), el("p", { class: "verdict", text: w.verdict }));
+  const rows = [
+    ["Buses used", w.before.buses_used, w.after.buses_used, deltaWord(w.delta.buses_used, "", 0)],
+    ["Total km", fmt(w.before.total_km), fmt(w.after.total_km), deltaWord(w.delta.total_km, " km")],
+    ["Longest ride", `${fmt(w.before.longest_ride_min, 0)} min`, `${fmt(w.after.longest_ride_min, 0)} min`, deltaWord(w.delta.longest_ride_min, " min")],
+    ["Over the limit", w.before.stops_over_limit, w.after.stops_over_limit, deltaWord(w.delta.stops_over_limit, "", 0)],
+    ["Students unserved", w.before.unserved_students, w.after.unserved_students, deltaWord(w.delta.unserved_students, "", 0)],
+  ];
+  const tb = el("table", { class: "delta" });
+  tb.append(el("thead", {}, el("tr", { class: "sr" }, el("th", { text: "Measure" }), el("th", { text: "Before" }), el("th", { text: "After" }), el("th", { text: "Change" }))));
+  rows.forEach(([a, b, c, d]) => tb.append(el("tr", {}, el("th", { scope: "row", text: a }), el("td", { class: "mono", text: String(b) }), el("td", { class: "mono", text: String(c) }), el("td", { class: "mono d", text: d }))));
+  box.append(tb);
+}
+
+function show(b) {
+  state.bundle = b;
+  renderStrip(b); renderMap(b); renderSheets(b); renderWatch(b);
+  $("lede").textContent = `A made-up town with ${b.town.stops.length} stops and ${b.plan.summary.students} students. The bell rings at ${fmtClock(b.params.bell_min)}; buses arrive 5 minutes earlier.`;
+  state.first = false;
+}
+function fmtClock(m) { const h = Math.floor(m / 60), mm = m % 60; return `${(h + 11) % 12 + 1}:${String(mm).padStart(2, "0")} ${h < 12 ? "am" : "pm"}`; }
+
+async function api(path, body) {
+  const res = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : undefined);
+  if (!res.ok) { const j = await res.json().catch(() => ({})); throw new Error(typeof j.detail === "string" ? j.detail : "The planner could not solve that."); }
+  return res.json();
+}
+
+function schedule() {
+  clearTimeout(state.timer);
+  state.timer = setTimeout(solveScenario, 250);
+}
+async function solveScenario() {
+  const mine = ++state.seq, s = state.scenario;
+  $("status").textContent = "Solving...";
+  try {
+    const w = await api("/whatif", { base: {}, change: { buses: s.buses, capacity: s.capacity, ride_limit_min: s.ride_limit_min, close_roads: s.close_roads } });
+    if (mine !== state.seq) return;
+    $("status").textContent = "";
+    show(w.scenario);
+    renderResult(w);
+  } catch (e) {
+    if (mine === state.seq) $("status").textContent = e.message;
+  }
+}
+function resetScenario() {
+  const p = state.base.params;
+  state.scenario = { buses: p.buses, capacity: p.capacity, ride_limit_min: p.ride_limit_min, close_roads: [] };
+  $("result").hidden = true; $("status").textContent = "";
+  show(state.base); renderDrawer();
+}
+
+document.querySelectorAll(".stepper .btn").forEach((b) => b.addEventListener("click", () => {
+  const k = b.dataset.k;
+  state.scenario[k] += Number(b.dataset.d);
+  renderDrawer(); schedule();
+}));
+$("reset").addEventListener("click", resetScenario);
+$("theme").addEventListener("click", () => {
+  const root = document.documentElement;
+  const light = getComputedStyle(root).colorScheme === "light";
+  root.setAttribute("data-theme", light ? "dark" : "light");
+  $("theme").textContent = light ? "Switch to light mode" : "Switch to dark mode";
+});
+if (matchMedia("(prefers-color-scheme: light)").matches) $("theme").textContent = "Switch to dark mode";
+
+api("/sample").then((b) => { state.base = b; resetScenario(); }).catch((e) => { $("status").textContent = e.message; });
+</script>
+<noscript><p class="foot">This page needs JavaScript to draw the map.</p></noscript>
+</body>
+</html>
