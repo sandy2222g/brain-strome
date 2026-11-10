@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study Pass</title>
+<meta name="description" content="Pair students who can help each other and actually have time to meet, with a plain reason for every pair.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600&display=swap">
+<style>
+/* Visual system dealt with taste-skill: palette "paper-grey-brass" (brass is a fill, ink carries text), display face Bricolage Grotesque + Hanken Grotesk, sharp radius. Layout: pass-style pair cards with a weekly availability strip. */
+:root {
+  --bg:#e8e8e3; --surface:#dcdcd6; --card:#f4f4f0; --ink:#181715; --muted:#5b5a54; --brass:#bfb21a; --on-brass:#181715; --line:#c7c7bf;
+  --display:"Bricolage Grotesque", system-ui, sans-serif; --sans:"Hanken Grotesk", system-ui, sans-serif; --ease:cubic-bezier(.2,.8,.2,1); --r:2px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#181715; --surface:#22211e; --card:#1d1c1a; --ink:#f0efe8; --muted:#a4a298; --brass:#d6c82a; --on-brass:#181715; --line:#38362f; color-scheme:dark; } }
+:root[data-theme="dark"] {
+  --bg:#181715; --surface:#22211e; --card:#1d1c1a; --ink:#f0efe8; --muted:#a4a298; --brass:#d6c82a; --on-brass:#181715; --line:#38362f; color-scheme:dark; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:400 16px/1.5 var(--sans); }
+.wrap { max-width:1180px; margin:0 auto; padding-block:26px 56px; padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); }
+h1 { font:600 clamp(2.2rem,6vw,4rem)/.98 var(--display); letter-spacing:-.04em; margin:0 0 10px; text-wrap:balance; max-width:16ch; }
+h1 mark { background:var(--brass); color:var(--on-brass); padding:0 .12em; }
+.lead { color:var(--muted); max-width:56ch; margin:0 0 22px; }
+.bar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:20px; }
+.stat { border:1px solid var(--ink); padding:8px 14px; background:var(--card); } .stat b { font:600 1.6rem var(--display); margin-right:6px; letter-spacing:-.03em; } .stat span { color:var(--muted); font-size:.85rem; }
+.btn { min-height:44px; padding:0 18px; border:1px solid var(--ink); background:var(--brass); color:var(--on-brass); border-radius:var(--r); font:600 1rem var(--sans); cursor:pointer; transition:transform 150ms var(--ease), box-shadow 150ms var(--ease); }
+.btn:hover { transform:translateY(-1px); box-shadow:3px 3px 0 var(--ink); } .btn:active { transform:translate(1px,1px); box-shadow:none; transition-duration:90ms; }
+:focus-visible { outline:3px solid var(--ink); outline-offset:2px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(330px, 100%), 1fr)); gap:16px; }
+.pass { position:relative; background:var(--card); border:1px solid var(--ink); display:grid; grid-template-columns:minmax(0,1fr); transition:transform 150ms var(--ease); }
+.pass:hover { transform:translateY(-2px); }
+.pass header { display:flex; align-items:stretch; border-bottom:1px dashed var(--ink); }
+.who { flex:1; padding:12px 14px; min-width:0; } .who b { display:block; font:600 1.25rem var(--display); letter-spacing:-.02em; } .who span { color:var(--muted); font-size:.82rem; }
+.plus { display:grid; place-items:center; width:34px; background:var(--brass); color:var(--on-brass); font:700 1.2rem var(--display); border-left:1px solid var(--ink); border-right:1px solid var(--ink); }
+.score { padding:10px 14px 0; display:flex; align-items:baseline; gap:8px; } .score b { font:600 2.2rem/1 var(--display); letter-spacing:-.04em; } .score span { color:var(--muted); font-size:.8rem; }
+.meter { margin:6px 14px 10px; height:6px; background:var(--surface); } .meter i { display:block; height:100%; background:var(--brass); outline:1px solid var(--ink); width:var(--w); }
+.pass ul { margin:0; padding:0 14px 12px 30px; font-size:.9rem; } .pass li { margin-bottom:2px; }
+.week { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; padding:0 14px 14px; } .week div { display:grid; gap:2px; text-align:center; font:500 .62rem var(--sans); color:var(--muted); }
+.week i { display:block; height:10px; background:var(--surface); } .week i.on { background:var(--brass); outline:1px solid var(--ink); }
+.note { color:var(--muted); font-size:.85rem; margin-top:22px; } .note a { color:var(--ink); }
+.enter { animation:enter 900ms cubic-bezier(.22,1,.36,1) both; } @keyframes enter { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) { .enter { animation:none; } * { transition:none !important; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="enter">
+    <h1>Find your <mark>study buddy</mark></h1>
+    <p class="lead">Each pair can help each other, has time to meet, and likes to study the same way. Every pass says why. Odd cohort? The last student joins a pair as a third member.</p>
+  </header>
+  <div class="bar">
+    <div class="stat"><b id="n">0</b><span>students</span></div>
+    <div class="stat"><b id="score">0</b><span>match score</span></div>
+    <div class="stat"><b id="base">0</b><span>random pairing</span></div>
+    <button class="btn" id="again" type="button">Try another pairing</button>
+  </div>
+  <div class="grid" id="grid"></div>
+  <p class="note">Synthetic cohort, invented names. <a href="/docs">API docs</a></p>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; };
+const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"], PARTS = ["morning","afternoon","evening"];
+let cohort = null, seed = 1;
+function card(p, byName) {
+  const c = el("article", "pass"); const h = el("header");
+  p.members.forEach((m, i) => { if (i) h.append(el("div", "plus", "+")); const w = el("div", "who"); const s = byName[m]; w.append(el("b", "", m), el("span", "", s.style + " · " + (s.goal === "exam" ? "exam prep" : "long term"))); h.append(w); });
+  c.append(h);
+  const sc = el("div", "score"); sc.append(el("b", "", p.score.toFixed(1)), el("span", "", "of 10.5 possible")); c.append(sc);
+  const meter = el("div", "meter"); const i = el("i"); i.style.setProperty("--w", Math.min(100, (p.score / 10.5) * 100) + "%"); meter.append(i); c.append(meter);
+  const ul = el("ul"); p.reasons.slice(0, 5).forEach((r) => ul.append(el("li", "", r))); c.append(ul);
+  const week = el("div", "week"); DAYS.forEach((d) => { const col = el("div"); col.append(el("span", "", d)); PARTS.forEach((pt) => { const shared = p.shared_slots.includes(d + " " + pt); col.append(el("i", shared ? "on" : "")); }); week.append(col); }); c.append(week);
+  return c;
+}
+async function run() {
+  const r = await fetch("/match", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ students: cohort.students, seed }) });
+  const d = await r.json(); if (!r.ok) return;
+  const by = Object.fromEntries(cohort.students.map((s) => [s.name, s]));
+  $("n").textContent = d.students; $("score").textContent = d.total_score.toFixed(0); $("base").textContent = d.random_baseline.toFixed(0);
+  const g = $("grid"); g.textContent = ""; d.pairs.sort((a, b) => b.score - a.score).forEach((p) => g.append(card(p, by)));
+}
+$("again").addEventListener("click", () => { seed += 1; run(); });
+(async () => { cohort = await (await fetch("/sample")).json(); await run(); })();
+</script>
+</body>
+</html>

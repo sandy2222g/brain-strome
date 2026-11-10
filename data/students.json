@@ -1,0 +1,658 @@
+{
+ "subjects": [
+  "Calculus",
+  "Statistics",
+  "Programming",
+  "Physics",
+  "Chemistry",
+  "Academic writing"
+ ],
+ "students": [
+  {
+   "name": "Aiko",
+   "skills": {
+    "Calculus": 4,
+    "Statistics": 3,
+    "Programming": 2,
+    "Physics": 2,
+    "Chemistry": 2,
+    "Academic writing": 1
+   },
+   "slots": [
+    "Tue morning",
+    "Tue afternoon",
+    "Wed afternoon",
+    "Thu morning",
+    "Fri evening",
+    "Sat evening"
+   ],
+   "style": "quiet",
+   "goal": "ongoing"
+  },
+  {
+   "name": "Bruno",
+   "skills": {
+    "Calculus": 4,
+    "Statistics": 0,
+    "Programming": 5,
+    "Physics": 5,
+    "Chemistry": 0,
+    "Academic writing": 2
+   },
+   "slots": [
+    "Wed evening",
+    "Fri afternoon",
+    "Sat afternoon",
+    "Sun morning",
+    "Sun afternoon",
+    "Sun evening"
+   ],
+   "style": "chatty",
+   "goal": "exam"
+  },
+  {
+   "name": "Chloe",
+   "skills": {
+    "Calculus": 2,
+    "Statistics": 0,
+    "Programming": 2,
+    "Physics": 1,
+    "Chemistry": 5,
+    "Academic writing": 4
+   },
+   "slots": [
+    "Tue morning",
+    "Tue afternoon",
+    "Tue evening",
+    "Wed morning",
+    "Wed afternoon",
+    "Thu afternoon",
+    "Thu evening",
+    "Fri afternoon",
+    "Sat afternoon",
+    "Sat evening",
+    "Sun morning"
+   ],
+   "style": "chatty",
+   "goal": "exam"
+  },
+  {
+   "name": "Dev",
+   "skills": {
+    "Calculus": 4,
+    "Statistics": 4,
+    "Programming": 4,
+    "Physics": 5,
+    "Chemistry": 1,
+    "Academic writing": 3
+   },
+   "slots": [
+    "Tue afternoon",
+    "Thu morning",
+    "Thu evening",
+    "Fri afternoon",
+    "Fri evening",
+    "Sat morning",
+    "Sun morning",
+    "Sun afternoon"
+   ],
+   "style": "chatty",
+   "goal": "exam"
+  },
+  {
+   "name": "Esme",
+   "skills": {
+    "Calculus": 4,
+    "Statistics": 0,
+    "Programming": 4,
+    "Physics": 5,
+    "Chemistry": 1,
+    "Academic writing": 1
+   },
+   "slots": [
+    "Mon afternoon",
+    "Mon evening",
+    "Tue morning",
+    "Fri afternoon",
+    "Fri evening",
+    "Sat morning",
+    "Sat evening"
+   ],
+   "style": "chatty",
+   "goal": "exam"
+  },
+  {
+   "name": "Farid",
+   "skills": {
+    "Calculus": 4,
+    "Statistics": 1,
+    "Programming": 4,
+    "Physics": 2,
+    "Chemistry": 2,
+    "Academic writing": 1
+   },
+   "slots": [
+    "Mon evening",
+    "Wed afternoon",
+    "Sat afternoon",
+    "Sat evening"
+   ],
+   "style": "chatty",
+   "goal": "exam"
+  },
+  {
+   "name": "Gia",
+   "skills": {
+    "Calculus": 0,
+    "Statistics": 2,
+    "Programming": 0,
+    "Physics": 4,
+    "Chemistry": 5,
+    "Academic writing": 5
+   },
+   "slots": [
+    "Mon morning",
+    "Mon afternoon",
+    "Tue morning",
+    "Tue afternoon",
+    "Fri afternoon",
+    "Sat morning",
+    "Sun morning",
+    "Sun evening"
+   ],
+   "style": "chatty",
+   "goal": "ongoing"
+  },
+  {
+   "name": "Hector",
+   "skills": {
+    "Calculus": 4,
+    "Statistics": 4,
+    "Programming": 3,
+    "Physics": 3,
+    "Chemistry": 0,
+    "Academic writing": 4
+   },
+   "slots": [
+    "Mon afternoon",
+    "Tue afternoon",
+    "Wed morning",
+    "Wed afternoon",
+    "Wed evening",
+    "Thu afternoon",
+    "Fri morning",
+    "Fri afternoon",
+    "Fri evening",
+    "Sat afternoon",
+    "Sat evening",
+    "Sun afternoon"
+   ],
+   "style": "quiet",
+   "goal": "ongoing"
+  },
+  {
+   "name": "Ines",
+   "skills": {
+    "Calculus": 0,
+    "Statistics": 3,
+    "Programming": 3,
+    "Physics": 4,
+    "Chemistry": 3,
+    "Academic writing": 4
+   },
+   "slots": [
+    "Tue morning",
+    "Wed evening",
+    "Thu afternoon",
+    "Thu evening",
+    "Fri afternoon",
+    "Fri evening",
+    "Sun afternoon"
+   ],
+   "style": "chatty",
+   "goal": "ongoing"
+  },
+  {
+   "name": "Jamal",
+   "skills": {
+    "Calculus": 4,
+    "Statistics": 1,
+    "Programming": 2,
+    "Physics": 0,
+    "Chemistry": 5,
+    "Academic writing": 0
+   },
+   "slots": [
+    "Mon morning",
+    "Mon afternoon",
+    "Mon evening",
+    "Tue afternoon",
+    "Tue evening",
+    "Wed morning",
+    "Wed afternoon",
+    "Thu afternoon",
+    "Thu evening",
+    "Fri morning",
+    "Fri evening"
+   ],
+   "style": "chatty",
+   "goal": "exam"
+  },
+  {
+   "name": "Kira",
+   "skills": {
+    "Calculus": 1,
+    "Statistics": 1,
+    "Programming": 4,
+    "Physics": 2,
+    "Chemistry": 5,
+    "Academic writing": 3
+   },
+   "slots": [
+    "Mon evening",
+    "Wed morning",
+    "Sat afternoon",
+    "Sun morning"
+   ],
+   "style": "quiet",
+   "goal": "exam"
+  },
+  {
+   "name": "Leo",
+   "skills": {
+    "Calculus": 5,
+    "Statistics": 3,
+    "Programming": 0,
+    "Physics": 3,
+    "Chemistry": 5,
+    "Academic writing": 1
+   },
+   "slots": [
+    "Mon evening",
+    "Wed morning",
+    "Wed afternoon",
+    "Fri morning",
+    "Sat morning",
+    "Sat evening",
+    "Sun morning",
+    "Sun afternoon",
+    "Sun evening"
+   ],
+   "style": "chatty",
+   "goal": "exam"
+  },
+  {
+   "name": "Mina",
+   "skills": {
+    "Calculus": 1,
+    "Statistics": 3,
+    "Programming": 0,
+    "Physics": 2,
+    "Chemistry": 3,
+    "Academic writing": 1
+   },
+   "slots": [
+    "Mon morning",
+    "Mon afternoon",
+    "Mon evening",
+    "Tue morning",
+    "Tue evening",
+    "Wed morning",
+    "Wed evening",
+    "Thu morning",
+    "Thu evening",
+    "Fri evening",
+    "Sun afternoon"
+   ],
+   "style": "chatty",
+   "goal": "exam"
+  },
+  {
+   "name": "Niko",
+   "skills": {
+    "Calculus": 4,
+    "Statistics": 0,
+    "Programming": 0,
+    "Physics": 2,
+    "Chemistry": 2,
+    "Academic writing": 3
+   },
+   "slots": [
+    "Tue afternoon",
+    "Wed afternoon",
+    "Thu afternoon",
+    "Fri morning"
+   ],
+   "style": "chatty",
+   "goal": "exam"
+  },
+  {
+   "name": "Olu",
+   "skills": {
+    "Calculus": 4,
+    "Statistics": 0,
+    "Programming": 0,
+    "Physics": 1,
+    "Chemistry": 3,
+    "Academic writing": 1
+   },
+   "slots": [
+    "Mon morning",
+    "Mon evening",
+    "Tue morning",
+    "Tue afternoon",
+    "Tue evening",
+    "Wed morning",
+    "Thu afternoon",
+    "Fri evening",
+    "Sat afternoon"
+   ],
+   "style": "quiet",
+   "goal": "ongoing"
+  },
+  {
+   "name": "Pia",
+   "skills": {
+    "Calculus": 5,
+    "Statistics": 0,
+    "Programming": 1,
+    "Physics": 4,
+    "Chemistry": 5,
+    "Academic writing": 1
+   },
+   "slots": [
+    "Tue morning",
+    "Sat morning",
+    "Sat afternoon",
+    "Sat evening",
+    "Sun morning",
+    "Sun afternoon"
+   ],
+   "style": "quiet",
+   "goal": "exam"
+  },
+  {
+   "name": "Quentin",
+   "skills": {
+    "Calculus": 4,
+    "Statistics": 3,
+    "Programming": 1,
+    "Physics": 3,
+    "Chemistry": 3,
+    "Academic writing": 2
+   },
+   "slots": [
+    "Mon evening",
+    "Tue morning",
+    "Tue afternoon",
+    "Tue evening",
+    "Wed morning",
+    "Thu afternoon",
+    "Fri afternoon",
+    "Sat afternoon",
+    "Sun evening"
+   ],
+   "style": "chatty",
+   "goal": "ongoing"
+  },
+  {
+   "name": "Rosa",
+   "skills": {
+    "Calculus": 4,
+    "Statistics": 1,
+    "Programming": 2,
+    "Physics": 4,
+    "Chemistry": 3,
+    "Academic writing": 3
+   },
+   "slots": [
+    "Mon morning",
+    "Mon afternoon",
+    "Mon evening",
+    "Wed morning",
+    "Wed afternoon",
+    "Thu evening",
+    "Fri morning",
+    "Sat afternoon",
+    "Sun evening"
+   ],
+   "style": "chatty",
+   "goal": "ongoing"
+  },
+  {
+   "name": "Sven",
+   "skills": {
+    "Calculus": 0,
+    "Statistics": 1,
+    "Programming": 0,
+    "Physics": 1,
+    "Chemistry": 3,
+    "Academic writing": 1
+   },
+   "slots": [
+    "Mon morning",
+    "Mon afternoon",
+    "Tue morning",
+    "Wed morning",
+    "Wed evening",
+    "Thu morning",
+    "Thu evening",
+    "Fri morning",
+    "Fri afternoon",
+    "Fri evening",
+    "Sat afternoon",
+    "Sat evening",
+    "Sun morning"
+   ],
+   "style": "quiet",
+   "goal": "ongoing"
+  },
+  {
+   "name": "Tala",
+   "skills": {
+    "Calculus": 0,
+    "Statistics": 5,
+    "Programming": 5,
+    "Physics": 3,
+    "Chemistry": 3,
+    "Academic writing": 3
+   },
+   "slots": [
+    "Mon morning",
+    "Tue afternoon",
+    "Tue evening",
+    "Wed afternoon",
+    "Thu afternoon",
+    "Fri morning",
+    "Fri afternoon",
+    "Sun morning",
+    "Sun afternoon"
+   ],
+   "style": "chatty",
+   "goal": "ongoing"
+  },
+  {
+   "name": "Uma",
+   "skills": {
+    "Calculus": 1,
+    "Statistics": 1,
+    "Programming": 4,
+    "Physics": 4,
+    "Chemistry": 3,
+    "Academic writing": 2
+   },
+   "slots": [
+    "Mon afternoon",
+    "Mon evening",
+    "Tue evening",
+    "Wed afternoon",
+    "Wed evening",
+    "Thu evening",
+    "Sat morning",
+    "Sat evening"
+   ],
+   "style": "chatty",
+   "goal": "ongoing"
+  },
+  {
+   "name": "Viktor",
+   "skills": {
+    "Calculus": 1,
+    "Statistics": 4,
+    "Programming": 1,
+    "Physics": 3,
+    "Chemistry": 0,
+    "Academic writing": 1
+   },
+   "slots": [
+    "Mon evening",
+    "Tue afternoon",
+    "Thu morning",
+    "Thu afternoon",
+    "Thu evening",
+    "Fri afternoon",
+    "Sat afternoon",
+    "Sun afternoon"
+   ],
+   "style": "chatty",
+   "goal": "ongoing"
+  },
+  {
+   "name": "Wren",
+   "skills": {
+    "Calculus": 0,
+    "Statistics": 1,
+    "Programming": 5,
+    "Physics": 5,
+    "Chemistry": 0,
+    "Academic writing": 3
+   },
+   "slots": [
+    "Mon morning",
+    "Tue afternoon",
+    "Wed morning",
+    "Wed afternoon",
+    "Wed evening",
+    "Fri evening"
+   ],
+   "style": "chatty",
+   "goal": "ongoing"
+  },
+  {
+   "name": "Xavi",
+   "skills": {
+    "Calculus": 4,
+    "Statistics": 4,
+    "Programming": 0,
+    "Physics": 0,
+    "Chemistry": 2,
+    "Academic writing": 5
+   },
+   "slots": [
+    "Mon afternoon",
+    "Tue morning",
+    "Wed morning",
+    "Thu evening",
+    "Fri morning",
+    "Fri evening",
+    "Sun morning"
+   ],
+   "style": "chatty",
+   "goal": "ongoing"
+  },
+  {
+   "name": "Yara",
+   "skills": {
+    "Calculus": 4,
+    "Statistics": 4,
+    "Programming": 1,
+    "Physics": 4,
+    "Chemistry": 1,
+    "Academic writing": 2
+   },
+   "slots": [
+    "Mon morning",
+    "Mon evening",
+    "Tue evening",
+    "Wed afternoon",
+    "Wed evening",
+    "Fri afternoon",
+    "Sun afternoon"
+   ],
+   "style": "chatty",
+   "goal": "ongoing"
+  },
+  {
+   "name": "Zane",
+   "skills": {
+    "Calculus": 5,
+    "Statistics": 4,
+    "Programming": 0,
+    "Physics": 4,
+    "Chemistry": 3,
+    "Academic writing": 3
+   },
+   "slots": [
+    "Mon morning",
+    "Mon evening",
+    "Tue morning",
+    "Tue afternoon",
+    "Wed morning",
+    "Fri morning",
+    "Fri afternoon",
+    "Sat morning",
+    "Sat afternoon",
+    "Sat evening",
+    "Sun evening"
+   ],
+   "style": "chatty",
+   "goal": "exam"
+  },
+  {
+   "name": "Amal",
+   "skills": {
+    "Calculus": 0,
+    "Statistics": 5,
+    "Programming": 3,
+    "Physics": 2,
+    "Chemistry": 5,
+    "Academic writing": 4
+   },
+   "slots": [
+    "Wed morning",
+    "Wed afternoon",
+    "Thu evening",
+    "Fri evening",
+    "Sat morning",
+    "Sat afternoon",
+    "Sat evening"
+   ],
+   "style": "chatty",
+   "goal": "ongoing"
+  },
+  {
+   "name": "Boris",
+   "skills": {
+    "Calculus": 2,
+    "Statistics": 3,
+    "Programming": 4,
+    "Physics": 3,
+    "Chemistry": 2,
+    "Academic writing": 5
+   },
+   "slots": [
+    "Mon afternoon",
+    "Tue evening",
+    "Wed morning",
+    "Thu morning",
+    "Thu afternoon",
+    "Fri morning",
+    "Fri afternoon",
+    "Sun morning",
+    "Sun afternoon"
+   ],
+   "style": "chatty",
+   "goal": "ongoing"
+  }
+ ]
+}
