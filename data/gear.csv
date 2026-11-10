@@ -1,0 +1,46 @@
+id,name,category,weight_g,utility,group,tags
+tent,2-person tent,shelter,1600,10,shelter,
+tarp,Tarp and cord,shelter,520,7,shelter,
+bivy,Bivy bag,shelter,450,6,shelter,
+bag3,Sleeping bag (3-season),sleep,950,9,bag,
+bag1,Summer sleeping bag,sleep,520,6,bag,
+bag4,Winter sleeping bag,sleep,1500,10,bag,
+pad,Sleeping pad,sleep,480,8,pad,
+padlite,Short foam pad,sleep,260,5,pad,
+pillow,Inflatable pillow,comfort,95,3,,
+stove,Stove and fuel,cooking,380,7,,
+pot,Cook pot,cooking,160,5,,
+spork,Spork,cooking,15,4,,
+mug,Insulated mug,cooking,110,3,,
+filter,Water filter,water,70,9,,
+bottles,Two 1 L bottles,water,120,8,,
+bladder,3 L water bladder,water,140,5,,
+jacketrain,Rain jacket,clothing,320,9,,rain
+pantsrain,Rain trousers,clothing,230,4,,rain
+puffy,Insulated jacket,clothing,420,8,,cold
+fleece,Fleece,clothing,380,6,,cold
+gloves,Warm gloves and hat,clothing,140,6,,cold
+baselayer,Thermal base layer,clothing,260,6,,cold
+shirt,Spare hiking shirt,clothing,180,4,,
+socks,Spare socks (2 pairs),clothing,120,6,,
+sunhat,Sun hat,clothing,70,4,,sun
+sunscreen,Sunscreen,safety,90,5,,sun
+sunglasses,Sunglasses,safety,40,3,,sun
+map,Paper map and compass,navigation,130,8,,
+phone,Phone and cable,navigation,220,7,,
+gps,GPS device,navigation,160,5,,
+powerbank,Power bank,navigation,280,5,,
+headlamp,Headlamp,safety,85,9,,
+firstaid,First-aid kit,safety,230,9,,
+whistle,Whistle,safety,10,6,,
+blanket,Emergency blanket,safety,60,6,,
+repair,Repair kit and tape,safety,110,5,,
+knife,Pocket knife,safety,70,5,,
+poles,Trekking poles,comfort,480,5,,
+camera,Camera,comfort,420,2,,
+book,Paperback book,comfort,260,2,,
+chair,Camp chair,comfort,540,1,,
+towel,Quick-dry towel,comfort,80,3,,
+toiletries,Toiletries and trowel,comfort,130,6,,
+bugspray,Insect repellent,safety,80,4,,bugs
+bugnet,Head net,safety,25,3,,bugs

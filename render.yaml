@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: trail-pack-optimizer
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pack Weigh-In</title>
+<meta name="description" content="Tell it about your hike and your weight limit. It picks the most useful gear that fits, and shows what each extra kilo would buy.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400..700&family=Funnel+Sans:wght@400..600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Visual system dealt with taste-skill: palette "white-mint-tiles" (mint is a fill, ink carries text; night set below), type "funnel" (Funnel Display + Funnel Sans + DM Mono), soft radius. Layout: tile board around a weigh-in bar. */
+:root {
+  --bg:#ffffff; --surface:#f3f3f3; --card:#fafafa; --ink:#232323; --muted:#666a68; --mint:#a1ffcb; --on-mint:#0e2a1b; --line:#e2e2e2;
+  --warn:#b3261e; --display:"Funnel Display", system-ui, sans-serif; --sans:"Funnel Sans", system-ui, sans-serif; --mono:"DM Mono", ui-monospace, monospace;
+  --ease:cubic-bezier(.2,.8,.2,1); --r:14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#111312; --surface:#1b1e1c; --card:#161917; --ink:#ececea; --muted:#9aa09c; --mint:#a1ffcb; --on-mint:#0e2a1b; --line:#2b302d; --warn:#ff8a7e; color-scheme:dark; } }
+:root[data-theme="dark"] {
+  --bg:#111312; --surface:#1b1e1c; --card:#161917; --ink:#ececea; --muted:#9aa09c; --mint:#a1ffcb; --on-mint:#0e2a1b; --line:#2b302d; --warn:#ff8a7e; color-scheme:dark; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:400 16px/1.5 var(--sans); }
+.wrap { max-width:1180px; margin:0 auto; padding-block:26px 56px; padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); }
+h1 { font:500 clamp(2.2rem,5.5vw,3.8rem)/1 var(--display); letter-spacing:-.04em; margin:0 0 10px; text-wrap:balance; }
+h1 mark { background:var(--mint); color:var(--on-mint); padding:0 .14em; border-radius:.18em; }
+h2 { font:500 1.1rem var(--display); margin:0 0 10px; letter-spacing:-.01em; }
+.lead { color:var(--muted); max-width:54ch; margin:0 0 22px; }
+.board { display:grid; grid-template-columns:260px minmax(0,1fr); gap:14px; align-items:start; }
+@media (max-width:900px) { .board { grid-template-columns:minmax(0,1fr); } }
+.tile { background:var(--surface); border-radius:var(--r); padding:16px; }
+.col { display:grid; gap:14px; min-width:0; }
+.two { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); gap:14px; } @media (max-width:760px) { .two { grid-template-columns:minmax(0,1fr); } }
+.ctl { margin-bottom:12px; } .ctl label { display:flex; justify-content:space-between; font-size:.88rem; } .ctl output { font-family:var(--mono); }
+input[type=range] { width:100%; min-height:44px; accent-color:#2b9a67; }
+.toggles { display:flex; gap:8px; flex-wrap:wrap; }
+.toggle { min-height:44px; padding:0 14px; border-radius:999px; border:1.5px solid var(--ink); background:transparent; color:var(--ink); font:500 .9rem var(--sans); cursor:pointer; transition:transform 150ms var(--ease), background 150ms var(--ease); }
+.toggle:hover { transform:translateY(-2px); } .toggle[aria-pressed="true"] { background:var(--mint); color:var(--on-mint); border-color:var(--mint); }
+:focus-visible { outline:3px solid var(--ink); outline-offset:2px; }
+.big { font:500 clamp(2rem,5vw,3rem)/1 var(--display); letter-spacing:-.04em; } .big small { font:400 .9rem var(--sans); color:var(--muted); letter-spacing:0; }
+.weigh { position:relative; display:flex; height:46px; border-radius:12px; overflow:hidden; margin:14px 0 8px; background:var(--card); }
+.weigh i { display:block; height:100%; border-right:2px solid var(--surface); transition:width 300ms var(--ease); } .weigh i:last-child { border-right:0; }
+.limit { position:relative; height:0; } .limit b { position:absolute; top:-64px; width:2px; height:54px; background:var(--ink); } .limit span { position:absolute; top:-16px; transform:translateX(calc(-100% - 6px)); font:500 .7rem var(--mono); }
+.legend { display:flex; flex-wrap:wrap; gap:6px 14px; font-size:.8rem; color:var(--muted); } .legend b { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; }
+ul.gear { list-style:none; margin:0; padding:0; } .gear li { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); font-size:.92rem; transition:transform 150ms var(--ease); } .gear li:hover { transform:translateX(3px); }
+.gear small { color:var(--muted); font-family:var(--mono); } .gear .tag { font:500 .65rem var(--mono); background:var(--mint); color:var(--on-mint); padding:1px 7px; border-radius:99px; margin-left:6px; }
+.cat { font:500 .7rem var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:12px 0 2px; }
+svg.curve { width:100%; height:auto; display:block; } svg text { font:400 10px var(--mono); fill:var(--muted); }
+.note { color:var(--muted); font-size:.85rem; margin-top:18px; } .note a { color:var(--ink); } .warn { color:var(--warn); font-weight:500; }
+.enter { animation:enter 900ms cubic-bezier(.22,1,.36,1) both; } @keyframes enter { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) { .enter { animation:none; } * { transition:none !important; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="enter"><h1>Pack <mark>light</mark>, carry what matters</h1>
+  <p class="lead">The best gear that fits your weight limit, chosen exactly rather than by rule of thumb. Food and water are added for your trip length, and conditions decide what is essential.</p></header>
+  <div class="board">
+    <section class="tile" aria-label="Trip">
+      <h2>Your trip</h2>
+      <div class="ctl"><label for="days">Days<output id="o-days"></output></label><input id="days" type="range" min="1" max="7" value="2"></div>
+      <div class="ctl"><label for="temp">Coldest night<output id="o-temp"></output></label><input id="temp" type="range" min="-10" max="25" value="8"></div>
+      <div class="ctl"><label for="rain">Chance of rain<output id="o-rain"></output></label><input id="rain" type="range" min="0" max="100" step="10" value="30"></div>
+      <div class="ctl"><label for="lim">Carry limit<output id="o-lim"></output></label><input id="lim" type="range" min="4" max="20" step="0.5" value="9"></div>
+      <div class="toggles"><button class="toggle" id="sun" type="button" aria-pressed="true">Sunny</button><button class="toggle" id="bugs" type="button" aria-pressed="false">Insects</button></div>
+    </section>
+    <div class="col">
+      <section class="tile"><div class="big" id="total">0 kg <small id="of"></small></div><div class="weigh" id="bar" role="img" aria-label="Pack weight by category"></div><div class="limit" id="lim-line"></div><div class="legend" id="legend"></div><p id="notes" class="warn"></p></section>
+      <div class="two">
+        <section class="tile"><h2>In your pack</h2><div id="chosen"></div></section>
+        <div class="col">
+          <section class="tile"><h2>What an extra kilo buys</h2><svg class="curve" id="curve" viewBox="0 0 300 150" role="img" aria-label="Usefulness against weight limit"></svg><p class="note" style="margin:6px 0 0" id="cmp"></p></section>
+          <section class="tile"><h2>Left behind, next in line</h2><div id="left"></div></section>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="note">Synthetic gear list with illustrative weights and usefulness scores. <a href="/docs">API docs</a></p>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; };
+const NS = "http://www.w3.org/2000/svg", mk = (n, a, t) => { const e = document.createElementNS(NS, n); Object.entries(a || {}).forEach(([k, v]) => e.setAttribute(k, v)); if (t !== undefined) e.textContent = t; return e; };
+const COLORS = { shelter:"#7fd6a8", sleep:"#a1ffcb", clothing:"#c8f0dc", cooking:"#e6c9a1", water:"#8cc5e8", navigation:"#d9d9d9", safety:"#f2a99b", comfort:"#e7e2a3", food:"#bba58a" };
+const state = { sun: true, bugs: false }; let timer = null;
+const kg = (g) => (g / 1000).toFixed(1);
+function labels() { $("o-days").textContent = $("days").value; $("o-temp").textContent = $("temp").value + " °C"; $("o-rain").textContent = $("rain").value + "%"; $("o-lim").textContent = $("lim").value + " kg"; }
+function show(d) {
+  $("total").textContent = ""; $("total").append(kg(d.total_g) + " kg ", el("small", "", "of " + kg(d.limit_g) + " kg limit"));
+  const parts = [...Object.entries(d.by_category_g), ["food", d.food_g], ["water", d.water_g]]; const bar = $("bar"); bar.textContent = ""; const scale = Math.max(d.total_g, d.limit_g);
+  parts.forEach(([c, g]) => { const i = el("i"); i.style.width = (g / scale * 100) + "%"; i.style.background = COLORS[c] || "#ccc"; i.title = c + " " + kg(g) + " kg"; bar.append(i); });
+  const ll = $("lim-line"); ll.textContent = ""; const b = el("b"); b.style.left = (d.limit_g / scale * 100) + "%"; const s = el("span", "", "limit"); s.style.left = (d.limit_g / scale * 100) + "%"; ll.append(b, s);
+  const lg = $("legend"); lg.textContent = ""; parts.forEach(([c, g]) => { const sp = el("span"); const sw = el("b"); sw.style.background = COLORS[c] || "#ccc"; sp.append(sw, c + " " + kg(g)); lg.append(sp); });
+  $("notes").textContent = d.notes.join(" ");
+  const box = $("chosen"); box.textContent = ""; let cat = "", ul = null;
+  d.chosen.forEach((i) => { if (i.category !== cat) { cat = i.category; box.append(el("div", "cat", cat)); ul = el("ul", "gear"); box.append(ul); } const li = el("li"); const n = el("span", "", i.name); if (i.required) n.append(el("span", "tag", "essential")); li.append(n, el("small", "", i.weight_g + " g")); ul.append(li); });
+  const lf = $("left"); lf.textContent = ""; const u2 = el("ul", "gear"); d.leave_behind.slice(0, 5).forEach((i) => { const li = el("li"); li.append(el("span", "", i.name), el("small", "", i.weight_g + " g")); u2.append(li); }); lf.append(u2);
+  const c = $("curve"); c.textContent = ""; const pts = d.curve.filter((p) => p.feasible); if (pts.length > 1) {
+    const xs = pts.map((p) => p.limit_kg), ys = pts.map((p) => p.utility), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys), px = (x) => 28 + (x - x0) / (x1 - x0 || 1) * 258, py = (y) => 130 - (y - y0) / (y1 - y0 || 1) * 110;
+    c.append(mk("path", { d: pts.map((p, i) => (i ? "L" : "M") + px(p.limit_kg) + " " + py(p.utility)).join(" "), fill: "none", stroke: "var(--ink)", "stroke-width": 2 }));
+    pts.forEach((p) => { const here = Math.abs(p.limit_kg - +$("lim").value) < 0.01; c.append(mk("circle", { cx: px(p.limit_kg), cy: py(p.utility), r: here ? 6 : 3.5, fill: here ? "#2b9a67" : "var(--ink)" }), mk("text", { x: px(p.limit_kg), y: 146, "text-anchor": "middle" }, p.limit_kg + "")); });
+    c.append(mk("text", { x: 0, y: 12 }, "usefulness"));
+  }
+  const gain = d.utility - d.greedy_utility; $("cmp").textContent = gain > 0.05 ? "Exact choice beats the rule-of-thumb pack by " + gain.toFixed(1) + " usefulness points." : "Matches the rule-of-thumb pack here; the exact method wins when the budget is tight.";
+}
+async function run() {
+  labels(); const body = { days: +$("days").value, min_temp_c: +$("temp").value, rain_chance: +$("rain").value / 100, limit_kg: +$("lim").value, sun: state.sun, bugs: state.bugs };
+  const r = await fetch("/pack", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body) }); const d = await r.json(); if (r.ok) show(d);
+}
+document.querySelectorAll("input[type=range]").forEach((i) => i.addEventListener("input", () => { labels(); clearTimeout(timer); timer = setTimeout(run, 150); }));
+["sun", "bugs"].forEach((k) => $(k).addEventListener("click", () => { state[k] = !state[k]; $(k).setAttribute("aria-pressed", String(state[k])); run(); }));
+run();
+</script>
+</body>
+</html>
