@@ -1,0 +1,254 @@
+{
+ "table_size": 8,
+ "guests": [
+  {
+   "name": "Dario",
+   "group": "Bride's family"
+  },
+  {
+   "name": "Theo",
+   "group": "Bride's family"
+  },
+  {
+   "name": "Lena",
+   "group": "Bride's family"
+  },
+  {
+   "name": "Nina",
+   "group": "Bride's family"
+  },
+  {
+   "name": "Iris",
+   "group": "Bride's family"
+  },
+  {
+   "name": "Rafael",
+   "group": "Bride's family"
+  },
+  {
+   "name": "Clara",
+   "group": "Bride's family"
+  },
+  {
+   "name": "Alma",
+   "group": "Bride's family"
+  },
+  {
+   "name": "Hugo",
+   "group": "Bride's family"
+  },
+  {
+   "name": "Jonas",
+   "group": "Bride's family"
+  },
+  {
+   "name": "Samir",
+   "group": "Groom's family"
+  },
+  {
+   "name": "Hana",
+   "group": "Groom's family"
+  },
+  {
+   "name": "Ines",
+   "group": "Groom's family"
+  },
+  {
+   "name": "Joel",
+   "group": "Groom's family"
+  },
+  {
+   "name": "Sofia",
+   "group": "Groom's family"
+  },
+  {
+   "name": "Mila",
+   "group": "Groom's family"
+  },
+  {
+   "name": "Amara",
+   "group": "Groom's family"
+  },
+  {
+   "name": "Noor",
+   "group": "Groom's family"
+  },
+  {
+   "name": "Arjun",
+   "group": "Groom's family"
+  },
+  {
+   "name": "Tessa",
+   "group": "Groom's family"
+  },
+  {
+   "name": "Leo",
+   "group": "College friends"
+  },
+  {
+   "name": "Casper",
+   "group": "College friends"
+  },
+  {
+   "name": "Oskar",
+   "group": "College friends"
+  },
+  {
+   "name": "Anton",
+   "group": "College friends"
+  },
+  {
+   "name": "Zara",
+   "group": "College friends"
+  },
+  {
+   "name": "Bruno",
+   "group": "College friends"
+  },
+  {
+   "name": "Priya",
+   "group": "College friends"
+  },
+  {
+   "name": "Greta",
+   "group": "College friends"
+  },
+  {
+   "name": "Pavel",
+   "group": "College friends"
+  },
+  {
+   "name": "Idris",
+   "group": "College friends"
+  },
+  {
+   "name": "Emeka",
+   "group": "College friends"
+  },
+  {
+   "name": "Talia",
+   "group": "College friends"
+  },
+  {
+   "name": "Sana",
+   "group": "Work"
+  },
+  {
+   "name": "Tariq",
+   "group": "Work"
+  },
+  {
+   "name": "Mateo",
+   "group": "Work"
+  },
+  {
+   "name": "Kofi",
+   "group": "Work"
+  },
+  {
+   "name": "Ravi",
+   "group": "Work"
+  },
+  {
+   "name": "Maya",
+   "group": "Work"
+  },
+  {
+   "name": "Omar",
+   "group": "Work"
+  },
+  {
+   "name": "Nadia",
+   "group": "Work"
+  },
+  {
+   "name": "Dina",
+   "group": "Neighbours"
+  },
+  {
+   "name": "Leila",
+   "group": "Neighbours"
+  },
+  {
+   "name": "Rhea",
+   "group": "Neighbours"
+  },
+  {
+   "name": "Yuki",
+   "group": "Neighbours"
+  },
+  {
+   "name": "Felix",
+   "group": "Neighbours"
+  },
+  {
+   "name": "Vera",
+   "group": "Neighbours"
+  },
+  {
+   "name": "Milo",
+   "group": "Neighbours"
+  },
+  {
+   "name": "Elin",
+   "group": "Neighbours"
+  }
+ ],
+ "together": [
+  [
+   "Dario",
+   "Theo",
+   "Lena"
+  ],
+  [
+   "Samir",
+   "Hana"
+  ],
+  [
+   "Leo",
+   "Casper"
+  ],
+  [
+   "Sana",
+   "Tariq"
+  ]
+ ],
+ "likes": [
+  [
+   "Anton",
+   "Mateo"
+  ],
+  [
+   "Dina",
+   "Rafael"
+  ],
+  [
+   "Sofia",
+   "Bruno"
+  ],
+  [
+   "Ravi",
+   "Rhea"
+  ]
+ ],
+ "dislikes": [
+  [
+   "Nina",
+   "Joel"
+  ],
+  [
+   "Maya",
+   "Priya"
+  ]
+ ],
+ "apart": [
+  [
+   "Iris",
+   "Mila"
+  ],
+  [
+   "Yuki",
+   "Omar"
+  ]
+ ]
+}
