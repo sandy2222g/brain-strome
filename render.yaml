@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: pantry-saver
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

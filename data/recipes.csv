@@ -1,0 +1,61 @@
+id,name,minutes,servings,ingredients,steps
+1,Spinach and Egg Scramble,10,2,spinach;egg;butter,Wilt the spinach in butter then pour in beaten eggs and stir gently until just set.
+2,Tomato Basil Pasta,20,2,pasta;tomato;basil;garlic;parmesan,Boil the pasta and toss with garlic and tomatoes cooked down with basil and a little parmesan.
+3,Mushroom Risotto-Style Rice,35,3,rice;mushroom;onion;parmesan;butter,Soften onion and mushrooms then simmer the rice with stock added a ladle at a time and finish with butter and parmesan.
+4,Chicken and Veg Stir-Fry,20,2,chicken breast;bell pepper;carrot;broccoli;soy sauce;ginger,Fry the chicken then add sliced vegetables and finish with soy sauce and grated ginger.
+5,Veggie Fried Rice,15,2,rice;egg;carrot;frozen pea;soy sauce;onion,Fry onion and carrot then add cold rice peas and a scrambled egg and season with soy sauce.
+6,Cheesy Omelette,10,1,egg;cheddar;milk,Whisk eggs with a splash of milk and cook in a pan topped with grated cheddar.
+7,Creamy Mushroom Pasta,25,2,pasta;mushroom;cream;garlic;parsley,Saute mushrooms and garlic add cream and toss with pasta and parsley.
+8,Chickpea and Spinach Curry,25,3,chickpea;spinach;canned tomato;onion;garlic;ginger;coconut milk,Cook onion garlic and ginger then simmer with chickpeas tomatoes and coconut milk and stir in spinach.
+9,Potato and Onion Frittata,25,3,potato;onion;egg;cheddar,Fry sliced potato and onion then pour over eggs top with cheese and bake until set.
+10,Tuna Pasta Salad,20,2,pasta;canned tuna;tomato;cucumber;lemon,Toss cooked cooled pasta with tuna chopped tomato cucumber and lemon juice.
+11,Banana Oat Pancakes,15,2,banana;oats;egg;milk,Blend banana oats egg and milk and fry small pancakes until golden.
+12,Roasted Veg Tray Bake,40,3,potato;carrot;zucchini;bell pepper;onion,Chop all vegetables toss in oil and roast until browned at the edges.
+13,Lentil Soup,35,4,lentil;carrot;onion;garlic;canned tomato,Simmer lentils with softened carrot onion garlic and tomatoes until tender.
+14,Garlic Butter Shrimp Pasta,20,2,shrimp;pasta;garlic;butter;lemon;parsley,Saute shrimp in garlic butter and toss with pasta lemon and parsley.
+15,Salmon with Lemon and Broccoli,25,2,salmon;lemon;broccoli;butter,Bake the salmon with lemon and butter and steam the broccoli alongside.
+16,Black Bean Tacos,20,3,black bean;tortilla;avocado;tomato;cilantro;lemon,Warm the beans and fill tortillas with avocado tomato and cilantro and a squeeze of lemon.
+17,Caprese Toast,10,2,bread;tomato;mozzarella;basil,Toast the bread and top with sliced tomato mozzarella and basil.
+18,Yogurt and Banana Breakfast Bowl,5,1,yogurt;banana;oats,Layer yogurt sliced banana and oats.
+19,Cauliflower Cheese Bake,35,3,cauliflower;cheddar;milk;butter,Make a quick cheese sauce with milk butter and cheddar pour over cauliflower and bake.
+20,Sausage and Bean Stew,35,3,sausage;canned tomato;black bean;onion;bell pepper,Brown the sausage then simmer with onion pepper beans and tomatoes.
+21,French Toast,15,2,bread;egg;milk;butter,Soak bread in whisked egg and milk and fry in butter until golden.
+22,Greek Salad,10,2,cucumber;tomato;feta;onion,Chop everything and toss with oil and a little vinegar.
+23,Chicken Fajita Wraps,25,3,chicken breast;bell pepper;onion;tortilla;yogurt,Fry strips of chicken pepper and onion and serve in tortillas with yogurt.
+24,Sweet Potato Soup,35,4,sweet potato;onion;carrot;coconut milk;ginger,Simmer vegetables in stock until soft then blend with coconut milk.
+25,Egg Fried Noodle-Style Pasta,15,2,pasta;egg;cabbage;soy sauce;garlic,Stir-fry shredded cabbage and garlic add cooked pasta and egg and season with soy sauce.
+26,Zucchini Fritters,25,2,zucchini;egg;parmesan;onion,Grate and squeeze the zucchini mix with egg onion and parmesan and fry spoonfuls.
+27,Ham and Cheese Toastie,10,1,bread;ham;cheddar;butter,Butter the bread fill with ham and cheese and toast in a pan.
+28,Aubergine Parmigiana,50,3,eggplant;canned tomato;mozzarella;parmesan;basil,Layer roasted eggplant with tomato sauce and cheeses and bake until bubbling.
+29,Quinoa Veggie Bowl,25,2,quinoa;carrot;cucumber;avocado;lemon,Cook the quinoa and top with raw vegetables avocado and lemon.
+30,Couscous with Roasted Veg,20,2,couscous;zucchini;bell pepper;onion;feta,Roast the vegetables soak couscous in hot stock and crumble over feta.
+31,Bacon and Egg Fried Rice,15,2,rice;bacon;egg;frozen pea;onion,Crisp the bacon then fry with rice onion peas and egg.
+32,Cabbage and Potato Hash,25,2,cabbage;potato;onion;bacon,Fry diced potato bacon and onion then add shredded cabbage until soft.
+33,Peanut Noodle-Style Pasta,15,2,pasta;peanut butter;soy sauce;carrot;cucumber,Whisk peanut butter with soy sauce and warm water and toss with pasta and shredded vegetables.
+34,Corn and Pea Fritters,20,2,frozen corn;frozen pea;egg;parmesan,Mix thawed vegetables with egg and parmesan and fry small patties.
+35,Tomato Soup with Grilled Cheese,30,3,canned tomato;onion;garlic;bread;cheddar,Simmer and blend tomato onion and garlic and serve with a cheese toastie.
+36,Avocado Toast with Egg,10,1,bread;avocado;egg;lemon,Mash avocado with lemon on toast and top with a fried egg.
+37,Chicken and Rice Soup,35,4,chicken breast;rice;carrot;onion;parsley,Simmer chicken with vegetables then shred the meat and add rice and parsley.
+38,Shakshuka,25,2,egg;canned tomato;bell pepper;onion;garlic;feta,Simmer tomato pepper onion and garlic then crack in eggs and cook covered and top with feta.
+39,Beef and Potato Skillet,30,3,ground beef;potato;onion;cheddar,Brown the beef fry diced potato and onion together and melt cheddar on top.
+40,Beef Bolognese,40,4,ground beef;pasta;canned tomato;onion;carrot;garlic,Brown beef with onion carrot and garlic then simmer with tomatoes and serve over pasta.
+41,Chickpea Salad,10,2,chickpea;cucumber;tomato;feta;lemon;parsley,Toss everything together with lemon juice and oil.
+42,Spinach and Feta Wrap,10,1,tortilla;spinach;feta;egg,Scramble the egg with spinach and feta and roll in a tortilla.
+43,Milk Rice Pudding,40,3,rice;milk;sugar;lemon,Simmer rice slowly in milk with sugar and a strip of lemon zest.
+44,Overnight Oats,5,1,oats;milk;yogurt;apple,Stir oats with milk and yogurt and top with grated apple then chill overnight.
+45,Apple Oat Crumble,40,3,apple;oats;butter;sugar,Bake sliced apple under a topping of oats butter and sugar.
+46,Banana Bread,60,6,banana;egg;butter;flour;sugar,Mash bananas mix with egg butter flour and sugar and bake in a loaf tin.
+47,Ginger Carrot Soup,30,3,carrot;ginger;onion;yogurt,Simmer carrot onion and ginger in stock blend and swirl in yogurt.
+48,Stuffed Bell Peppers,45,3,bell pepper;rice;ground beef;canned tomato;cheddar,Stuff the peppers with browned beef rice and tomato and bake topped with cheese.
+49,Salmon Fried Rice,20,2,salmon;rice;egg;frozen pea;soy sauce,Flake cooked salmon into fried rice with egg peas and soy sauce.
+50,Shrimp and Avocado Salad,15,2,shrimp;avocado;lettuce;lemon;cucumber,Sear the shrimp and toss with leaves avocado cucumber and lemon.
+51,Garlic Bread Soup Croutons,15,2,bread;garlic;butter;parsley,Cube the bread and toast with garlic butter and parsley.
+52,Broccoli and Cheddar Soup,30,3,broccoli;cheddar;onion;milk;potato,Simmer broccoli potato and onion in stock blend and stir in milk and cheddar.
+53,Mushroom and Spinach Omelette,15,1,egg;mushroom;spinach;parmesan,Saute mushrooms and spinach and fold into an omelette with parmesan.
+54,Lettuce Wraps with Chicken,20,2,chicken breast;lettuce;carrot;soy sauce;ginger,Fry minced chicken with ginger and soy sauce and spoon into lettuce leaves with carrot.
+55,Coconut Lentil Dal,30,3,lentil;coconut milk;onion;garlic;ginger;spinach,Simmer lentils in coconut milk with aromatics and stir in spinach at the end.
+56,Green Bean and Potato Salad,25,3,green bean;potato;onion;lemon;parsley,Boil potato and beans then toss with onion lemon and parsley.
+57,Cream of Mushroom Toast,20,2,mushroom;cream;bread;garlic;parsley,Cook mushrooms in garlic and cream and pile on toasted bread.
+58,Sausage Pasta Bake,40,4,sausage;pasta;canned tomato;mozzarella;onion,Mix browned sausage with pasta tomato and onion top with mozzarella and bake.
+59,Sweet Potato Black Bean Bowl,35,2,sweet potato;black bean;avocado;cilantro;lemon,Roast the sweet potato and serve over beans with avocado cilantro and lemon.
+60,Ham and Pea Pasta,20,2,ham;pasta;frozen pea;cream;parmesan,Toss cooked pasta with ham peas cream and parmesan.
