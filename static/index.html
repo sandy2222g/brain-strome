@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en" data-radius="round">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rent Check - is my rent fair?</title>
+<meta name="description" content="Enter a flat and see a fair rent range, a verdict and what pushes the price. Synthetic city, no real data.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23d0106f'/%3E%3Cpath d='M7 20h18M10 20v-4M16 20v-7M22 20v-5' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600&family=Rethink+Sans:wght@400..600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --p-bg: #f7f7f5; --p-surface: #ebebe8; --p-ink: #000000; --p-muted: #666662;
+  --p-accent: #d0106f; --p-accent-ink: #ffffff; --p-action: #d0106f; --p-action-ink: #ffffff;
+  --font-display: "Zilla Slab", Georgia, serif;
+  --font-text: "Rethink Sans", system-ui, sans-serif;
+  --display-weight: 400;
+  --display-tracking: -0.018em;
+  --display-tracking-xl: -0.024em;
+
+  --card: #ffffff;
+  --line: #d9d9d4;
+  --pink-soft: #fbdcea;
+  --butter: #fbf0c9;
+  --mint: #dcf1e3;
+  --peach: #fde3d3;
+  --down: #1b1b1b;
+  --focus: #000000;
+  --r-card: 28px;
+  --r-pill: 999px;
+  --gutter: 16px;
+  --shadow: 0 1px 0 rgba(0,0,0,.04), 0 8px 24px -12px rgba(0,0,0,.18);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --p-bg: #131012; --p-surface: #1f1b1d; --p-ink: #f7f5f6; --p-muted: #a9a3a6;
+    --p-accent: #ff5fa6; --p-accent-ink: #1c0010; --p-action: #ff5fa6; --p-action-ink: #1c0010;
+    --card: #1a1618; --line: #342e31;
+    --pink-soft: #3a1628; --butter: #332c14; --mint: #173022; --peach: #3a2318;
+    --down: #f2eef0; --focus: #ffffff;
+    --shadow: 0 1px 0 rgba(255,255,255,.04), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"] {
+  --p-bg: #131012; --p-surface: #1f1b1d; --p-ink: #f7f5f6; --p-muted: #a9a3a6;
+  --p-accent: #ff5fa6; --p-accent-ink: #1c0010; --p-action: #ff5fa6; --p-action-ink: #1c0010;
+  --card: #1a1618; --line: #342e31;
+  --pink-soft: #3a1628; --butter: #332c14; --mint: #173022; --peach: #3a2318;
+  --down: #f2eef0; --focus: #ffffff;
+  --shadow: 0 1px 0 rgba(255,255,255,.04), 0 8px 24px -12px rgba(0,0,0,.7);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--p-bg); color: var(--p-ink);
+  font-family: var(--font-text); font-size: 1rem; line-height: 1.55;
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: var(--display-weight); letter-spacing: var(--display-tracking); margin: 0; line-height: 1.1; }
+p { margin: 0; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 8px; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 var(--gutter); }
+.skip { position: absolute; left: -999px; top: 8px; background: var(--p-ink); color: var(--p-bg); padding: 10px 14px; border-radius: 10px; z-index: 5; }
+.skip:focus { left: var(--gutter); }
+
+/* top bar */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 0 10px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 1.4rem; font-weight: 500; }
+.brand i { width: 30px; height: 30px; border-radius: 10px; background: var(--p-accent); display: grid; place-items: center; }
+.brand svg { width: 18px; height: 18px; }
+.top p { color: var(--p-muted); font-size: .95rem; }
+
+section { margin-top: 28px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card); padding: 20px; box-shadow: var(--shadow); }
+.card h2, .sec h2 { font-size: clamp(1.5rem, 3.4vw, 2rem); margin-bottom: 6px; }
+.sub { color: var(--p-muted); margin-bottom: 18px; max-width: 60ch; }
+
+/* hero: price ruler */
+.hero { background: var(--pink-soft); border-color: transparent; padding: clamp(20px, 4vw, 40px); animation: rise .6s cubic-bezier(.2,.7,.2,1) both; }
+.kicker { font-weight: 500; font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; color: var(--p-muted); margin-bottom: 10px; }
+.verdict { font-family: var(--font-display); font-size: clamp(2rem, 6.4vw, 3.9rem); line-height: 1.04; letter-spacing: var(--display-tracking-xl); font-weight: 500; max-width: 18ch; }
+.verdict em { font-style: normal; color: var(--p-accent); }
+.badge { display: inline-block; margin-top: 14px; padding: 6px 14px; border-radius: var(--r-pill); background: var(--p-ink); color: var(--p-bg); font-weight: 500; font-size: .95rem; }
+.ruler { margin: 64px 4px 8px; position: relative; height: 84px; }
+.track { position: absolute; left: 0; right: 0; top: 34px; height: 14px; border-radius: var(--r-pill); background: color-mix(in srgb, var(--p-ink) 12%, transparent); }
+.band { position: absolute; top: 34px; height: 14px; border-radius: var(--r-pill); background: var(--p-accent); opacity: .38; transform-origin: center; animation: grow .8s .15s cubic-bezier(.2,.7,.2,1) both; }
+.tick { position: absolute; top: 24px; width: 4px; height: 34px; margin-left: -2px; border-radius: 2px; background: var(--p-ink); }
+.edge { position: absolute; top: 28px; width: 2px; height: 26px; margin-left: -1px; background: color-mix(in srgb, var(--p-ink) 55%, transparent); }
+.dot { position: absolute; top: 27px; width: 28px; height: 28px; margin-left: -14px; border-radius: 50%; background: var(--p-accent); border: 4px solid var(--card); box-shadow: 0 0 0 2px var(--p-accent), 0 4px 10px rgba(0,0,0,.25); animation: drop .7s .5s cubic-bezier(.2,.9,.3,1.2) both; }
+.dotlab { position: absolute; bottom: 62px; transform: translateX(-50%); white-space: nowrap; font-weight: 600; background: var(--p-accent); color: var(--p-accent-ink); padding: 4px 12px; border-radius: var(--r-pill); font-size: .95rem; }
+.dotlab.l { transform: none; margin-left: -10px; }
+.dotlab.r { transform: translateX(-100%); margin-left: 10px; }
+.scale { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
+.scale div { background: var(--card); border-radius: 18px; padding: 10px 12px; min-width: 0; }
+.scale span { display: block; font-size: .8rem; color: var(--p-muted); }
+.scale b { font-family: var(--font-display); font-size: clamp(1.15rem, 3.6vw, 1.6rem); font-weight: 500; }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes drop { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
+
+/* form */
+form .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 14px; }
+label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 500; font-size: .92rem; }
+label.f small { font-weight: 400; color: var(--p-muted); }
+input[type=number], select {
+  min-height: 44px; border-radius: 16px; border: 1.5px solid var(--line); background: var(--p-bg);
+  padding: 8px 14px; width: 100%; transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+}
+input:hover, select:hover { border-color: var(--p-muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.chip { position: relative; }
+.chip input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.chip span { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: var(--r-pill); border: 1.5px solid var(--line); background: var(--p-bg); font-weight: 500; transition: transform 150ms ease-out, background 150ms ease-out, border-color 150ms ease-out; }
+.chip:hover span { transform: translateY(-2px); }
+.chip input:checked + span { background: var(--p-ink); color: var(--p-bg); border-color: var(--p-ink); }
+.chip input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 3px; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; align-items: center; }
+.btn { min-height: 48px; padding: 0 26px; border-radius: var(--r-pill); border: 1.5px solid transparent; font-weight: 600; cursor: pointer; transition: transform 150ms ease-out, box-shadow 150ms ease-out, background 150ms ease-out; }
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0) scale(.97); }
+.btn.main { background: var(--p-action); color: var(--p-action-ink); box-shadow: 0 6px 16px -8px var(--p-action); }
+.btn.alt { background: transparent; border-color: var(--p-ink); color: var(--p-ink); }
+.btn[disabled] { opacity: .6; cursor: progress; }
+.err { color: var(--p-accent); font-weight: 500; min-height: 1.5em; margin-top: 10px; }
+
+/* waterfall */
+.two { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; align-items: start; }
+.wf { list-style: none; padding: 0; margin: 0; display: grid; gap: 4px; }
+.wf li { display: grid; grid-template-columns: minmax(120px, 36%) 1fr 78px; gap: 10px; align-items: center; min-height: 44px; padding: 2px 6px; border-radius: 14px; transition: background 150ms ease-out, transform 150ms ease-out; }
+.wf li:hover { background: var(--p-surface); transform: translateY(-2px); }
+.wf .nm { font-weight: 500; line-height: 1.25; }
+.wf .nm small { display: block; font-weight: 400; color: var(--p-muted); font-size: .8rem; }
+.wf .lane { position: relative; height: 18px; background: color-mix(in srgb, var(--p-ink) 6%, transparent); border-radius: 9px; }
+.wf .bar { position: absolute; top: 0; bottom: 0; border-radius: 9px; background: var(--p-accent); min-width: 4px; }
+.wf .bar.neg { background: var(--down); }
+.wf .bar.total { background: var(--p-ink); }
+.wf .bar.base { background: var(--p-muted); }
+.wf .amt { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+.wf .amt.pos { color: var(--p-accent); }
+.wf li.sum { border-top: 2px solid var(--p-ink); margin-top: 6px; padding-top: 8px; }
+.tip { background: var(--butter); border: 0; }
+.tip p { font-size: 1.05rem; }
+.tip h2 { font-size: 1.5rem; }
+
+/* districts */
+.ranks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ranks li { display: grid; grid-template-columns: 28px minmax(104px, 28%) 1fr auto; gap: 10px; align-items: center; min-height: 44px; padding: 2px 8px; border-radius: 16px; transition: background 150ms ease-out, transform 150ms ease-out; }
+.ranks li:hover { background: var(--p-surface); transform: translateY(-2px); }
+.ranks .n { font-family: var(--font-display); font-size: 1.3rem; color: var(--p-muted); }
+.ranks .nm { font-weight: 500; }
+.ranks .lane { height: 16px; border-radius: 8px; background: color-mix(in srgb, var(--p-ink) 6%, transparent); }
+.ranks .bar { display: block; height: 100%; border-radius: 8px; background: var(--peach); border: 1.5px solid color-mix(in srgb, var(--p-ink) 25%, transparent); }
+.ranks li.me .bar { background: var(--p-accent); border-color: var(--p-accent); }
+.ranks li.me .nm::after { content: " (your flat)"; color: var(--p-accent); font-weight: 400; }
+.ranks .v { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; }
+
+/* alternatives */
+.alts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 14px; }
+.alts li { border-radius: 24px; padding: 16px; background: var(--mint); transition: transform 150ms ease-out; }
+.alts li:nth-child(even) { background: var(--peach); }
+.alts li:hover { transform: translateY(-2px); }
+.alts .save { font-family: var(--font-display); font-size: 1.7rem; font-weight: 500; line-height: 1.1; }
+.alts .where { font-weight: 600; margin-top: 4px; }
+.alts .meta { color: var(--p-muted); font-size: .9rem; margin-top: 4px; }
+.empty { color: var(--p-muted); }
+
+footer { margin: 40px 0 36px; color: var(--p-muted); font-size: .9rem; display: flex; gap: 8px 20px; flex-wrap: wrap; }
+footer a { color: inherit; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+@media (max-width: 760px) {
+  .two { grid-template-columns: 1fr; }
+  .wf li { grid-template-columns: 1fr 70px; }
+  .wf .lane { grid-column: 1 / -1; grid-row: 2; }
+  .wf .amt { grid-column: 2; grid-row: 1; }
+  .ranks li { grid-template-columns: 24px 1fr auto; }
+  .ranks .lane { grid-column: 1 / -1; grid-row: 2; }
+  .ranks li { min-height: 52px; }
+  .card { padding: 16px; border-radius: 24px; }
+  .scale div { padding: 8px 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .btn:hover, .chip:hover span, .wf li:hover, .ranks li:hover, .alts li:hover { transform: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#check">Skip to the form</a>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><i aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M3 18h18M7 18v-5M12 18V8M17 18v-8"/></svg></i> Rent Check</div>
+    <p>Is my rent fair? Worked example from Marlowe, a made-up city.</p>
+  </header>
+
+  <main>
+    <section class="card hero" aria-labelledby="h-ruler" aria-live="polite">
+      <p class="kicker" id="h-ruler">Your rent on the price ruler</p>
+      <h1 class="verdict" id="verdict">Checking this rent...</h1>
+      <span class="badge" id="badge" hidden></span>
+      <div class="ruler" id="ruler" role="img" aria-label="Price ruler"></div>
+      <div class="scale">
+        <div><span>Low end of normal</span><b id="v10">-</b></div>
+        <div><span>Typical price</span><b id="v50">-</b></div>
+        <div><span>High end of normal</span><b id="v90">-</b></div>
+      </div>
+    </section>
+
+    <section class="card" id="check" aria-labelledby="h-form">
+      <h2 id="h-form">Check your flat</h2>
+      <p class="sub">Change anything below. The example is a flat priced about 15% over the market.</p>
+      <form id="form" novalidate>
+        <div class="grid">
+          <label class="f">District<select name="district" id="district"></select></label>
+          <label class="f">Monthly rent <small>in euros</small><input type="number" name="rent" min="100" step="5" inputmode="numeric"></label>
+          <label class="f">Size <small>square metres</small><input type="number" name="size_m2" min="15" max="250" step="1" inputmode="numeric"></label>
+          <label class="f">Bedrooms<input type="number" name="bedrooms" min="0" max="6" step="1" inputmode="numeric"></label>
+          <label class="f">Bathrooms<input type="number" name="bathrooms" min="1" max="4" step="1" inputmode="numeric"></label>
+          <label class="f">Floor <small>0 is ground</small><input type="number" name="floor" min="0" max="40" step="1" inputmode="numeric"></label>
+          <label class="f">Building age <small>years</small><input type="number" name="building_age" min="0" max="200" step="1" inputmode="numeric"></label>
+          <label class="f">Distance to centre <small>km</small><input type="number" name="dist_centre_km" min="0" max="30" step="0.1" inputmode="decimal"></label>
+          <label class="f">Distance to metro <small>km</small><input type="number" name="dist_metro_km" min="0" max="15" step="0.1" inputmode="decimal"></label>
+        </div>
+        <div class="chips" role="group" aria-label="Extras">
+          <label class="chip"><input type="checkbox" name="furnished"><span>Furnished</span></label>
+          <label class="chip"><input type="checkbox" name="balcony"><span>Balcony</span></label>
+          <label class="chip"><input type="checkbox" name="lift"><span>Lift</span></label>
+          <label class="chip"><input type="checkbox" name="pets_allowed"><span>Pets allowed</span></label>
+        </div>
+        <div class="actions">
+          <button class="btn main" type="submit" id="go">Check this rent</button>
+          <button class="btn alt" type="button" id="reset">Load the example flat</button>
+        </div>
+        <p class="err" id="err" role="alert"></p>
+      </form>
+    </section>
+
+    <section class="two" aria-label="Price breakdown and advice">
+      <div class="card">
+        <h2>What moves the price</h2>
+        <p class="sub" id="wf-sub">Each line shows how much one feature adds to or takes from the typical flat in your district.</p>
+        <ul class="wf" id="wf"></ul>
+      </div>
+      <div class="card tip">
+        <h2>What to say to the landlord</h2>
+        <p id="hint">-</p>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-dist">
+      <h2 id="h-dist">Rent per m&sup2; by district</h2>
+      <p class="sub">Median monthly rent for each square metre, from 4,000 made-up listings.</p>
+      <ol class="ranks" id="ranks"></ol>
+    </section>
+
+    <section class="card" aria-labelledby="h-alt">
+      <h2 id="h-alt">Cheaper flats that are similar</h2>
+      <p class="sub">Same number of bedrooms and about the same size, in other districts, for less than you pay.</p>
+      <ul class="alts" id="alts"></ul>
+    </section>
+  </main>
+
+  <footer>
+    <span>All listings are synthetic (CC0). No real people or addresses.</span>
+    <a href="/metrics">Model accuracy</a>
+    <a href="/docs">API</a>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const form = $("form");
+  let cur = "€";
+  let sample = null;
+  const money = (x) => cur + Math.round(x).toLocaleString("en-US");
+  const signed = (x) => (x >= 0 ? "+" : "-") + cur + Math.abs(Math.round(x)).toLocaleString("en-US");
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+  function readForm() {
+    const d = {};
+    for (const f of form.elements) {
+      if (!f.name) continue;
+      if (f.type === "checkbox") d[f.name] = f.checked;
+      else if (f.type === "number") d[f.name] = f.value === "" ? null : Number(f.value);
+      else d[f.name] = f.value;
+    }
+    return d;
+  }
+  function fillForm(d) {
+    for (const f of form.elements) {
+      if (!f.name || !(f.name in d)) continue;
+      if (f.type === "checkbox") f.checked = !!d[f.name]; else f.value = d[f.name];
+    }
+  }
+  async function api(path, body) {
+    const r = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : undefined);
+    if (!r.ok) {
+      let msg = "Something went wrong. Please try again.";
+      try {
+        const j = await r.json();
+        if (Array.isArray(j.detail)) msg = j.detail.map((e) => `${String(e.loc.slice(-1)[0]).replace(/_/g, " ")}: ${e.msg.replace("Value error, ", "")}`).join("; ");
+      } catch (_) { /* keep default */ }
+      throw new Error(msg);
+    }
+    return r.json();
+  }
+
+  function drawRuler(rent, r) {
+    const lo = Math.min(r.p10, rent), hi = Math.max(r.p90, rent);
+    const pad = (hi - lo) * 0.18 + 1;
+    const min = Math.max(0, lo - pad), max = hi + pad;
+    const pos = (v) => ((v - min) / (max - min)) * 100;
+    const box = $("ruler");
+    box.replaceChildren();
+    box.setAttribute("aria-label", `Price ruler: normal range ${money(r.p10)} to ${money(r.p90)}, typical ${money(r.p50)}, your rent ${money(rent)}`);
+    box.append(el("div", "track"));
+    const band = el("div", "band");
+    band.style.left = pos(r.p10) + "%"; band.style.width = (pos(r.p90) - pos(r.p10)) + "%";
+    box.append(band);
+    for (const v of [r.p10, r.p90]) { const e = el("div", "edge"); e.style.left = pos(v) + "%"; box.append(e); }
+    const t = el("div", "tick"); t.style.left = pos(r.p50) + "%"; box.append(t);
+    const dot = el("div", "dot"); dot.style.left = pos(rent) + "%"; box.append(dot);
+    const p = pos(rent);
+    const lab = el("div", "dotlab" + (p < 14 ? " l" : p > 86 ? " r" : ""), "Your rent " + money(rent));
+    lab.style.left = p + "%"; box.append(lab);
+  }
+
+  function drawVerdict(res) {
+    const v = res.verdict, pct = Math.abs(Math.round(v.diff_pct));
+    const h = $("verdict");
+    h.replaceChildren();
+    if (v.key === "fair") {
+      h.append("This rent is ", el("em", null, "fair"), pct ? ` (${pct}% ${v.diff_pct >= 0 ? "above" : "below"} typical).` : ".");
+    } else {
+      h.append("This rent is ", el("em", null, `${pct}% ${v.key === "above" ? "above" : "below"}`), " the market.");
+    }
+    const b = $("badge");
+    b.hidden = false;
+    b.textContent = `Verdict: ${v.label}`;
+    $("v10").textContent = money(res.range.p10);
+    $("v50").textContent = money(res.range.p50);
+    $("v90").textContent = money(res.range.p90);
+    drawRuler(res.rent, res.range);
+    $("hint").textContent = res.negotiation;
+  }
+
+  function drawWaterfall(bd, district) {
+    const ul = $("wf");
+    ul.replaceChildren();
+    const steps = [];
+    let run = bd.typical_flat;
+    steps.push({ name: `Typical flat in ${district}`, from: 0, to: run, kind: "base", amt: money(run) });
+    const items = bd.drivers.slice(0, 8);
+    const rest = bd.drivers.slice(8).reduce((s, d) => s + d.amount, 0) + bd.interactions;
+    for (const d of items) {
+      const start = run; run += d.amount;
+      steps.push({ name: d.label, sub: detail(d), from: Math.min(start, run), to: Math.max(start, run), kind: d.amount >= 0 ? "pos" : "neg", amt: signed(d.amount), raw: d.amount });
+    }
+    if (Math.abs(rest) >= 1) {
+      const start = run; run += rest;
+      steps.push({ name: "Smaller effects together", from: Math.min(start, run), to: Math.max(start, run), kind: rest >= 0 ? "pos" : "neg", amt: signed(rest), raw: rest });
+    }
+    steps.push({ name: "Fair price for your flat", from: 0, to: bd.estimate, kind: "total", amt: money(bd.estimate), sum: true });
+    const all = steps.flatMap((s) => [s.from, s.to]);
+    const lo = Math.min(...all.filter((v) => v > 0 || true)), hi = Math.max(...all);
+    const floor = Math.max(0, Math.min(bd.typical_flat, bd.estimate) - (hi - lo) * 0.25);
+    const span = hi - floor || 1;
+    for (const s of steps) {
+      const li = el("li", s.sum ? "sum" : "");
+      const nm = el("span", "nm", s.name);
+      if (s.sub) nm.append(el("small", null, s.sub));
+      const lane = el("span", "lane");
+      const bar = el("span", "bar " + s.kind);
+      const a = s.kind === "base" || s.kind === "total" ? floor : s.from;
+      bar.style.left = ((a - floor) / span) * 100 + "%";
+      bar.style.width = Math.max(((s.to - a) / span) * 100, 1.2) + "%";
+      lane.append(bar);
+      li.append(nm, lane, el("span", "amt" + (s.kind === "pos" ? " pos" : ""), s.amt));
+      ul.append(li);
+    }
+  }
+  function detail(d) {
+    const fmt = (v) => (Number.isInteger(v) ? v : Number(v).toFixed(1));
+    if (d.feature === "furnished" || d.feature === "balcony" || d.feature === "lift" || d.feature === "pets_allowed") {
+      return d.yours ? "yes (typical: " + (d.typical >= 0.5 ? "yes" : "no") + ")" : "no (typical: " + (d.typical >= 0.5 ? "yes" : "no") + ")";
+    }
+    return `${fmt(d.yours)} (typical: ${fmt(d.typical)})`;
+  }
+
+  function drawDistricts(rows, mine) {
+    const ol = $("ranks");
+    ol.replaceChildren();
+    const max = Math.max(...rows.map((r) => r.median_per_m2));
+    rows.forEach((r, i) => {
+      const li = el("li", r.district === mine ? "me" : "");
+      const lane = el("span", "lane"); const bar = el("span", "bar");
+      bar.style.width = (r.median_per_m2 / max) * 100 + "%"; lane.append(bar);
+      li.append(el("span", "n", String(i + 1)), el("span", "nm", r.district), lane, el("span", "v", cur + r.median_per_m2.toFixed(1) + " / m²"));
+      ol.append(li);
+    });
+  }
+
+  function drawAlts(list) {
+    const ul = $("alts");
+    ul.replaceChildren();
+    if (!list.length) { ul.append(el("li", "empty", "No cheaper similar flats found in other districts. Your price is already low for this size.")); ul.firstChild.style.background = "transparent"; return; }
+    for (const a of list) {
+      const li = el("li");
+      li.append(el("div", "save", `Save ${money(a.saving)} a month`), el("div", "where", `${a.district}: ${money(a.rent)}`));
+      const extras = [a.furnished && "furnished", a.balcony && "balcony", a.lift && "lift"].filter(Boolean).join(", ") || "no extras";
+      li.append(el("div", "meta", `${a.bedrooms} bed, ${a.size_m2} m², ${a.dist_metro_km} km to metro, ${a.dist_centre_km} km to centre. ${extras}.`));
+      ul.append(li);
+    }
+  }
+
+  async function run() {
+    const d = readForm();
+    $("err").textContent = "";
+    const btn = $("go"); btn.disabled = true;
+    try {
+      const [est, alt] = await Promise.all([api("/estimate", d), api("/alternatives", d)]);
+      cur = est.currency;
+      drawVerdict(est);
+      drawWaterfall(est.breakdown, d.district);
+      drawAlts(alt.alternatives);
+      const rows = window.__districts;
+      if (rows) drawDistricts(rows, d.district);
+    } catch (e) {
+      $("err").textContent = e.message;
+    } finally { btn.disabled = false; }
+  }
+
+  form.addEventListener("submit", (e) => { e.preventDefault(); run(); });
+  $("reset").addEventListener("click", () => { if (sample) { fillForm(sample); run(); } });
+
+  (async () => {
+    try {
+      const [dist, s] = await Promise.all([api("/districts"), api("/sample")]);
+      cur = dist.currency;
+      window.__districts = dist.districts;
+      const sel = $("district");
+      for (const r of dist.districts) sel.append(new Option(r.district, r.district));
+      sample = s; fillForm(s);
+      await run();
+    } catch (e) {
+      $("verdict").textContent = "The server did not answer. Please reload the page.";
+      $("err").textContent = e.message;
+    }
+  })();
+})();
+</script>
+</body>
+</html>
