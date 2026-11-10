@@ -1,0 +1,279 @@
+merchant,category,kind
+STREAMBOX,streaming,subscription
+TUNENEST,music,subscription
+FITPASS GYM,fitness,subscription
+CLOUDVAULT,software,subscription
+NEWSDAILY,news,subscription
+GAMELOOP,gaming,subscription
+MEALBOX,food,subscription
+DOMAINSHOP,software,subscription
+SHIELDVPN,software,subscription
+POWERGRID ENERGY,utilities,bill
+HOMEKEY RENTALS,housing,bill
+SAFENEST INSURANCE,insurance,bill
+FRESHMART,groceries,other
+BEANCART COFFEE,coffee,other
+QUICKFUEL,transport,other
+PIZZA HARBOUR,dining,other
+HEALTHPLUS PHARMACY,health,other
+PAGETURN BOOKS,shopping,other
+FILMFLIX PLUS,streaming,subscription
+SOUNDWAVE MUSIC,music,subscription
+IRONWORKS FITNESS,fitness,subscription
+DOCSTORE CLOUD,software,subscription
+DAILY HERALD,news,subscription
+PLAYZONE GAMES,gaming,subscription
+GREENCRATE MEALS,food,subscription
+CITY WATER,utilities,bill
+AQUAPOWER GAS,utilities,bill
+LANDLORD PROPERTY,housing,bill
+CARESURE INSURANCE,insurance,bill
+MARKET GROCER,groceries,other
+ROAST COFFEE HOUSE,coffee,other
+METRO TRANSIT,transport,other
+NOODLE BAR,dining,other
+WELLCARE CHEMIST,health,other
+CORNER BOOKSHOP,shopping,other
+SERIES STREAM TV,streaming,subscription
+BEATS RADIO,music,subscription
+YOGA STUDIO PASS,fitness,subscription
+LUMA FLIX,streaming,subscription
+OAK FLIX,streaming,subscription
+NOVA FLIX,streaming,subscription
+BRIGHT STREAM TV,streaming,subscription
+LUMA STREAM TV,streaming,subscription
+SUN STREAM TV,streaming,subscription
+BLUE CINEMA PLUS,streaming,subscription
+ATLAS CINEMA PLUS,streaming,subscription
+PRIME CINEMA PLUS,streaming,subscription
+RIVER WATCHLY,streaming,subscription
+OAK WATCHLY,streaming,subscription
+BRIGHT WATCHLY,streaming,subscription
+LUMA SHOWTIME,streaming,subscription
+URBAN SHOWTIME,streaming,subscription
+PEAK SHOWTIME,streaming,subscription
+PEAK MUSIC,music,subscription
+LUMA MUSIC,music,subscription
+BLUE MUSIC,music,subscription
+SUN TUNES,music,subscription
+BRIGHT TUNES,music,subscription
+METRO TUNES,music,subscription
+URBAN RADIO,music,subscription
+ZEN RADIO,music,subscription
+SWIFT RADIO,music,subscription
+SWIFT SOUNDS,music,subscription
+RIVER SOUNDS,music,subscription
+NOVA SOUNDS,music,subscription
+METRO BEATS,music,subscription
+OAK BEATS,music,subscription
+SWIFT BEATS,music,subscription
+URBAN GYM,fitness,subscription
+LUMA GYM,fitness,subscription
+ATLAS GYM,fitness,subscription
+SUN FITNESS,fitness,subscription
+RIVER FITNESS,fitness,subscription
+OAK FITNESS,fitness,subscription
+RIVER YOGA,fitness,subscription
+NOVA YOGA,fitness,subscription
+ZEN YOGA,fitness,subscription
+PEAK CLIMBING CLUB,fitness,subscription
+NOVA CLIMBING CLUB,fitness,subscription
+ATLAS CLIMBING CLUB,fitness,subscription
+LUMA SWIM CLUB,fitness,subscription
+ZEN SWIM CLUB,fitness,subscription
+SUN SWIM CLUB,fitness,subscription
+BRIGHT CLOUD,software,subscription
+URBAN CLOUD,software,subscription
+NOVA CLOUD,software,subscription
+LUMA VPN,software,subscription
+METRO VPN,software,subscription
+URBAN VPN,software,subscription
+RIVER APPS,software,subscription
+LUMA APPS,software,subscription
+SUN APPS,software,subscription
+NOVA DOMAINS,software,subscription
+BLUE DOMAINS,software,subscription
+OAK DOMAINS,software,subscription
+METRO SOFTWARE,software,subscription
+RIVER SOFTWARE,software,subscription
+PEAK SOFTWARE,software,subscription
+BRIGHT NEWS,news,subscription
+METRO NEWS,news,subscription
+SWIFT NEWS,news,subscription
+OAK TIMES,news,subscription
+RIVER TIMES,news,subscription
+URBAN TIMES,news,subscription
+LUMA HERALD,news,subscription
+SWIFT HERALD,news,subscription
+BLUE HERALD,news,subscription
+RIVER DAILY,news,subscription
+PEAK DAILY,news,subscription
+METRO DAILY,news,subscription
+OAK MAGAZINE,news,subscription
+ZEN MAGAZINE,news,subscription
+SUN MAGAZINE,news,subscription
+PEAK GAMES,gaming,subscription
+OAK GAMES,gaming,subscription
+NOVA GAMES,gaming,subscription
+NOVA PLAY,gaming,subscription
+SWIFT PLAY,gaming,subscription
+RIVER PLAY,gaming,subscription
+SWIFT ARCADE,gaming,subscription
+METRO ARCADE,gaming,subscription
+NOVA ARCADE,gaming,subscription
+OAK ESPORTS,gaming,subscription
+RIVER ESPORTS,gaming,subscription
+SUN ESPORTS,gaming,subscription
+SUN PLAYPASS,gaming,subscription
+URBAN PLAYPASS,gaming,subscription
+METRO PLAYPASS,gaming,subscription
+ZEN MEALBOX,food,subscription
+BRIGHT MEALBOX,food,subscription
+METRO MEALBOX,food,subscription
+PRIME FOOD BOX,food,subscription
+OAK FOOD BOX,food,subscription
+METRO FOOD BOX,food,subscription
+ATLAS RECIPE KIT,food,subscription
+URBAN RECIPE KIT,food,subscription
+SWIFT RECIPE KIT,food,subscription
+BLUE FRESH CRATE,food,subscription
+METRO FRESH CRATE,food,subscription
+PRIME FRESH CRATE,food,subscription
+BLUE SNACK BOX,food,subscription
+RIVER SNACK BOX,food,subscription
+PEAK SNACK BOX,food,subscription
+SWIFT ENERGY,utilities,bill
+RIVER ENERGY,utilities,bill
+OAK ENERGY,utilities,bill
+OAK WATER,utilities,bill
+SUN WATER,utilities,bill
+PEAK WATER,utilities,bill
+ZEN GAS,utilities,bill
+SWIFT GAS,utilities,bill
+ATLAS GAS,utilities,bill
+SUN BROADBAND,utilities,bill
+PRIME BROADBAND,utilities,bill
+RIVER BROADBAND,utilities,bill
+BRIGHT ELECTRIC,utilities,bill
+BLUE ELECTRIC,utilities,bill
+PRIME ELECTRIC,utilities,bill
+ZEN RENTALS,housing,bill
+OAK RENTALS,housing,bill
+URBAN RENTALS,housing,bill
+ZEN PROPERTY,housing,bill
+NOVA PROPERTY,housing,bill
+BRIGHT PROPERTY,housing,bill
+METRO LETTINGS,housing,bill
+LUMA LETTINGS,housing,bill
+NOVA LETTINGS,housing,bill
+OAK HOMES,housing,bill
+RIVER HOMES,housing,bill
+BRIGHT HOMES,housing,bill
+BRIGHT ESTATES,housing,bill
+LUMA ESTATES,housing,bill
+ZEN ESTATES,housing,bill
+LUMA INSURANCE,insurance,bill
+NOVA INSURANCE,insurance,bill
+SWIFT INSURANCE,insurance,bill
+ZEN ASSURANCE,insurance,bill
+BRIGHT ASSURANCE,insurance,bill
+SUN ASSURANCE,insurance,bill
+URBAN COVER,insurance,bill
+ZEN COVER,insurance,bill
+NOVA COVER,insurance,bill
+METRO INSURE,insurance,bill
+URBAN INSURE,insurance,bill
+RIVER INSURE,insurance,bill
+SUN PROTECT,insurance,bill
+BRIGHT PROTECT,insurance,bill
+LUMA PROTECT,insurance,bill
+URBAN MARKET,groceries,other
+LUMA MARKET,groceries,other
+PRIME MARKET,groceries,other
+BLUE GROCER,groceries,other
+ATLAS GROCER,groceries,other
+SWIFT GROCER,groceries,other
+NOVA SUPERMART,groceries,other
+SUN SUPERMART,groceries,other
+OAK SUPERMART,groceries,other
+LUMA FOODS,groceries,other
+PEAK FOODS,groceries,other
+METRO FOODS,groceries,other
+SUN FRESHMART,groceries,other
+SWIFT FRESHMART,groceries,other
+BRIGHT FRESHMART,groceries,other
+PEAK COFFEE,coffee,other
+SWIFT COFFEE,coffee,other
+SUN COFFEE,coffee,other
+ZEN ROASTERS,coffee,other
+ATLAS ROASTERS,coffee,other
+OAK ROASTERS,coffee,other
+BRIGHT CAFE,coffee,other
+SUN CAFE,coffee,other
+OAK CAFE,coffee,other
+BRIGHT ESPRESSO,coffee,other
+RIVER ESPRESSO,coffee,other
+ATLAS ESPRESSO,coffee,other
+BRIGHT COFFEE CART,coffee,other
+PRIME COFFEE CART,coffee,other
+URBAN COFFEE CART,coffee,other
+ZEN FUEL,transport,other
+BRIGHT FUEL,transport,other
+SUN FUEL,transport,other
+RIVER TRANSIT,transport,other
+LUMA TRANSIT,transport,other
+BRIGHT TRANSIT,transport,other
+PEAK TAXI,transport,other
+ATLAS TAXI,transport,other
+RIVER TAXI,transport,other
+PRIME PARKING,transport,other
+OAK PARKING,transport,other
+ZEN PARKING,transport,other
+URBAN RAIL,transport,other
+OAK RAIL,transport,other
+SUN RAIL,transport,other
+PEAK PIZZA,dining,other
+RIVER PIZZA,dining,other
+ZEN PIZZA,dining,other
+BRIGHT NOODLES,dining,other
+URBAN NOODLES,dining,other
+PRIME NOODLES,dining,other
+ATLAS GRILL,dining,other
+SUN GRILL,dining,other
+SWIFT GRILL,dining,other
+BLUE BISTRO,dining,other
+OAK BISTRO,dining,other
+BRIGHT BISTRO,dining,other
+BLUE KEBAB,dining,other
+PRIME KEBAB,dining,other
+ATLAS KEBAB,dining,other
+OAK PHARMACY,health,other
+LUMA PHARMACY,health,other
+ATLAS PHARMACY,health,other
+NOVA CHEMIST,health,other
+RIVER CHEMIST,health,other
+URBAN CHEMIST,health,other
+PEAK DENTAL,health,other
+ATLAS DENTAL,health,other
+BRIGHT DENTAL,health,other
+ATLAS OPTICIANS,health,other
+OAK OPTICIANS,health,other
+BLUE OPTICIANS,health,other
+METRO CLINIC,health,other
+PRIME CLINIC,health,other
+SUN CLINIC,health,other
+OAK BOOKS,shopping,other
+BLUE BOOKS,shopping,other
+ZEN BOOKS,shopping,other
+LUMA OUTLET,shopping,other
+ATLAS OUTLET,shopping,other
+SWIFT OUTLET,shopping,other
+BRIGHT HARDWARE,shopping,other
+NOVA HARDWARE,shopping,other
+ATLAS HARDWARE,shopping,other
+METRO GADGETS,shopping,other
+NOVA GADGETS,shopping,other
+PEAK GADGETS,shopping,other
+PEAK STORE,shopping,other
+PRIME STORE,shopping,other
+RIVER STORE,shopping,other

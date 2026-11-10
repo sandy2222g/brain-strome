@@ -1,0 +1,16 @@
+# Report
+
+Goal: build as many deployable, resume-ready open-source projects as time allows (stop 07:25 IST Nov 11; push by 07:30 IST).
+
+## Progress log
+- **Nov 10 21:28 IST** — Started. Repo `sandy2222g/brain-strome`, one branch per project from `main`. Env: Python 3.13, sandbox pip behind TLS proxy (slow, ~120 kB/s), Docker daemon had to be started manually (`dockerd`).
+- **Project 1 chosen: support-ticket-triage** (customer support / NLP). Reason: universal real business problem, classic ML + FastAPI + UI, trains in seconds, fits free hosting.
+- **21:55 IST** — Project 1 done: 20 tests pass, ruff clean, Docker image builds and serves /predict, README + DEPLOY + CI present.
+- **Blocker (resolved):** `docker build` failed with `CERTIFICATE_VERIFY_FAILED` because the sandbox proxy re-terminates TLS. Fix: the Dockerfile accepts an optional BuildKit `cacert` secret; built locally with `--network host --secret id=cacert,...`. TLS verification was not disabled. Normal builds are unaffected.
+- **22:20 IST — user feedback received mid-run:** wants unique, everyday, non-technical-domain projects (not support-ticket/bug/sensor style) and allowed up to 2 agents in parallel. Project 3 redirected to a food-waste app; later projects will follow that style.
+- **Project 2 chosen: clinic-noshow-predictor** (healthcare operations). Reason: real cost problem, tabular ML with calibration + fairness audit, different domain from project 1. Decision: isotonic calibration produced hard 0/1 probabilities, switched to sigmoid. 14 tests pass, ruff clean, Docker builds and serves.
+- **Project 3 chosen: pantry-saver** (household food waste; built by a delegated agent, verified by me: 20 tests pass, ruff clean, demo screenshot reviewed, pushed). Reason: everyday problem every household has; ranks items by expiry urgency, recommends recipes (TF-IDF + expiry-weighted score), 7-day plan, waste-risk gradient-boosting model. Replaced an abandoned first idea (machine-anomaly-monitor, never committed) after user asked for unique, non-technical-domain projects.
+- **Cleanup:** twice a delegated agent's worktree folder was accidentally committed as an embedded repo (my mistake: `git add -A`). Removed in follow-up commits and `.claude/` ignored; the gitlink remains in older commits on support-ticket-triage and clinic-noshow-predictor history (a force-push to rewrite history was denied by the harness, so I did not rewrite it).
+- **Restyled** projects 1, 2 (distinct palettes, type and layouts via taste-skill) so no two UIs match.
+- **Project 5 started** (delegated, one agent at a time): rent-check (housing; "is my rent fair?", quantile regression, price-ruler UI, magenta palette).
+- **Project 6 chosen: subscription-sniffer** (personal finance). Reason: everyone has forgotten subscriptions; rule-based recurrence detection plus a small ML category model; dark sage ledger UI. 20 tests pass, ruff clean, Docker builds and serves, detector precision/recall 1.0/1.0 on synthetic ground truth (limitation noted in README).
