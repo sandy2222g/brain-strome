@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: fair-shift-roster
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

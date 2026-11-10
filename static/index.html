@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fair Shift Roster</title>
+<meta name="description" content="Build a staff roster that covers every shift and shares weekends, evenings, nights and hours fairly.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..700&display=swap" rel="stylesheet">
+<style>
+/* Visual system dealt with taste-skill: palette chalk-tomato, type schibsted, radius sharp. */
+:root {
+  --p-bg: #f8f5ef; --p-surface: #ede7dc; --p-ink: #1f1b18; --p-muted: #645c54;
+  --p-accent: #b8381f; --p-accent-ink: #ffffff;
+  --font: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --bg: var(--p-bg); --surface: var(--p-surface); --ink: var(--p-ink); --muted: var(--p-muted);
+  --accent: var(--p-accent); --accent-ink: var(--p-accent-ink);
+  --raised: #fffdf9;
+  --line: color-mix(in srgb, var(--ink) 14%, transparent);
+  --line-strong: color-mix(in srgb, var(--ink) 55%, transparent);
+  --ok: #2c7a4d; --ok-ink: #ffffff;
+  --warn: #f0c27a; --warn-ink: #3a2705;
+  --bad: #b3261e; --bad-ink: #ffffff;
+  --gut: 16px;
+  --namecol: 128px; --daycol: 84px; --faircol: 176px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --p-bg: #171412; --p-surface: #231f1c; --p-ink: #f3ede4; --p-muted: #a89f94;
+    --p-accent: #f0765a; --p-accent-ink: #1a0f0b; --raised: #1d1917;
+    --ok: #4cb27a; --ok-ink: #0c1f14; --warn: #d9a64f; --warn-ink: #1d1404; --bad: #ea6359; --bad-ink: #2a0a07;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --p-bg: #171412; --p-surface: #231f1c; --p-ink: #f3ede4; --p-muted: #a89f94;
+  --p-accent: #f0765a; --p-accent-ink: #1a0f0b; --raised: #1d1917;
+  --ok: #4cb27a; --ok-ink: #0c1f14; --warn: #d9a64f; --warn-ink: #1d1404; --bad: #ea6359; --bad-ink: #2a0a07;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--font);
+  overflow-x: hidden; min-width: 0;
+}
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: clamp(26px, 5vw, 40px); line-height: 1.08; letter-spacing: -0.035em; font-weight: 500; }
+h2 { font-size: 20px; letter-spacing: -0.02em; font-weight: 600; }
+h3 { font-size: 15px; font-weight: 600; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1360px; margin: 0 auto; padding: 0 var(--gut); }
+.muted { color: var(--muted); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- top bar ---------- */
+header.top { border-bottom: 1px solid var(--line); padding: 20px 0 16px; }
+.top-grid { display: grid; gap: 16px; }
+.brand { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); margin-bottom: 6px; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+.seg { display: inline-flex; border: 1px solid var(--line-strong); }
+.seg button { border: 0; background: transparent; padding: 0 14px; min-height: 40px; cursor: pointer; transition: background-color 150ms ease-out, color 150ms ease-out; }
+.seg button + button { border-left: 1px solid var(--line-strong); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.seg button:hover:not([aria-pressed="true"]) { background: var(--surface); }
+label.f { display: grid; gap: 2px; font-size: 12px; color: var(--muted); }
+input[type=number] { width: 84px; min-height: 40px; padding: 0 8px; border: 1px solid var(--line-strong); background: var(--raised); }
+.btn {
+  min-height: 40px; padding: 0 16px; border: 1px solid var(--ink); background: transparent; cursor: pointer; font-weight: 500;
+  transition: transform 150ms ease-out, box-shadow 150ms ease-out, background-color 150ms ease-out;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 3px 0 color-mix(in srgb, var(--ink) 25%, transparent); }
+.btn:active { transform: translateY(0); box-shadow: none; filter: brightness(.94); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn[disabled] { opacity: .55; cursor: progress; transform: none; box-shadow: none; }
+@media (pointer: coarse) { .btn, .seg button, input[type=number] { min-height: 44px; } }
+
+/* ---------- headline numbers ---------- */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); border-bottom: 1px solid var(--line); }
+.kpi { padding: 14px 16px 14px 0; }
+.kpi + .kpi { padding-left: 16px; border-left: 1px solid var(--line); }
+.kpi dt { font-size: 12px; color: var(--muted); }
+.kpi dd { margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -0.03em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.kpi small { display: block; font-size: 12px; color: var(--muted); letter-spacing: 0; font-weight: 400; }
+@media (max-width: 520px) { .kpi:nth-child(odd) { border-left: 0; padding-left: 0; } }
+
+section.block { padding: 28px 0 8px; }
+.sec-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 8px 16px; margin-bottom: 12px; }
+.weeks { display: none; }
+.weeks.on { display: inline-flex; }
+
+/* ---------- board ---------- */
+.board-scroll { overflow-x: auto; border: 1px solid var(--line-strong); background: var(--raised); max-width: 100%; }
+.board-scroll:focus-visible { outline-offset: -3px; }
+table.board { border-collapse: separate; border-spacing: 0; width: 100%; min-width: max-content; }
+.board th, .board td { padding: 4px; border-bottom: 1px solid var(--line); vertical-align: middle; background: var(--raised); }
+.board thead th { font-size: 12px; font-weight: 600; color: var(--muted); text-align: center; padding: 8px 4px; }
+.board thead th.today-we { color: var(--ink); }
+.board .name { position: sticky; left: 0; z-index: 2; width: var(--namecol); min-width: var(--namecol); text-align: left; border-right: 1px solid var(--line-strong); padding: 6px 8px; }
+.board .fair { position: sticky; right: 0; z-index: 2; width: var(--faircol); min-width: var(--faircol); border-left: 1px solid var(--line-strong); padding: 6px 10px; text-align: left; }
+.board td.d { width: var(--daycol); min-width: var(--daycol); }
+.board th.we, .board td.we { background: color-mix(in srgb, var(--surface) 70%, var(--raised)); }
+.who { display: block; font-weight: 600; font-size: 14px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.skills { display: block; font-size: 11px; color: var(--muted); line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+tr.cover th, tr.cover td { background: var(--surface); }
+tr.cover .name, tr.cover .fair { background: var(--surface); }
+.heat { display: flex; gap: 2px; justify-content: center; }
+.ht { width: 18px; height: 22px; display: grid; place-items: center; font-size: 10px; font-weight: 700; line-height: 1; background: var(--ok); color: var(--ok-ink); font-variant-numeric: tabular-nums; }
+.ht.gap { background: var(--warn); color: var(--warn-ink); }
+.ht.short { background: repeating-linear-gradient(135deg, var(--bad) 0 3px, color-mix(in srgb, var(--bad) 70%, #000) 3px 5px); color: var(--bad-ink); }
+.ht.none { background: transparent; color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); font-weight: 400; }
+
+.cell-off, .cell-leave { display: grid; place-items: center; min-height: 34px; font-size: 11px; color: var(--muted); text-align: center; line-height: 1.2; }
+.cell-leave { background: repeating-linear-gradient(-45deg, transparent 0 4px, var(--line) 4px 5px); border: 1px dashed var(--line-strong); }
+.cell-off.asked { color: var(--ok); font-weight: 600; }
+[data-theme="dark"] .cell-off.asked { color: var(--ok); }
+
+.chip {
+  position: relative; display: flex; align-items: center; gap: 5px; width: 100%; min-height: 34px; padding: 3px 5px 3px 3px;
+  border: 1px solid var(--line-strong); background-color: var(--raised); color: var(--ink); cursor: pointer; text-align: left; font-size: 11px;
+  font-variant-numeric: tabular-nums; line-height: 1.1;
+  transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+}
+.chip:hover { transform: translateY(-2px); box-shadow: 0 3px 0 color-mix(in srgb, var(--ink) 22%, transparent); }
+.chip:active { transform: translateY(0) scale(.98); box-shadow: none; }
+.chip[aria-pressed="true"] { outline: 3px solid var(--accent); outline-offset: 1px; }
+.bd { flex: none; width: 22px; height: 22px; display: grid; place-items: center; background: var(--ink); color: var(--bg); font-weight: 700; font-size: 11px; }
+.k-morning .bd { clip-path: circle(50%); }
+.k-afternoon .bd { clip-path: none; }
+.k-evening .bd { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); font-size: 10px; }
+.k-night .bd { clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); }
+.k-afternoon { background-image: repeating-linear-gradient(135deg, transparent 0 5px, color-mix(in srgb, var(--ink) 12%, transparent) 5px 6px); }
+.k-evening { background-image: radial-gradient(color-mix(in srgb, var(--ink) 30%, transparent) 1px, transparent 1.3px); background-size: 6px 6px; }
+.k-night { background-color: var(--ink); color: var(--bg); border-color: var(--ink); }
+.k-night .bd { background: var(--bg); color: var(--ink); }
+.t { white-space: nowrap; }
+.mk { position: absolute; top: -1px; right: -1px; width: 14px; height: 14px; display: grid; place-items: center; font-size: 9px; font-weight: 700; }
+.mk.bad { background: var(--accent); color: var(--accent-ink); clip-path: polygon(0 0, 100% 0, 100% 100%); align-items: start; justify-items: end; padding: 0 1px; }
+.mk.star { color: var(--muted); font-size: 10px; }
+.k-night .mk.star { color: var(--bg); }
+
+.fb-top { display: flex; justify-content: space-between; font-size: 12px; font-variant-numeric: tabular-nums; gap: 6px; }
+.fb { position: relative; height: 9px; background: color-mix(in srgb, var(--ink) 12%, transparent); margin: 4px 0 3px; }
+.fb i { position: absolute; inset: 0 auto 0 0; background: var(--ink); }
+.fb i.over { background: var(--accent); }
+.fb b { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--accent); }
+.fb-meta { display: flex; gap: 8px; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
+.fb-meta .u { color: var(--accent); font-weight: 600; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 10px; font-size: 12px; color: var(--muted); align-items: center; }
+.legend .lg { display: inline-flex; gap: 6px; align-items: center; }
+.legend .chipkey { width: 40px; height: 22px; display: inline-flex; align-items: center; gap: 3px; padding: 0 2px; border: 1px solid var(--line-strong); }
+.legend .chipkey .bd { width: 16px; height: 16px; font-size: 9px; }
+
+/* ---------- reports ---------- */
+.cols { display: grid; gap: 28px; }
+@media (min-width: 900px) { .cols { grid-template-columns: 1fr 1fr; } }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+.rows > li { padding: 10px 0; border-top: 1px solid var(--line); }
+.rows > li:last-child { border-bottom: 1px solid var(--line); }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 6px; background: var(--ink); color: var(--bg); margin-right: 6px; }
+.tag.red { background: var(--bad); color: var(--bad-ink); }
+.why { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.ok-line { padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.cmp-wrap { overflow-x: auto; }
+table.cmp { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+.cmp th, .cmp td { text-align: left; padding: 9px 8px 9px 0; border-top: 1px solid var(--line); vertical-align: top; }
+.cmp thead th { font-size: 12px; color: var(--muted); font-weight: 500; }
+.cmp td.win { font-weight: 600; }
+.cmp .bar { display: block; height: 6px; margin-top: 4px; background: var(--ink); }
+.cmp .bar.base { background: color-mix(in srgb, var(--ink) 35%, transparent); }
+.cmp .bar.mine { background: var(--accent); }
+footer { margin-top: 40px; padding: 18px 0 40px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+
+/* ---------- inspector ---------- */
+.inspector {
+  position: fixed; z-index: 20; right: 0; top: 0; bottom: 0; width: min(420px, 100vw); background: var(--raised);
+  border-left: 1px solid var(--line-strong); overflow-y: auto; padding: 18px 18px 40px; box-shadow: -12px 0 30px -18px rgba(0,0,0,.35);
+}
+.inspector[hidden] { display: none; }
+.insp-head { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+.insp-head h2 { font-size: 18px; }
+.x { min-width: 40px; min-height: 40px; border: 1px solid var(--line-strong); background: transparent; cursor: pointer; font-size: 18px; line-height: 1; transition: transform 150ms ease-out; }
+.x:hover { transform: translateY(-2px); }
+.x:active { transform: none; }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 14px 0; border: 1px solid var(--line); }
+.facts div { padding: 8px 10px; }
+.facts div + div { border-left: 1px solid var(--line); }
+.facts dt { font-size: 11px; color: var(--muted); }
+.facts dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.insp h3 { margin: 18px 0 6px; }
+.swaps { margin-top: 6px; }
+.swap { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; width: 100%; text-align: left; padding: 9px 10px; min-height: 44px; border: 1px solid var(--line); border-bottom: 0; background: transparent; cursor: pointer; transition: transform 150ms ease-out, background-color 150ms ease-out; }
+.swap:last-child { border-bottom: 1px solid var(--line); }
+.swap:hover { transform: translateY(-2px); background: var(--surface); position: relative; }
+.swap:active { transform: none; }
+.swap[aria-expanded="true"] { background: var(--surface); }
+.swap .res { font-size: 12px; font-weight: 600; white-space: nowrap; }
+.res.good { color: var(--ok); }
+.res.warn { color: var(--warn-ink); background: var(--warn); padding: 0 6px; }
+.res.stop { color: var(--bad-ink); background: var(--bad); padding: 0 6px; }
+.res.wait { color: var(--muted); font-weight: 400; }
+.swap-detail { padding: 8px 10px 10px; border: 1px solid var(--line); border-top: 0; font-size: 13px; background: var(--surface); }
+.swap-detail p + p { margin-top: 4px; }
+@media (max-width: 760px) {
+  :root { --namecol: 92px; --daycol: 76px; --faircol: 150px; }
+  .board .fair { position: static; }
+  .who { font-size: 13px; }
+}
+@media (min-width: 1100px) { body.has-insp main { margin-right: 420px; } }
+@media (max-width: 759px) {
+  .inspector { top: auto; width: 100%; max-height: 82vh; border-left: 0; border-top: 2px solid var(--ink); }
+}
+
+/* ---------- motion: one entrance, nothing on scroll ---------- */
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.enter tbody tr { animation: rise 420ms ease-out both; animation-delay: calc(var(--i, 0) * 28ms); }
+.status { min-height: 22px; font-size: 13px; color: var(--muted); padding-top: 8px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .btn:hover, .chip:hover, .swap:hover, .x:hover { transform: none; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-grid">
+    <div>
+      <p class="brand">Fair Shift Roster</p>
+      <h1 id="title">Weekly staff roster</h1>
+      <p class="muted" id="sub" style="margin-top:6px;max-width:60ch">Every shift covered with the right skills, and weekends, evenings, nights and hours shared fairly.</p>
+    </div>
+    <div class="controls" role="group" aria-label="Roster settings">
+      <div class="seg" role="group" aria-label="Period">
+        <button type="button" data-weeks="1" aria-pressed="true">1 week</button>
+        <button type="button" data-weeks="4" aria-pressed="false">4 weeks</button>
+      </div>
+      <label class="f">Seed<input type="number" id="seed" value="7" min="0" max="1000000"></label>
+      <button class="btn primary" id="solve" type="button">Solve roster</button>
+      <button class="btn" id="csv" type="button">Download roster CSV</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <dl class="kpis" id="kpis" aria-label="Headline numbers"></dl>
+
+    <section class="block" aria-labelledby="h-board">
+      <div class="sec-head">
+        <h2 id="h-board">Roster board</h2>
+        <div class="seg weeks" id="weeks" role="group" aria-label="Week shown"></div>
+      </div>
+      <div class="board-scroll" id="boardScroll" tabindex="0" role="region" aria-label="Roster board, scrolls sideways on small screens">
+        <p class="muted" style="padding:20px">Solving the sample week...</p>
+      </div>
+      <div class="legend" aria-label="How to read the board">
+        <span class="lg"><span class="chipkey k-morning"><span class="bd">M</span></span>Morning</span>
+        <span class="lg"><span class="chipkey k-afternoon"><span class="bd">A</span></span>Afternoon</span>
+        <span class="lg"><span class="chipkey k-evening"><span class="bd">E</span></span>Evening</span>
+        <span class="lg"><span class="chipkey k-night"><span class="bd">N</span></span>Night</span>
+        <span class="lg"><span class="ht" style="width:16px;height:16px">3</span>Filled</span>
+        <span class="lg"><span class="ht gap" style="width:16px;height:16px">!</span>Skill missing</span>
+        <span class="lg"><span class="ht short" style="width:16px;height:16px">1</span>Short</span>
+        <span class="lg"><b style="color:var(--accent)">&#9698;</b>Wish not granted</span>
+        <span class="lg"><b>&#9733;</b>Preferred shift</span>
+        <span class="lg"><b style="color:var(--ok)">Off</b>Day off granted</span>
+      </div>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="block" aria-labelledby="h-cov">
+      <div class="sec-head"><h2 id="h-cov">Coverage report</h2></div>
+      <div id="coverage"></div>
+    </section>
+
+    <div class="cols">
+      <section class="block" aria-labelledby="h-unmet">
+        <div class="sec-head"><h2 id="h-unmet">Unmet wishes</h2></div>
+        <div id="unmet"></div>
+      </section>
+      <section class="block" aria-labelledby="h-cmp">
+        <div class="sec-head"><h2 id="h-cmp">Compared with round-robin</h2></div>
+        <div id="compare" class="cmp-wrap"></div>
+      </section>
+    </div>
+
+    <footer>All names and numbers are invented (CC0). Rules that are never broken: leave, 11 hours rest, consecutive days, weekly hours cap, one shift a day.</footer>
+  </div>
+</main>
+
+<aside class="inspector" id="inspector" hidden aria-label="Shift details" role="dialog"></aside>
+
+<script>
+"use strict";
+const KIND_LETTER = { morning: "M", afternoon: "A", evening: "E", night: "N" };
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const S = { weeks: 1, week: 0, problem: null, result: null, sel: null, token: 0, swapAbort: null, first: true };
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pad = (n) => String(n % 24).padStart(2, "0");
+
+async function api(path, body) {
+  const res = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : undefined);
+  if (!res.ok) throw new Error((await res.text()).slice(0, 200));
+  return res.json();
+}
+
+function dayLabel(d) { return DAYS[(S.problem.start_weekday + d) % 7]; }
+function isWeekend(d) { return (S.problem.start_weekday + d) % 7 >= 5; }
+function timeOf(kind) {
+  const t = S.problem.templates.find((x) => x.kind === kind);
+  return t ? pad(t.start_hour) + "–" + pad(t.start_hour + t.hours) : "";
+}
+function cellMap() {
+  const m = new Map();
+  for (const a of S.result.assignments) m.set(a.staff_id + "|" + a.day, a);
+  return m;
+}
+function person(id) { return S.result.people.find((p) => p.id === id); }
+function slotName(day, kind) { return dayLabel(day) + (S.problem.days > 7 ? " week " + (Math.floor(day / 7) + 1) : "") + " " + kind; }
+
+async function load() {
+  const token = ++S.token;
+  const btn = $("solve");
+  btn.disabled = true; btn.textContent = "Solving...";
+  $("status").textContent = "Solving the roster...";
+  try {
+    const problem = await api("/sample?weeks=" + S.weeks);
+    const result = await api("/solve", { problem, seed: Number($("seed").value) || 0 });
+    if (token !== S.token) return;
+    S.problem = problem; S.result = result; S.week = 0; S.sel = null;
+    closeInspector();
+    render();
+    $("status").textContent = "Solved in " + result.solver.seconds + " s with " + result.solver.iterations.toLocaleString() + " improvement steps.";
+  } catch (e) {
+    $("status").textContent = "Could not solve the roster: " + e.message;
+  } finally {
+    if (token === S.token) { btn.disabled = false; btn.textContent = "Solve roster"; }
+  }
+}
+
+function render() {
+  const r = S.result, c = r.comparison;
+  $("title").textContent = r.name + " roster";
+  $("sub").textContent = (S.problem.days > 7 ? S.problem.days / 7 + "-week" : "Weekly") + " plan for " + S.problem.staff.length + " staff. Every shift covered with the right skills, and weekends, evenings, nights and hours shared fairly.";
+  $("kpis").innerHTML =
+    kpi("Coverage", r.coverage.pct_headcount + "%", r.coverage.places_filled + " of " + r.coverage.places_needed + " places, skills " + r.coverage.pct_skills + "%") +
+    kpi("Fairness score", r.fairness.score, "round-robin: " + c.fairness_score.baseline) +
+    kpi("Unmet wishes", r.unmet_preferences, "round-robin: " + c.unmet_preferences.baseline) +
+    kpi("Rules broken", r.violations.length, "hard rules are never traded away");
+  renderWeeks();
+  renderBoard();
+  renderCoverage();
+  renderUnmet();
+  renderCompare();
+}
+function kpi(t, v, s) { return '<div class="kpi"><dt>' + esc(t) + "</dt><dd>" + esc(v) + "<small>" + esc(s) + "</small></dd></div>"; }
+
+function renderWeeks() {
+  const el = $("weeks");
+  const n = S.problem.days / 7;
+  el.className = "seg weeks" + (n > 1 ? " on" : "");
+  el.innerHTML = Array.from({ length: n }, (_, i) => '<button type="button" data-w="' + i + '" aria-pressed="' + (i === S.week) + '">Week ' + (i + 1) + "</button>").join("");
+}
+
+function heatCell(day) {
+  const slots = S.result.coverage.slots.filter((s) => s.day === day);
+  return '<div class="heat">' + S.result.kinds.map((k) => {
+    const s = slots.find((x) => x.kind === k);
+    if (!s) return '<span class="ht none" title="' + esc(slotName(day, k)) + ': not needed" aria-label="' + esc(slotName(day, k)) + ': not needed">' + KIND_LETTER[k] + "</span>";
+    const skillGap = s.filled >= s.need && s.status === "short";
+    const cls = s.filled < s.need ? "short" : skillGap ? "gap" : "";
+    const txt = skillGap ? "!" : s.filled + "/" + s.need;
+    const label = slotName(day, k) + ": " + s.filled + " of " + s.need + " people" + (skillGap ? ", a required skill is missing" : "");
+    return '<span class="ht ' + cls + '" title="' + esc(label) + '" aria-label="' + esc(label) + '">' + (cls === "" ? s.filled : skillGap ? "!" : s.filled) + "</span>";
+  }).join("") + "</div>";
+}
+
+function unmetSet() {
+  const set = new Set();
+  for (const p of S.result.people) for (const u of p.unmet) set.add(p.id + "|" + u.day);
+  return set;
+}
+
+function renderBoard() {
+  const r = S.result, P = S.problem, cells = cellMap(), bad = unmetSet();
+  const d0 = S.week * 7, days = Array.from({ length: Math.min(7, P.days - d0) }, (_, i) => d0 + i);
+  const maxH = Math.max(48, ...r.people.map((p) => Math.max(p.hours, p.contract)));
+  let h = '<table class="board' + (S.first ? " enter" : "") + '"><caption class="sr">Staff by day. Each chip is a shift; select one to see why it was given and to check swaps.</caption><thead><tr><th class="name" scope="col">Staff</th>';
+  for (const d of days) h += '<th scope="col" class="' + (isWeekend(d) ? "we" : "") + '">' + dayLabel(d) + "</th>";
+  h += '<th class="fair" scope="col">Hours vs contract</th></tr></thead><tbody>';
+  h += '<tr class="cover" style="--i:0"><th class="name" scope="row"><span class="who">Cover</span><span class="skills">M A E N filled</span></th>';
+  for (const d of days) h += '<td class="d ' + (isWeekend(d) ? "we" : "") + '">' + heatCell(d) + "</td>";
+  h += '<td class="fair"><div class="fb-top"><span>' + r.coverage.places_filled + "/" + r.coverage.places_needed + '</span><span class="muted">places</span></div></td></tr>';
+  P.staff.forEach((s, i) => {
+    const pp = person(s.id);
+    h += '<tr style="--i:' + (i + 1) + '"><th class="name" scope="row"><span class="who">' + esc(s.name) + '</span><span class="skills">' + esc(s.skills.join(" · ") || "no listed skills") + "</span></th>";
+    for (const d of days) {
+      const a = cells.get(s.id + "|" + d);
+      const we = isWeekend(d) ? " we" : "";
+      if (a) {
+        const k = a.kind, isBad = bad.has(s.id + "|" + d);
+        const star = !isBad && s.preferred_shifts.includes(k);
+        const sel = S.sel && S.sel.staff_id === s.id && S.sel.day === d;
+        const label = s.name + ", " + slotName(d, k) + (isBad ? ", against a wish" : "");
+        h += '<td class="d' + we + '"><button type="button" class="chip k-' + k + '" data-s="' + esc(s.id) + '" data-d="' + d + '" aria-pressed="' + !!sel + '" aria-label="' + esc(label) + '" title="' + esc(label) + '"><span class="bd">' + KIND_LETTER[k] + '</span><span class="t">' + timeOf(k) + "</span>" +
+          (isBad ? '<span class="mk bad" aria-hidden="true">!</span>' : star ? '<span class="mk star" aria-hidden="true">★</span>' : "") + "</button></td>";
+      } else if (s.leave.includes(d)) {
+        h += '<td class="d' + we + '"><div class="cell-leave">Leave</div></td>';
+      } else if (s.days_off_requests.includes(d)) {
+        h += '<td class="d' + we + '"><div class="cell-off asked">Off</div></td>';
+      } else {
+        h += '<td class="d' + we + '"><div class="cell-off" aria-label="Not working"></div></td>';
+      }
+    }
+    const over = pp.hours > pp.contract;
+    h += '<td class="fair"><div class="fb-top"><span>' + pp.hours + "h</span><span class=\"muted\">of " + pp.contract + 'h</span></div><div class="fb" role="img" aria-label="' + pp.hours + " hours of " + pp.contract + ' contracted"><i class="' + (over ? "over" : "") + '" style="width:' + Math.min(100, pp.hours / maxH * 100) + '%"></i><b style="left:' + Math.min(99, pp.contract / maxH * 100) + '%"></b></div>' +
+      '<div class="fb-meta"><span title="Weekend shifts">Wknd ' + pp.weekends + '</span><span title="Evening and night shifts">E/N ' + (pp.evenings + pp.nights) + "</span>" + (pp.unmet_count ? '<span class="u">' + pp.unmet_count + " unmet</span>" : "") + "</div></td></tr>";
+  });
+  h += "</tbody></table>";
+  $("boardScroll").innerHTML = h;
+  S.first = false;
+}
+
+function renderCoverage() {
+  const cov = S.result.coverage, bad = cov.unfilled;
+  if (!bad.length) {
+    $("coverage").innerHTML = '<p class="ok-line">All ' + cov.slots.length + " shifts are filled to their headcount with every required skill present.</p>";
+    return;
+  }
+  $("coverage").innerHTML = '<ul class="plain rows">' + bad.map((s) => {
+    const sk = Object.entries(s.skills).filter(([, v]) => v.have < v.need).map(([k, v]) => k + " " + v.have + "/" + v.need).join(", ");
+    return '<li><span class="tag red">Short</span><strong>' + esc(slotName(s.day, s.kind)) + "</strong> has " + s.filled + " of " + s.need + " people" + (sk ? "; missing skill: " + esc(sk) : "") + '.<p class="why">' + esc(s.reason) + "</p></li>";
+  }).join("") + "</ul>";
+}
+
+function renderUnmet() {
+  const items = [];
+  for (const p of S.result.people) for (const u of p.unmet) items.push({ p, u });
+  items.sort((a, b) => a.u.day - b.u.day);
+  const granted = S.result.people.reduce((n, p) => n + p.off_granted + p.preferred_worked, 0);
+  if (!items.length) { $("unmet").innerHTML = '<p class="ok-line">Every day-off request and avoided shift was respected (' + granted + " wishes granted).</p>"; return; }
+  $("unmet").innerHTML = '<p class="muted" style="margin-bottom:8px">' + items.length + " not granted, " + granted + " granted.</p><ul class=\"plain rows\">" + items.map(({ p, u }) =>
+    "<li><strong>" + esc(p.name) + "</strong>: " + esc(u.text) + '.<p class="why">' + esc(u.why) + "</p></li>").join("") + "</ul>";
+}
+
+function renderCompare() {
+  const c = S.result.comparison;
+  const row = (label, k, lowBetter, fmt = (v) => v) => {
+    const b = c[k].baseline, s = c[k].solver, mx = Math.max(b, s, 0.0001);
+    const win = lowBetter ? s <= b : s >= b;
+    return "<tr><th scope=\"row\" style=\"font-weight:400\">" + esc(label) + "</th><td>" + fmt(b) + '<span class="bar base" style="width:' + b / mx * 100 + '%"></span></td><td class="' + (win ? "win" : "") + '">' + fmt(s) + '<span class="bar mine" style="width:' + s / mx * 100 + '%"></span></td></tr>';
+  };
+  $("compare").innerHTML = '<table class="cmp"><thead><tr><th scope="col">Measure</th><th scope="col">Round-robin</th><th scope="col">This solver</th></tr></thead><tbody>' +
+    row("Fairness score (higher is better)", "fairness_score", false) +
+    row("Weekend spread, Gini", "gini_weekend", true) +
+    row("Evening and night spread, Gini", "gini_unsocial", true) +
+    row("Hours vs contract, Gini", "gini_hours", true) +
+    row("Unmet wishes", "unmet_preferences", true) +
+    row("Places filled", "coverage_pct", false, (v) => v + "%") +
+    "</tbody></table>";
+}
+
+/* ---------- inspector and swap picker ---------- */
+function openInspector(staffId, day) {
+  S.sel = { staff_id: staffId, day };
+  const a = cellMap().get(staffId + "|" + day);
+  const p = person(staffId);
+  const staff = S.problem.staff.find((s) => s.id === staffId);
+  const others = S.problem.staff.filter((s) => s.id !== staffId);
+  const cells = cellMap();
+  const ins = $("inspector");
+  ins.hidden = false;
+  document.body.classList.add("has-insp");
+  ins.innerHTML =
+    '<div class="insp-head"><div><p class="muted" style="font-size:12px">' + esc(slotName(day, a.kind)) + " &middot; " + timeOf(a.kind) + "</p><h2>" + esc(staff.name) + '</h2></div><button class="x" type="button" id="closeInsp" aria-label="Close details">&times;</button></div>' +
+    '<dl class="facts"><div><dt>Hours</dt><dd>' + p.hours + "/" + p.contract + "</dd></div><div><dt>Weekends</dt><dd>" + p.weekends + "</dd></div><div><dt>Evenings/nights</dt><dd>" + (p.evenings + p.nights) + "</dd></div></dl>" +
+    '<h3>Why this assignment</h3><p>' + esc(a.why) + "</p>" +
+    '<h3>Wishes</h3><p class="muted">' + wishText(staff, p, day, a.kind) + "</p>" +
+    '<h3>Swap with a colleague on ' + esc(dayLabel(day)) + '</h3><p class="muted" style="font-size:13px">Each row asks the server whether the swap breaks a rule.</p><div class="swaps" id="swaps">' +
+    others.map((o) => {
+      const b = cells.get(o.id + "|" + day);
+      return '<button type="button" class="swap" data-o="' + esc(o.id) + '" aria-expanded="false"><span><strong>' + esc(o.name) + '</strong><br><span class="muted" style="font-size:12px">' + (b ? b.kind + " " + timeOf(b.kind) : o.leave.includes(day) ? "on leave" : "off") + '</span></span><span class="res wait" id="res-' + esc(o.id) + '">Checking...</span></button><div class="swap-detail" id="det-' + esc(o.id) + '" hidden></div>';
+    }).join("") + "</div>";
+  $("closeInsp").focus({ preventScroll: true });
+  renderBoard();
+  runSwapChecks(staffId, day, others);
+}
+
+function wishText(staff, p, day, kind) {
+  const bits = [];
+  if (staff.days_off_requests.includes(day)) bits.push("Asked for this day off: not granted.");
+  if (staff.avoid_shifts.includes(kind)) bits.push("Asked to avoid " + kind + "s: not granted.");
+  if (staff.preferred_shifts.includes(kind)) bits.push("Prefers " + kind + " shifts: granted.");
+  if (!bits.length) bits.push("No wish applies to this shift.");
+  bits.push(p.off_granted + " of " + p.off_requests + " day-off requests granted this period.");
+  return esc(bits.join(" "));
+}
+
+async function runSwapChecks(staffId, day, others) {
+  if (S.swapAbort) S.swapAbort.abort();
+  const ac = (S.swapAbort = new AbortController());
+  const assignments = S.result.assignments.map((x) => ({ staff_id: x.staff_id, day: x.day, kind: x.kind }));
+  await Promise.all(others.map(async (o) => {
+    const el = document.getElementById("res-" + o.id);
+    const det = document.getElementById("det-" + o.id);
+    try {
+      const res = await fetch("/swap-check", { method: "POST", headers: { "Content-Type": "application/json" }, signal: ac.signal,
+        body: JSON.stringify({ problem: S.problem, assignments, a: { staff_id: staffId, day }, b: { staff_id: o.id, day } }) });
+      if (!res.ok) throw new Error("check failed");
+      const r = await res.json();
+      if (!el) return;
+      el.className = "res " + (!r.ok ? "stop" : r.coverage_ok ? "good" : "warn");
+      el.textContent = !r.ok ? "Blocked" : r.coverage_ok ? "Allowed" : "Loses a skill";
+      const f = r.fairness.delta, u = r.unmet_preferences.delta;
+      det.innerHTML = "<p><strong>" + esc(r.verdict) + "</strong></p>" +
+        "<p>Fairness " + r.fairness.before + " to " + r.fairness.after + " (" + (f > 0 ? "+" : "") + f + "). Unmet wishes " + r.unmet_preferences.before + " to " + r.unmet_preferences.after + (u ? " (" + (u > 0 ? "+" : "") + u + ")" : "") + ".</p>" +
+        r.violations.slice(0, 3).map((v) => "<p>" + esc(v.message) + "</p>").join("");
+    } catch (e) {
+      if (e.name !== "AbortError" && el) { el.className = "res wait"; el.textContent = "Not checked"; }
+    }
+  }));
+}
+
+function closeInspector() {
+  if (S.swapAbort) S.swapAbort.abort();
+  $("inspector").hidden = true;
+  document.body.classList.remove("has-insp");
+  S.sel = null;
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", (e) => {
+  const chip = e.target.closest(".chip");
+  if (chip) { openInspector(chip.dataset.s, Number(chip.dataset.d)); return; }
+  if (e.target.closest("#closeInsp")) {
+    const had = S.sel; closeInspector(); renderBoard();
+    if (had) { const c = document.querySelector('.chip[data-s="' + had.staff_id + '"][data-d="' + had.day + '"]'); if (c) c.focus(); }
+    return;
+  }
+  const sw = e.target.closest(".swap");
+  if (sw) {
+    const det = document.getElementById("det-" + sw.dataset.o);
+    const open = sw.getAttribute("aria-expanded") === "true";
+    sw.setAttribute("aria-expanded", String(!open));
+    det.hidden = open;
+    return;
+  }
+  const wk = e.target.closest("#weeks button");
+  if (wk) { S.week = Number(wk.dataset.w); closeInspector(); renderWeeks(); renderBoard(); return; }
+  const per = e.target.closest(".seg button[data-weeks]");
+  if (per) {
+    S.weeks = Number(per.dataset.weeks);
+    document.querySelectorAll(".seg button[data-weeks]").forEach((b) => b.setAttribute("aria-pressed", String(b === per)));
+    load();
+  }
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("inspector").hidden) { closeInspector(); renderBoard(); } });
+$("solve").addEventListener("click", load);
+$("csv").addEventListener("click", () => {
+  if (!S.result) return;
+  const cells = cellMap(), head = ["Name"];
+  for (let d = 0; d < S.problem.days; d++) head.push(dayLabel(d) + (S.problem.days > 7 ? " w" + (Math.floor(d / 7) + 1) : ""));
+  const rows = [head].concat(S.problem.staff.map((s) => [s.name].concat(Array.from({ length: S.problem.days }, (_, d) => {
+    const a = cells.get(s.id + "|" + d); return a ? a.kind : s.leave.includes(d) ? "leave" : "";
+  }))));
+  const blob = new Blob([rows.map((r) => r.map((v) => '"' + String(v).replace(/"/g, '""') + '"').join(",")).join("\n")], { type: "text/csv" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "roster.csv"; a.click(); URL.revokeObjectURL(a.href);
+});
+load();
+</script>
+<noscript><p style="padding:16px">This page needs JavaScript to show the roster board.</p></noscript>
+</body>
+</html>
