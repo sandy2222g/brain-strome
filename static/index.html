@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arc Mixer</title>
+<meta name="description" content="Pick the shape of your session and get a playlist whose energy follows it, with smooth transitions between tracks.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Mona+Sans:wdth,wght@75..125,400..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet">
+<style>
+/* Visual system dealt with taste-skill: palette "sky-sand" (sky field, black ink, magenta accent; night set below), type "Mona Sans + Geist Mono", round radius. Layout: arc chart over a track list. */
+:root {
+  --bg:#cbe4f2; --surface:#bcdcee; --card:#e3f0f8; --ink:#0a0a0a; --muted:#44606e; --accent:#b0298f; --on-accent:#ffffff; --line:#a5c8dc;
+  --sans:"Mona Sans", system-ui, sans-serif; --mono:"Geist Mono", ui-monospace, monospace; --ease:cubic-bezier(.2,.8,.2,1); --r:18px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0a0a0a; --surface:#151616; --card:#121313; --ink:#d4e9f5; --muted:#8a9aa3; --accent:#e45fb8; --on-accent:#16040f; --line:#2a2e30; color-scheme:dark; } }
+:root[data-theme="dark"] {
+  --bg:#0a0a0a; --surface:#151616; --card:#121313; --ink:#d4e9f5; --muted:#8a9aa3; --accent:#e45fb8; --on-accent:#16040f; --line:#2a2e30; color-scheme:dark; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:400 16px/1.5 var(--sans); }
+.wrap { max-width:1160px; margin:0 auto; padding-block:26px 56px; padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); }
+h1 { font:500 clamp(2.2rem,6vw,4.2rem)/.98 var(--sans); letter-spacing:-.045em; margin:0 0 10px; text-wrap:balance; font-stretch:104%; }
+h1 em { font-style:normal; color:var(--accent); }
+.lead { color:var(--muted); max-width:54ch; margin:0 0 22px; }
+.label { font:500 .72rem var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+.chip { min-height:44px; padding:0 16px; border-radius:999px; border:1.5px solid var(--ink); background:transparent; color:var(--ink); font:500 .95rem var(--sans); cursor:pointer; transition:transform 150ms var(--ease), background 150ms var(--ease), color 150ms var(--ease); }
+.chip:hover { transform:translateY(-2px); } .chip:active { transform:translateY(1px); transition-duration:90ms; }
+.chip[aria-pressed="true"] { background:var(--ink); color:var(--bg); }
+.row { display:flex; gap:20px; flex-wrap:wrap; align-items:end; margin-bottom:18px; }
+.row label { font-size:.9rem; display:block; } .row output { font-family:var(--mono); color:var(--accent); margin-left:6px; }
+input[type=range] { min-height:44px; width:220px; max-width:100%; accent-color:var(--accent); }
+.btn { min-height:44px; padding:0 22px; border-radius:999px; border:0; background:var(--accent); color:var(--on-accent); font:600 1rem var(--sans); cursor:pointer; transition:transform 150ms var(--ease), filter 150ms var(--ease); }
+.btn:hover { transform:translateY(-2px); filter:brightness(1.08); } .btn:active { transform:translateY(1px); transition-duration:90ms; }
+:focus-visible { outline:3px solid var(--ink); outline-offset:2px; }
+.layout { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:22px; align-items:start; }
+@media (max-width:900px) { .layout { grid-template-columns:minmax(0,1fr); } }
+.panel { background:var(--card); border-radius:var(--r); padding:18px; }
+svg.chart { width:100%; height:auto; display:block; } svg text { font:400 10px var(--mono); fill:var(--muted); }
+.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-top:14px; }
+.stat { background:var(--surface); border-radius:14px; padding:10px 12px; } .stat b { display:block; font:500 1.6rem var(--sans); letter-spacing:-.03em; } .stat span { font-size:.8rem; color:var(--muted); }
+ol.tracks { list-style:none; margin:0; padding:0; counter-reset:t; }
+.t { display:grid; grid-template-columns:28px minmax(0,1fr) auto; gap:4px 10px; padding:10px 0; border-bottom:1px solid var(--line); align-items:center; transition:transform 150ms var(--ease); }
+.t:hover { transform:translateX(3px); } .t .n { font:500 .8rem var(--mono); color:var(--muted); }
+.t b { font-weight:600; } .t .a { color:var(--muted); font-size:.85rem; }
+.bar { grid-column:2 / 4; height:8px; border-radius:99px; background:var(--surface); overflow:hidden; } .bar i { display:block; height:100%; border-radius:99px; background:var(--accent); width:var(--w); }
+.meta { font:400 .75rem var(--mono); color:var(--muted); text-align:right; white-space:nowrap; }
+.join { grid-column:2 / 4; font:400 .72rem var(--mono); color:var(--muted); } .join.smooth { color:var(--ink); } .join.rough { color:var(--accent); font-weight:500; }
+.enter { animation:enter 900ms cubic-bezier(.22,1,.36,1) both; } @keyframes enter { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) { .enter { animation:none; } * { transition:none !important; } }
+.note { color:var(--muted); font-size:.85rem; margin-top:20px; } .note a { color:var(--ink); }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="enter"><h1>Shape the night, <em>we pick the songs</em></h1>
+  <p class="lead">Choose how the energy should move. The mixer picks tracks that follow that curve and joins them smoothly: close tempos, friendly keys, no same artist twice in a row.</p></header>
+  <p class="label">Shape</p><div class="chips" id="arcs" role="group" aria-label="Energy shape"></div>
+  <div class="row">
+    <div><label for="min">Length<output id="o-min">45 min</output></label><input id="min" type="range" min="15" max="120" step="5" value="45"></div>
+    <div><p class="label" style="margin:0 0 6px">Moods</p><div class="chips" id="moods" role="group" aria-label="Moods" style="margin:0"></div></div>
+    <button class="btn" id="go" type="button">Build playlist</button>
+  </div>
+  <div class="layout">
+    <section class="panel"><p class="label">Energy: target vs playlist</p>
+      <svg class="chart" id="chart" viewBox="0 0 520 220" role="img" aria-label="Target energy arc and the playlist's track energies"></svg>
+      <div class="stats" id="stats"></div></section>
+    <section class="panel"><p class="label" id="count">Playlist</p><ol class="tracks" id="list"></ol></section>
+  </div>
+  <p class="note">Invented tracks and artists, synthetic audio features. <a href="/docs">API docs</a></p>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; };
+const NS = "http://www.w3.org/2000/svg", mk = (n, a, t) => { const e = document.createElementNS(NS, n); Object.entries(a || {}).forEach(([k, v]) => e.setAttribute(k, v)); if (t !== undefined) e.textContent = t; return e; };
+let arc = "Warm-up, peak, cool-down", moods = new Set(), allMoods = [];
+const mmss = (s) => Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+function chips(box, items, active, onClick) { box.textContent = ""; items.forEach((n) => { const b = el("button", "chip", n); b.type = "button"; b.setAttribute("aria-pressed", String(active(n))); b.addEventListener("click", () => { onClick(n); chips(box, items, active, onClick); }); box.append(b); }); }
+function chart(d) {
+  const s = $("chart"); s.textContent = ""; const W = 520, H = 220, L = 30, B = 22, T = 8, plotW = W - L - 8, plotH = H - B - T;
+  [0, .5, 1].forEach((v) => { const y = T + plotH * (1 - v); s.append(mk("line", { x1: L, x2: W - 8, y1: y, y2: y, stroke: "var(--line)" }), mk("text", { x: 0, y: y + 3 }, v.toFixed(1))); });
+  const path = d.arc.map((p, i) => (i ? "L" : "M") + (L + p.x * plotW).toFixed(1) + " " + (T + plotH * (1 - p.y)).toFixed(1)).join(" ");
+  s.append(mk("path", { d: path, fill: "none", stroke: "var(--ink)", "stroke-width": 2, "stroke-dasharray": "5 4" }));
+  d.tracks.forEach((t) => { const x0 = L + (t.start_s / d.total_s) * plotW, w = Math.max(3, (t.duration_s / d.total_s) * plotW - 2), h = t.energy * plotH;
+    const r = mk("rect", { x: x0, y: T + plotH - h, width: w, height: h, rx: 3, fill: "var(--accent)", opacity: .85 }); r.append(mk("title", {}, t.title + " · energy " + t.energy)); s.append(r); });
+  s.append(mk("text", { x: L, y: H - 6 }, "0"), mk("text", { x: W - 40, y: H - 6 }, Math.round(d.total_s / 60) + " min"));
+}
+function show(d) {
+  chart(d); const st = $("stats"); st.textContent = "";
+  [[d.arc_rmse.toFixed(2), "arc error (random: " + d.baseline_arc_rmse.toFixed(2) + ")"], [d.mean_transition.toFixed(2), "join roughness (random: " + d.baseline_mean_transition.toFixed(2) + ")"], [d.tracks.length, "tracks, " + d.minutes + " min"]]
+    .forEach(([v, l]) => { const x = el("div", "stat"); x.append(el("b", "", String(v)), el("span", "", l)); st.append(x); });
+  $("count").textContent = d.tracks.length + " tracks · " + d.minutes + " minutes";
+  const ol = $("list"); ol.textContent = "";
+  d.tracks.forEach((t, i) => { const li = el("li", "t"); li.append(el("span", "n", String(i + 1)));
+    const m = el("div"); m.append(el("b", "", t.title), el("div", "a", t.artist + " · " + t.genre + " · " + t.mood)); li.append(m, el("span", "meta", Math.round(t.tempo) + " bpm · " + mmss(t.duration_s)));
+    const bar = el("div", "bar"), f = el("i"); f.style.setProperty("--w", Math.round(t.energy * 100) + "%"); bar.append(f); li.append(bar);
+    if (i) { const rough = t.transition > 0.6, smooth = t.transition < 0.25; li.append(el("div", "join " + (rough ? "rough" : smooth ? "smooth" : ""), (rough ? "Bold change" : smooth ? "Smooth join" : "Gentle join") + " · tempo " + (t.tempo_delta < 1 ? "same" : "±" + Math.round(t.tempo_delta)) + ", key " + (t.key_distance === 0 ? "matches" : t.key_distance <= 0.34 ? "close" : "far"))); }
+    ol.append(li); });
+}
+async function build() {
+  const body = { arc, minutes: +$("min").value, moods: moods.size ? [...moods] : null, seed: 1 };
+  const r = await fetch("/build", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body) }); const d = await r.json();
+  if (!r.ok) { $("count").textContent = d.detail || "Could not build that playlist"; return; } show(d);
+}
+$("go").addEventListener("click", build); $("min").addEventListener("input", () => { $("o-min").textContent = $("min").value + " min"; });
+(async () => {
+  const arcs = Object.keys(await (await fetch("/arcs")).json()); allMoods = Object.keys(await (await fetch("/moods")).json());
+  const draw = () => { chips($("arcs"), arcs, (n) => n === arc, (n) => { arc = n; build(); }); chips($("moods"), allMoods, (n) => moods.has(n), (n) => { moods.has(n) ? moods.delete(n) : moods.add(n); }); };
+  draw(); await build();
+})();
+</script>
+</body>
+</html>

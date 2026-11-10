@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: playlist-arc-builder
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
