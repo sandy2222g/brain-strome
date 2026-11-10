@@ -6,19 +6,19 @@
 <title>Day Sheet</title>
 <meta name="description" content="A clinic day sheet that shows which appointments are likely to be missed and what to do about each one.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap">
 <style>
-/* Visual system dealt with taste-skill: palette "linen-harbour", type "albert" (Albert Sans), soft radius. Layout: timetable with a side desk. */
+/* Visual system dealt with taste-skill: palette "oxblood-grey", type "nunito" (Nunito), soft radius. Layout: timetable with a side desk. */
 :root {
-  --bg:#f3f1ec; --surface:#e6e2d9; --card:#fbfaf7; --ink:#1d2530; --muted:#59626e; --accent:#2c5877; --on-accent:#ffffff; --line:#d6d1c5;
-  --high:#b3261e; --medium:#a8630a; --low:#2c7a54;
-  --sans:"Albert Sans", system-ui, sans-serif; --ease:cubic-bezier(.2,.8,.2,1); --r:8px;
+  --bg:#e8e6e6; --surface:#dad6d6; --card:#f7f5f5; --ink:#241a1b; --muted:#5f5456; --accent:#7d0c14; --on-accent:#ffffff; --line:#cfc8c8;
+  --high:#b3261e; --medium:#8f5a00; --low:#2c7a54;
+  --sans:"Nunito", system-ui, sans-serif; --ease:cubic-bezier(.2,.8,.2,1); --r:8px;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg:#141a21; --surface:#1c242d; --card:#1f2933; --ink:#e9edf2; --muted:#98a3b0; --accent:#8fb8d9; --on-accent:#10202c; --line:#303c48;
+  --bg:#1a1415; --surface:#241b1c; --card:#2a1f20; --ink:#f2e9e9; --muted:#aa9a9c; --accent:#f0868e; --on-accent:#2a0b0e; --line:#3d2e30;
   --high:#ff8277; --medium:#efb05a; --low:#6cc99a; color-scheme: dark; } }
 :root[data-theme="dark"] {
-  --bg:#141a21; --surface:#1c242d; --card:#1f2933; --ink:#e9edf2; --muted:#98a3b0; --accent:#8fb8d9; --on-accent:#10202c; --line:#303c48;
+  --bg:#1a1415; --surface:#241b1c; --card:#2a1f20; --ink:#f2e9e9; --muted:#aa9a9c; --accent:#f0868e; --on-accent:#2a0b0e; --line:#3d2e30;
   --high:#ff8277; --medium:#efb05a; --low:#6cc99a; color-scheme: dark; }
 * { box-sizing:border-box; }
 body { margin:0; background:var(--bg); color:var(--ink); font:400 16px/1.5 var(--sans); }
