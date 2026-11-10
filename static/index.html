@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exam Runway</title>
+<meta name="description" content="Plan your revision day by day. Spaced repetition and a forgetting-curve model show how ready you will be on exam day.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Visual system dealt with taste-skill: palette "cool-grey-cobalt", type "plex" (IBM Plex Sans + Mono). Layout: boarding passes on paper. */
+:root {
+  --bg:#eef0f3; --surface:#e2e5ea; --card:#ffffff; --ink:#0b0c0e; --muted:#555c68; --accent:#1f2de6; --on-accent:#ffffff;
+  --line:#c9ced6; --good:#1b7a4a; --warn:#a8630a; --bad:#bd3228;
+  --sans:"IBM Plex Sans", system-ui, sans-serif; --mono:"IBM Plex Mono", ui-monospace, monospace;
+  --ease:cubic-bezier(.2,.8,.2,1); --r:6px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#12141a; --surface:#1b1e26; --card:#1f232c; --ink:#eceef3; --muted:#9aa1ae; --accent:#6f95ff; --on-accent:#0b0c0e;
+  --line:#2f3440; --good:#4cc38a; --warn:#e5a24a; --bad:#ff7a6e; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg:#12141a; --surface:#1b1e26; --card:#1f232c; --ink:#eceef3; --muted:#9aa1ae; --accent:#6f95ff; --on-accent:#0b0c0e;
+  --line:#2f3440; --good:#4cc38a; --warn:#e5a24a; --bad:#ff7a6e; color-scheme: dark; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:400 16px/1.5 var(--sans); }
+.wrap { max-width:1120px; margin:0 auto; padding-block:28px 56px; padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); }
+h1 { font:500 clamp(1.9rem,4.6vw,3rem)/1.05 var(--sans); letter-spacing:-.035em; margin:0 0 10px; text-wrap:balance; max-width:18ch; }
+h2 { font:500 1.15rem/1.2 var(--sans); letter-spacing:-.01em; margin:0 0 12px; }
+.lead { color:var(--muted); max-width:56ch; margin:0 0 24px; }
+.mono { font-family:var(--mono); font-feature-settings:"tnum"; }
+.label { font:500 .72rem/1 var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+.layout { display:grid; grid-template-columns:minmax(0,380px) minmax(0,1fr); gap:28px; align-items:start; }
+@media (max-width:860px) { .layout { grid-template-columns:minmax(0,1fr); } }
+.panel { background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:18px; }
+label.f { display:block; margin-top:12px; font-weight:500; font-size:.9rem; }
+input, select { width:100%; min-height:44px; padding:8px 10px; margin-top:4px; background:var(--bg); color:var(--ink); border:1px solid var(--line); border-radius:var(--r); font:inherit; }
+input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.row2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.topics { display:grid; gap:8px; margin-top:6px; }
+.topic { display:grid; grid-template-columns:minmax(0,1fr) 64px 64px 64px 36px; gap:6px; align-items:end; }
+.topic input { margin-top:0; padding:8px 6px; }
+.th { display:grid; grid-template-columns:minmax(0,1fr) 64px 64px 64px 36px; gap:6px; margin-top:12px; }
+.btn { min-height:44px; padding:0 16px; border-radius:var(--r); border:1px solid var(--accent); background:var(--accent); color:var(--on-accent); font:500 1rem var(--sans); cursor:pointer; transition:transform 150ms var(--ease), filter 150ms var(--ease); }
+.btn:hover { filter:brightness(1.08); transform:translateY(-1px); }
+.btn:active { transform:translateY(1px) scale(.99); transition-duration:90ms; }
+.btn.ghost { background:transparent; color:var(--accent); }
+.btn.icon { padding:0; width:36px; min-width:36px; }
+.actions { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:16px; }
+.kpi { border:1px solid var(--line); background:var(--card); border-radius:var(--r); padding:14px; }
+.kpi b { display:block; font:500 1.9rem/1.1 var(--mono); letter-spacing:-.03em; margin-top:8px; }
+.passes { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; margin-bottom:22px; }
+.pass { position:relative; display:grid; grid-template-columns:minmax(0,1fr) 92px; background:var(--card); border:1px solid var(--line); border-radius:var(--r); transition:transform 150ms var(--ease), border-color 150ms var(--ease); }
+.pass:hover { transform:translateY(-2px); border-color:var(--accent); }
+.pass .main { padding:14px; min-width:0; }
+.pass .main strong { display:block; font-weight:600; margin:6px 0 10px; overflow-wrap:anywhere; }
+.pass .stub { border-left:2px dashed var(--line); padding:14px 10px; text-align:center; display:flex; flex-direction:column; justify-content:center; gap:4px; }
+.pass .stub b { font:500 1.6rem/1 var(--mono); letter-spacing:-.04em; }
+.pass::before, .pass::after { content:""; position:absolute; right:84px; width:14px; height:14px; border-radius:50%; background:var(--bg); border:1px solid var(--line); }
+.pass::before { top:-8px; } .pass::after { bottom:-8px; }
+.meter { height:6px; background:var(--surface); border-radius:3px; overflow:hidden; }
+.meter i { display:block; height:100%; background:var(--c, var(--accent)); width:var(--w); }
+.good { --c:var(--good); color:var(--good); } .warn { --c:var(--warn); color:var(--warn); } .bad { --c:var(--bad); color:var(--bad); }
+.strip { display:grid; grid-template-columns:repeat(auto-fill, minmax(136px,1fr)); gap:6px; }
+.day { background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:8px; min-height:104px; font-size:.78rem; display:flex; flex-direction:column; gap:4px; transition:transform 150ms var(--ease); }
+.day:hover { transform:translateY(-2px); }
+.day.rest { background:transparent; border-style:dashed; color:var(--muted); }
+.day .d { font:500 .7rem var(--mono); color:var(--muted); }
+.day .s { display:flex; gap:6px; align-items:baseline; justify-content:space-between; min-width:0; }
+.day .s span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.day .h { height:4px; border-radius:2px; background:var(--accent); width:var(--w); margin-top:auto; }
+.warns { list-style:none; margin:0 0 16px; padding:0; display:grid; gap:8px; }
+.warns li { border:1px solid var(--warn); color:var(--ink); background:var(--card); border-radius:var(--r); padding:10px 12px; font-size:.9rem; }
+.hscroll { overflow-x:auto; }
+.enter { animation:enter 900ms cubic-bezier(.22,1,.36,1) both; }
+@keyframes enter { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+@media (max-width:560px) { .topic, .th { grid-template-columns:minmax(0,1fr) 54px 54px 54px 36px; } }
+@media (prefers-reduced-motion: reduce) { .enter { animation:none; } * { transition:none !important; } }
+footer { margin-top:32px; color:var(--muted); font-size:.85rem; }
+footer a { color:var(--accent); }
+[hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="enter">
+    <p class="label">Exam Runway</p>
+    <h1>Be ready on exam day, not the night before</h1>
+    <p class="lead">Add your topics and your exam date. Exam Runway schedules short reviews that space out as you learn, and estimates how much you will remember on the day.</p>
+  </header>
+
+  <div class="layout">
+    <form class="panel" id="form" autocomplete="off">
+      <h2>Your exam</h2>
+      <div class="row2">
+        <label class="f" for="exam_date">Exam date<input id="exam_date" type="date" required></label>
+        <label class="f" for="hours">Hours per day<input id="hours" type="number" min="0.5" max="16" step="0.5" value="3"></label>
+      </div>
+      <div class="row2">
+        <label class="f" for="rest">Rest day<select id="rest"><option value="">None</option><option value="5">Saturday</option><option value="6" selected>Sunday</option></select></label>
+        <label class="f" for="sleep">Sleep (hours)<input id="sleep" type="number" min="3" max="12" step="0.5" value="7"></label>
+      </div>
+      <div class="th label"><span>Topic</span><span>Marks</span><span>Hard</span><span>Know</span><span></span></div>
+      <div class="topics" id="topics"></div>
+      <div class="actions">
+        <button class="btn ghost" type="button" id="add">Add topic</button>
+        <button class="btn" type="submit">Plan my runway</button>
+      </div>
+      <p class="label" style="margin-top:14px;text-transform:none;letter-spacing:0">Marks: share of the exam. Hard and Know: 0 to 1.</p>
+    </form>
+
+    <section id="out" aria-live="polite">
+      <div class="kpis" id="kpis"></div>
+      <ul class="warns" id="warns"></ul>
+      <h2>Readiness by topic on exam day</h2>
+      <div class="passes" id="passes"></div>
+      <h2>Day by day</h2>
+      <div class="hscroll"><div class="strip" id="strip"></div></div>
+    </section>
+  </div>
+  <footer>API docs at <a href="/docs">/docs</a>. Score model metrics at <a href="/metrics">/metrics</a>. Synthetic training data.</footer>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
+const pct = (x) => Math.round(x * 100);
+const tone = (r) => (r >= 0.75 ? "good" : r >= 0.5 ? "warn" : "bad");
+function addTopic(t = { name: "", weight: 1, difficulty: 0.5, confidence: 0.2 }) {
+  const row = el("div", "topic");
+  const mk = (cls, type, val, extra = {}) => { const i = el("input"); i.type = type; i.value = val; i.className = cls; Object.assign(i, extra); return i; };
+  const name = mk("t-name", "text", t.name, { placeholder: "Topic name", maxLength: 60 }); name.setAttribute("aria-label", "Topic name");
+  const w = mk("t-w", "number", t.weight, { min: 0.5, step: 0.5 }); w.setAttribute("aria-label", "Marks share");
+  const d = mk("t-d", "number", t.difficulty, { min: 0, max: 1, step: 0.1 }); d.setAttribute("aria-label", "Difficulty from 0 to 1");
+  const c = mk("t-c", "number", t.confidence, { min: 0, max: 1, step: 0.1 }); c.setAttribute("aria-label", "Confidence from 0 to 1");
+  const rm = el("button", "btn ghost icon", "×"); rm.type = "button"; rm.setAttribute("aria-label", "Remove topic");
+  rm.addEventListener("click", () => { if (document.querySelectorAll(".topic").length > 1) row.remove(); });
+  row.append(name, w, d, c, rm); $("topics").append(row);
+}
+function readForm() {
+  const topics = [...document.querySelectorAll(".topic")].map((r) => ({
+    name: r.querySelector(".t-name").value.trim(), weight: +r.querySelector(".t-w").value,
+    difficulty: +r.querySelector(".t-d").value, confidence: +r.querySelector(".t-c").value })).filter((t) => t.name);
+  const rest = $("rest").value;
+  return { topics, exam_date: $("exam_date").value, hours_per_day: +$("hours").value, sleep_hours: +$("sleep").value, rest_weekdays: rest ? [+rest] : [] };
+}
+function render(d) {
+  const k = $("kpis"); k.textContent = "";
+  [["Predicted score", Math.round(d.predicted_score) + "/100"], ["Memory on exam day", pct(d.exam_readiness) + "%"], ["Recall half-life", d.avg_half_life_days + " days"], ["Study hours", d.total_hours + " h"]]
+    .forEach(([l, v]) => { const x = el("div", "kpi"); x.append(el("span", "label", l), el("b", "", v)); k.append(x); });
+  const w = $("warns"); w.textContent = ""; d.warnings.forEach((m) => w.append(el("li", "", m)));
+  const p = $("passes"); p.textContent = "";
+  Object.entries(d.readiness).sort((a, b) => a[1] - b[1]).forEach(([name, r]) => {
+    const c = el("div", "pass " + tone(r)); const main = el("div", "main"); const meter = el("div", "meter"); const i = el("i"); i.style.setProperty("--w", pct(r) + "%"); meter.append(i);
+    main.append(el("span", "label", "Topic"), el("strong", "", name), meter);
+    const stub = el("div", "stub"); const b = el("b", "", pct(r) + "%"); b.className = tone(r); stub.append(b, el("span", "label", "recall"));
+    c.append(main, stub); p.append(c);
+  });
+  const s = $("strip"); s.textContent = "";
+  const maxH = Math.max(...d.days.map((x) => x.hours), 1);
+  d.days.forEach((day) => {
+    const dt = new Date(day.date + "T00:00:00"); const box = el("div", "day" + (day.sessions.length ? "" : " rest"));
+    box.append(el("span", "d", dt.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })));
+    if (!day.sessions.length) box.append(el("span", "", "Rest"));
+    day.sessions.forEach((x) => { const r = el("div", "s"); r.append(el("span", "", x.topic), el("span", "mono", x.hours + "h")); box.append(r); });
+    if (day.hours) { const h = el("div", "h"); h.style.setProperty("--w", Math.round((day.hours / maxH) * 100) + "%"); box.append(h); }
+    s.append(box);
+  });
+}
+async function plan() {
+  const body = readForm();
+  const r = await fetch("/plan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const d = await r.json();
+  if (!r.ok) { $("kpis").textContent = ""; $("passes").textContent = ""; $("strip").textContent = ""; const w = $("warns"); w.textContent = ""; w.append(el("li", "", typeof d.detail === "string" ? d.detail : "Check the form: every topic needs a name and the exam must be in the future.")); return; }
+  render(d);
+}
+$("add").addEventListener("click", () => addTopic());
+$("form").addEventListener("submit", (e) => { e.preventDefault(); plan(); });
+(async () => {
+  const s = await (await fetch("/sample")).json();
+  $("exam_date").value = s.exam_date; $("hours").value = s.hours_per_day; $("sleep").value = s.sleep_hours;
+  s.topics.forEach(addTopic); plan();
+})();
+</script>
+</body>
+</html>
