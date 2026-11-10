@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from buddies.api import app
 from fastapi.testclient import TestClient
+
+from buddies.api import app
 
 A = {"name": "A", "skills": {"Calculus": 5}, "slots": ["Mon morning"]}
 B = {"name": "B", "skills": {"Calculus": 0}, "slots": ["Mon morning"]}
