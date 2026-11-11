@@ -1,0 +1,20 @@
+{"source":"Invented menu and step timings for the demo. MIT.",
+"capacity":{"oven":1,"hob":3,"hands":1},
+"dishes":[
+{"name":"Roast chicken","steps":[
+ {"step":"Season and truss","minutes":15,"resource":"hands"},
+ {"step":"Roast","minutes":75,"resource":"oven"},
+ {"step":"Rest and carve","minutes":15,"resource":"hands"}]},
+{"name":"Roast potatoes","steps":[
+ {"step":"Peel and chop","minutes":15,"resource":"hands"},
+ {"step":"Parboil","minutes":10,"resource":"hob"},
+ {"step":"Roast","minutes":45,"resource":"oven"}]},
+{"name":"Green beans","steps":[
+ {"step":"Trim","minutes":8,"resource":"hands"},
+ {"step":"Steam and toss","minutes":8,"resource":"hob"}]},
+{"name":"Gravy","steps":[
+ {"step":"Make base","minutes":10,"resource":"hob"},
+ {"step":"Simmer and season","minutes":10,"resource":"hands"}]},
+{"name":"Apple crumble","steps":[
+ {"step":"Prepare filling and topping","minutes":20,"resource":"hands"},
+ {"step":"Bake","minutes":35,"resource":"oven"}]}]}
