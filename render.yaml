@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: race-pace-planner
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

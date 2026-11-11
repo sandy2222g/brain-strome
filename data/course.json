@@ -1,0 +1,46 @@
+{
+ "source": "Invented hilly 10 km course; grade is percent slope per kilometre segment. MIT.",
+ "even_kmh": 11.0,
+ "segments": [
+  {
+   "km": 1.0,
+   "grade": 0.0
+  },
+  {
+   "km": 1.0,
+   "grade": 4.0
+  },
+  {
+   "km": 1.0,
+   "grade": 8.0
+  },
+  {
+   "km": 1.0,
+   "grade": 5.0
+  },
+  {
+   "km": 1.0,
+   "grade": -2.0
+  },
+  {
+   "km": 1.0,
+   "grade": -8.0
+  },
+  {
+   "km": 1.0,
+   "grade": -5.0
+  },
+  {
+   "km": 1.0,
+   "grade": 2.0
+  },
+  {
+   "km": 1.0,
+   "grade": 7.0
+  },
+  {
+   "km": 1.0,
+   "grade": 0.0
+  }
+ ]
+}
