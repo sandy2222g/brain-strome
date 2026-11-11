@@ -55,7 +55,7 @@ Goal: build as many deployable, resume-ready open-source projects as time allows
 | Arc Mixer | playlist-arc-builder | 22 pass | built+ran | workflow present | yes | no (guide + render.yaml) | Docker Hub 429s were transient |
 | Pack Weigh-In | trail-pack-optimizer | 19 pass | built+ran | workflow present | yes | no (guide + render.yaml) | Docker Hub 429s were transient |
 | Same Time Zone | fair-meeting-time | 21 pass | built+ran | workflow present | yes | no (guide + render.yaml) | Docker Hub 429s were transient |
-| Square Up | roommate-bill-settler | 16 pass | built+ran | workflow present | yes | no | none |
+| Square Up | roommate-bill-settler | 16 pass | built OK; COPY data fix not re-run locally (Docker Hub 429) | workflow present | yes | no | none |
 | Perishable Stock Planner | (none) | - | - | - | no | no | agent hit 5-hour API rate limit mid-build; abandoned |
 
 ### Built
@@ -75,3 +75,4 @@ Python + FastAPI + static UI per project; each project got its own palette, type
 
 ### Next steps
 Deploy two to Render, confirm CI green on the newest branches, rebuild perishable-stock-planner, add screenshots to a portfolio page.
+- 06:40 IST: roommate-bill-settler container check caught missing COPY data (sample 500). Fixed in Dockerfile and pushed; local rebuild blocked twice by: 429 Too Many Requests on registry-1.docker.io python:3.12-slim manifest. Not retried further; CI docker job builds it.
