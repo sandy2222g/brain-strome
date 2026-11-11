@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: fair-meeting-time
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
