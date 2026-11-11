@@ -1,0 +1,81 @@
+{
+ "route": {
+  "name": "Harbor to Coast",
+  "length_km": 540
+ },
+ "source": "Synthetic route and prices. MIT.",
+ "stops": [
+  {
+   "name": "Harbor Fuel",
+   "km": 62,
+   "kind": "fuel",
+   "price": 1.71
+  },
+  {
+   "name": "Pine Cafe",
+   "km": 95,
+   "kind": "break",
+   "price": 0
+  },
+  {
+   "name": "Ridge Services",
+   "km": 140,
+   "kind": "both",
+   "price": 1.84
+  },
+  {
+   "name": "Mill Road Diner",
+   "km": 171,
+   "kind": "break",
+   "price": 0
+  },
+  {
+   "name": "Lakeside Gas",
+   "km": 205,
+   "kind": "fuel",
+   "price": 1.66
+  },
+  {
+   "name": "Orchard Stop",
+   "km": 248,
+   "kind": "both",
+   "price": 1.79
+  },
+  {
+   "name": "Hilltop Fuel",
+   "km": 290,
+   "kind": "fuel",
+   "price": 1.92
+  },
+  {
+   "name": "Crossroads Cafe",
+   "km": 322,
+   "kind": "break",
+   "price": 0
+  },
+  {
+   "name": "Valley Services",
+   "km": 371,
+   "kind": "both",
+   "price": 1.74
+  },
+  {
+   "name": "Riverbend Gas",
+   "km": 415,
+   "kind": "fuel",
+   "price": 1.69
+  },
+  {
+   "name": "Summit Cafe",
+   "km": 452,
+   "kind": "break",
+   "price": 0
+  },
+  {
+   "name": "Coast Fuel",
+   "km": 498,
+   "kind": "fuel",
+   "price": 1.77
+  }
+ ]
+}

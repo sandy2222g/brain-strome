@@ -1,0 +1,34 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pit Stops</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#10151f;--panel:#182133;--ink:#eef2f8;--mute:#98a6bd;--road:#2a3550;--fuel:#ffb020;--brk:#36d6c0;--line:#2b3957}
+@media(prefers-color-scheme:light){:root{--bg:#eef1f6;--panel:#fff;--ink:#14213a;--mute:#566685;--road:#c6cfdf;--fuel:#d98200;--brk:#0f9c8a;--line:#d5dcea}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Source Sans 3",sans-serif}
+main{max-width:1000px;margin:auto;padding:24px 16px 56px}h1{font:800 clamp(2rem,7vw,3.4rem)/1 Rubik;margin:0}h1 em{font-style:normal;color:var(--fuel)}
+.sub{color:var(--mute);margin:6px 0 20px}.ctl{display:flex;flex-wrap:wrap;gap:20px;margin-bottom:20px}label{display:grid;gap:4px;font-size:.85rem;color:var(--mute);min-width:200px}
+input[type=range]{accent-color:var(--fuel);min-height:44px}b.v{color:var(--ink)}:focus-visible{outline:3px solid var(--brk);outline-offset:2px}
+.panel{background:var(--panel);border:1px solid var(--line);padding:16px;margin-bottom:16px;border-radius:8px;animation:in .3s}@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.road{position:relative;height:84px;margin:28px 8px 8px}.road:before{content:"";position:absolute;left:0;right:0;top:40px;height:8px;background:var(--road);border-radius:4px}
+.pin{position:absolute;top:30px;width:16px;height:28px;margin-left:-8px;border-radius:8px}.pin.fuel{background:var(--fuel)}.pin.break{background:var(--brk)}.pin.both{background:linear-gradient(var(--fuel) 50%,var(--brk) 50%)}
+.pin.off{opacity:.25}.pin span{position:absolute;top:34px;left:50%;transform:translateX(-50%);font-size:.7rem;color:var(--mute);white-space:nowrap}
+.stats{display:flex;flex-wrap:wrap;gap:24px}.stat b{display:block;font:800 2.2rem Rubik}.stat span{color:var(--mute);font-size:.85rem}
+.list div{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}.err{color:var(--fuel);font-weight:600}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><main>
+<h1>Pit <em>Stops</em></h1><p class="sub">Fewest stops, cheapest fuel, regular breaks. Amber is fuel, teal is a break.</p>
+<div class="ctl"><label><span>Tank range <b class="v" id="rv">220</b> km</span><input type="range" id="r" min="120" max="400" step="10" value="220"></label>
+<label><span>Longest stretch without a stop <b class="v" id="lv">130</b> km</span><input type="range" id="l" min="60" max="250" step="10" value="130"></label></div>
+<div class="panel"><div class="road" id="road" aria-label="Route with chosen stops"></div></div>
+<div class="panel stats" id="st" aria-live="polite"></div><div class="panel list" id="ls"></div></main>
+<script>
+const $=i=>document.getElementById(i);let route;
+async function go(){$("rv").textContent=$("r").value;$("lv").textContent=$("l").value;
+if(!route)route=await (await fetch("/route")).json();
+const r=await fetch("/plan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({range_km:+$("r").value,max_leg_km:+$("l").value})});const d=await r.json();
+if(!r.ok){$("st").innerHTML=`<span class="err">${d.detail}</span>`;$("ls").innerHTML="";$("road").innerHTML="";return}
+const on=new Set(d.stops.map(s=>s.name));
+$("road").innerHTML=route.stops.map(s=>`<div class="pin ${s.kind}${on.has(s.name)?"":" off"}" style="left:${s.km/route.length_km*100}%" title="${s.name} ${s.km} km">${on.has(s.name)?`<span>${s.km}</span>`:""}</div>`).join("");
+$("st").innerHTML=`<div class="stat"><b>${d.summary.stops}</b><span>stops (greedy plan: ${d.naive_summary.stops})</span></div><div class="stat"><b>${d.summary.fuel_stops}</b><span>fuel stops</span></div><div class="stat"><b>$${d.summary.avg_fuel_price.toFixed(2)}</b><span>avg fuel price/l (greedy: $${d.naive_summary.avg_fuel_price.toFixed(2)})</span></div>`;
+$("ls").innerHTML=d.stops.map(s=>`<div><span>${s.name} · km ${s.km}</span><span>${s.kind==="break"?"break":s.kind==="both"?"fuel + break $"+s.price.toFixed(2):"fuel $"+s.price.toFixed(2)}</span></div>`).join("")}
+$("r").oninput=$("l").oninput=go;go();
+</script></body></html>

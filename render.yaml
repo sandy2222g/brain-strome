@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: road-trip-stop-planner
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
