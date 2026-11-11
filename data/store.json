@@ -1,0 +1,12 @@
+{"source":"Invented store layout and product positions for the demo. MIT.",
+"aisles":8,"depth":10,"aisle_gap":3,
+"aisle_names":["Fresh produce","Bakery","Dairy","Pasta & rice","Tins & sauces","Snacks","Drinks","Household"],
+"items":{
+"apples":[0,2],"bananas":[0,3],"lettuce":[0,7],"tomatoes":[0,9],
+"bread":[1,1],"bagels":[1,4],"croissants":[1,8],
+"milk":[2,9],"yogurt":[2,6],"cheese":[2,3],"eggs":[2,1],
+"pasta":[3,2],"rice":[3,5],"noodles":[3,8],
+"beans":[4,3],"tomato sauce":[4,7],"tuna":[4,9],
+"crisps":[5,2],"chocolate":[5,6],"biscuits":[5,9],
+"water":[6,1],"juice":[6,5],"coffee":[6,8],
+"dish soap":[7,3],"bin bags":[7,6],"toothpaste":[7,9]}}

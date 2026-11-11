@@ -1,0 +1,44 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aisle Walk</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff9db;--card:#fffef5;--ink:#1f2a1d;--mute:#667060;--tomato:#e8452c;--leaf:#2f8f4e;--line:#e6dfb0;--shelf:#f2e6a0}
+@media(prefers-color-scheme:dark){:root{--bg:#171a12;--card:#20241a;--ink:#f4f1da;--mute:#a7aa97;--tomato:#ff6b50;--leaf:#6cd08a;--line:#383d2c;--shelf:#3a3a20}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,sans-serif}
+main{max-width:1040px;margin:auto;padding:24px 16px 56px}h1{font:700 clamp(2.2rem,8vw,3.8rem)/1 Fredoka;margin:0}h1 span{color:var(--tomato)}.sub{color:var(--mute);margin:6px 0 18px}
+.two{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:18px;align-items:start}@media(max-width:720px){.two{grid-template-columns:1fr}}
+.list{background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:12px;max-height:520px;overflow:auto}.list h2{font:700 1.1rem Fredoka;margin:8px 0 4px;color:var(--leaf)}
+.list label{display:flex;align-items:center;gap:8px;min-height:36px;font-size:.92rem;cursor:pointer}input[type=checkbox]{accent-color:var(--tomato);width:18px;height:18px}:focus-visible{outline:3px solid var(--tomato);outline-offset:2px}
+.map{background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:12px;overflow-x:auto}svg{width:100%;min-width:560px;height:auto;display:block}
+.stats{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px}.s{border:2px solid var(--ink);border-radius:12px;padding:6px 14px;background:var(--card)}.s b{display:block;font:700 1.8rem Fredoka;color:var(--tomato)}.s span{font-size:.8rem;color:var(--mute)}
+ol{margin:10px 0 0;padding-left:1.4em;font-size:.9rem}li small{color:var(--mute)}
+</style></head><body><main>
+<h1>Aisle <span>Walk</span></h1><p class="sub">Tick your shopping list in the order you think of things. Get the shortest path through the shop instead of zig-zagging.</p>
+<div class="two"><div class="list" id="l" role="group" aria-label="Shopping list"></div>
+<div><div class="stats" id="st" aria-live="polite"></div><div class="map"><svg id="m" viewBox="0 0 640 330" role="img" aria-label="Store map with route"></svg></div><ol id="o"></ol></div></div></main>
+<script>
+const $=i=>document.getElementById(i);let store;const picked=["milk","apples","pasta","water","bread","tuna","crisps","dish soap","eggs","rice"];
+const X=a=>50+a*(540/7),Y=d=>40+d*24;
+function pos(a,d){return [X(a),Y(d)]}
+function sync(e){const i=picked.indexOf(e.target.value);if(e.target.checked&&i<0)picked.push(e.target.value);if(!e.target.checked&&i>=0)picked.splice(i,1);go()}
+async function go(){const items=picked.slice();
+if(!items.length){$("st").innerHTML="";$("o").innerHTML="";draw([],[]);return}
+const d=await (await fetch("/route",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({items})})).json();
+$("st").innerHTML=`<div class="s"><b>${d.length}</b><span>steps (best order)</span></div><div class="s"><b>${d.list_order_length}</b><span>steps in tick order</span></div><div class="s"><b>${Math.round((1-d.length/d.list_order_length)*100)}%</b><span>less walking</span></div>`;
+$("o").innerHTML=d.steps.map(s=>`<li>${s.item} <small>${s.aisle_name} · ${s.leg} steps</small></li>`).join("");
+draw(d.steps,items)}
+function draw(steps,items){let g="";
+for(let a=0;a<store.aisles;a++){g+=`<rect x="${X(a)-8}" y="${Y(0)}" width="16" height="${Y(store.depth)-Y(0)}" fill="var(--shelf)" stroke="var(--line)"/><text x="${X(a)}" y="14" font-size="9" text-anchor="middle" fill="currentColor" opacity=".7">${store.aisle_names[a].split(" ")[0]}</text>`}
+g+=`<text x="12" y="${Y(0)-6}" font-size="9" fill="currentColor" opacity=".6">front</text><text x="12" y="${Y(store.depth)+14}" font-size="9" fill="currentColor" opacity=".6">back</text>`;
+const pts=[[0,0],...steps.slice(0,-1).map(s=>[s.aisle,s.depth]),[store.aisles-1,0]];
+let path="M";const route=[];let cur=[0,0];
+for(const s of steps){const nxt=[s.aisle,s.depth];route.push(cur,nxt);cur=nxt}
+let p="";for(let i=0;i<route.length;i+=2){const [a1,d1]=route[i],[a2,d2]=route[i+1];const [x1,y1]=pos(a1,d1),[x2,y2]=pos(a2,d2);
+if(a1===a2)p+=`M${x1},${y1}L${x2},${y2}`;else{const front=d1+d2<=(2*store.depth-d1-d2);const cy=front?Y(0)-8:Y(store.depth)+8;p+=`M${x1},${y1}L${x1},${cy}L${x2},${cy}L${x2},${y2}`}}
+g+=`<path d="${p}" fill="none" stroke="var(--tomato)" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="6 4"/>`;
+steps.forEach((s,i)=>{if(s.item==="Checkout")return;const [x,y]=pos(s.aisle,s.depth);g+=`<circle cx="${x}" cy="${y}" r="9" fill="var(--tomato)"/><text x="${x}" y="${y+3.5}" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">${i+1}</text>`});
+g+=`<text x="${X(0)}" y="${Y(store.depth)+26}" font-size="10" fill="var(--leaf)" font-weight="700" text-anchor="middle">IN (front)</text><text x="${X(store.aisles-1)}" y="${Y(store.depth)+26}" font-size="10" fill="var(--leaf)" font-weight="700" text-anchor="middle">CHECKOUT (front)</text>`;
+$("m").innerHTML=g}
+(async()=>{store=await (await fetch("/store")).json();
+$("l").innerHTML=store.aisle_names.map((n,a)=>`<h2>${n}</h2>`+Object.entries(store.items).filter(([k,v])=>v[0]===a).map(([k])=>`<label><input type="checkbox" value="${k}" ${picked.includes(k)?"checked":""}>${k}</label>`).join("")).join("");
+document.querySelectorAll("#l input").forEach(e=>e.onchange=sync);go()})();
+</script></body></html>

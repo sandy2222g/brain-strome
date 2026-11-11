@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: grocery-aisle-route
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
