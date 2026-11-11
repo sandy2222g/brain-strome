@@ -1,0 +1,7 @@
+{"source":"Synthetic recipes and prices invented for this demo. MIT.",
+"packs":{"rice":{"size":1000,"unit":"g","price":2.4},"lentils":{"size":500,"unit":"g","price":1.8},"onion":{"size":1000,"unit":"g","price":1.5},"tomato":{"size":500,"unit":"g","price":1.9},"coconut milk":{"size":400,"unit":"ml","price":1.3},"curry paste":{"size":100,"unit":"g","price":2.2},"spinach":{"size":200,"unit":"g","price":1.6},"pasta":{"size":500,"unit":"g","price":1.2},"olive oil":{"size":500,"unit":"ml","price":5.5},"garlic":{"size":50,"unit":"g","price":0.8},"cheese":{"size":200,"unit":"g","price":2.6},"eggs":{"size":6,"unit":"pc","price":2.1}},
+"recipes":[
+{"name":"Lentil curry","serves":4,"items":{"lentils":300,"onion":200,"tomato":400,"coconut milk":400,"curry paste":50,"rice":320}},
+{"name":"Spinach pasta","serves":4,"items":{"pasta":400,"spinach":200,"garlic":15,"olive oil":40,"cheese":80}},
+{"name":"Tomato egg rice","serves":2,"items":{"eggs":4,"tomato":300,"onion":100,"rice":160,"olive oil":20}}
+]}

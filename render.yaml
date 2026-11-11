@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: recipe-scaler-shopping-list
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

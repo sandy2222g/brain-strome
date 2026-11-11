@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cook For N</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff7ec;--ink:#201a14;--mute:#6b5f52;--pop:#e4572e;--pop2:#2e86ab;--card:#ffffff;--line:#e8dac6}
+@media(prefers-color-scheme:dark){:root{--bg:#171310;--ink:#f6ecde;--mute:#b3a592;--pop:#ff7a52;--pop2:#62b7da;--card:#221c17;--line:#3b3128}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,sans-serif}
+main{max-width:960px;margin:auto;padding:24px 16px 56px}h1{font:800 clamp(2rem,6vw,3.4rem)/1 "Bricolage Grotesque";margin:0}h1 span{color:var(--pop)}
+.sub{color:var(--mute);margin:6px 0 20px}.pick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.pick label{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:2px solid var(--ink);background:var(--card);cursor:pointer;border-radius:999px;transition:transform 150ms}
+.pick label:hover{transform:translateY(-2px)}input[type=checkbox]{accent-color:var(--pop);width:18px;height:18px}
+.n{display:flex;align-items:center;gap:12px;margin-bottom:20px}input[type=range]{flex:1;max-width:340px;accent-color:var(--pop)}.num{font:800 2rem "Bricolage Grotesque";min-width:2.5ch}
+:focus-visible{outline:3px solid var(--pop2);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:16px}
+.card{background:var(--card);border:2px solid var(--ink);padding:16px;box-shadow:6px 6px 0 var(--pop);animation:in .3s}@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.card h2{font:800 1.2rem "Bricolage Grotesque";margin:0 0 8px}.l{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.big{font:800 2.6rem "Bricolage Grotesque";color:var(--pop2)}.mute{color:var(--mute);font-size:.85rem}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><main>
+<h1>Cook for <span id="hn">4</span></h1><p class="sub">Pick dishes and a headcount. Get a shopping list rounded to real pack sizes.</p>
+<div class="pick" id="pick" role="group" aria-label="Dishes"></div>
+<div class="n"><input type="range" id="ppl" min="1" max="24" value="4" aria-label="People"><span class="num" id="pn">4</span></div>
+<div class="grid"><section class="card" aria-live="polite"><h2>Shopping list</h2><div id="list"></div></section>
+<section class="card" aria-live="polite"><h2>Cost</h2><div class="big" id="tot"></div><p class="mute" id="note"></p></section></div></main>
+<script>
+const $=i=>document.getElementById(i),m=n=>"$"+n.toFixed(2);let names=[];
+async function init(){const r=await (await fetch("/recipes")).json();names=r.map(x=>x.name);
+$("pick").innerHTML=names.map((n,i)=>`<label><input type="checkbox" value="${n}" ${i!=1?"checked":""}>${n}</label>`).join("");
+document.querySelectorAll("input[type=checkbox]").forEach(e=>e.onchange=go);$("ppl").oninput=go;go()}
+async function go(){const sel=[...document.querySelectorAll("input[type=checkbox]:checked")].map(e=>e.value),p=+$("ppl").value;
+$("hn").textContent=$("pn").textContent=p;if(!sel.length){$("list").textContent="Pick a dish.";$("tot").textContent="";$("note").textContent="";return}
+const d=await (await fetch("/shop",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({recipes:sel,people:p})})).json();
+$("list").innerHTML=d.lines.map(x=>`<div class="l"><span>${x.item} <span class="mute">${x.needed}${x.unit}</span></span><span>${x.packs} pack${x.packs==1?"":"s"} · ${m(x.cost)}</span></div>`).join("");
+$("tot").textContent=m(d.total);$("note").textContent=`Shopping for all dishes together costs ${m(d.combined_cost)} vs ${m(d.separate_cost)} shopping each dish separately. Unused leftovers worth ${m(d.waste_value)}.`}
+init();
+</script></body></html>
