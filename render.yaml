@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: day-timebox-planner
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

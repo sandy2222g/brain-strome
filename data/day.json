@@ -1,0 +1,84 @@
+{
+ "source": "Invented day for the demo. MIT.",
+ "day_start": 9.0,
+ "day_end": 18.0,
+ "buffer_min": 5,
+ "events": [
+  {
+   "title": "Team stand-up",
+   "start": 9.5,
+   "end": 10.0
+  },
+  {
+   "title": "Design review",
+   "start": 11.0,
+   "end": 12.0
+  },
+  {
+   "title": "Lunch",
+   "start": 12.5,
+   "end": 13.25
+  },
+  {
+   "title": "1:1 with manager",
+   "start": 15.0,
+   "end": 15.5
+  }
+ ],
+ "tasks": [
+  {
+   "title": "Learn new library",
+   "minutes": 60,
+   "priority": 1,
+   "deadline": null
+  },
+  {
+   "title": "Update documentation",
+   "minutes": 50,
+   "priority": 3,
+   "deadline": null
+  },
+  {
+   "title": "Book flights",
+   "minutes": 15,
+   "priority": 2,
+   "deadline": null
+  },
+  {
+   "title": "Reply to emails",
+   "minutes": 30,
+   "priority": 2,
+   "deadline": 11.0
+  },
+  {
+   "title": "Review pull requests",
+   "minutes": 45,
+   "priority": 3,
+   "deadline": null
+  },
+  {
+   "title": "Prepare demo slides",
+   "minutes": 45,
+   "priority": 4,
+   "deadline": 16.0
+  },
+  {
+   "title": "Plan next sprint",
+   "minutes": 40,
+   "priority": 4,
+   "deadline": 17.0
+  },
+  {
+   "title": "Fix login bug",
+   "minutes": 60,
+   "priority": 5,
+   "deadline": 14.0
+  },
+  {
+   "title": "Write project report",
+   "minutes": 90,
+   "priority": 5,
+   "deadline": null
+  }
+ ]
+}

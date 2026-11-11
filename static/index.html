@@ -1,0 +1,25 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Day Boxes</title>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;800&family=Work+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#fbfbf6;--grid:#d8e3f0;--ink:#1d2433;--mute:#5c6678;--blue:#2556b8;--red:#d9493a;--event:#e6e9f0;--p5:#2556b8;--p4:#4a7fd8;--p3:#7fa6e6;--p2:#aac4ee;--p1:#cfdcf3}
+@media(prefers-color-scheme:dark){:root{--paper:#16191f;--grid:#252b36;--ink:#eaeef7;--mute:#9aa4b8;--blue:#7da2f0;--red:#ff7b6b;--event:#2a303b;--p5:#7da2f0;--p4:#5f86d6;--p3:#486bb0;--p2:#385490;--p1:#2c4272}}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);font:16px/1.5 "Work Sans",sans-serif;background:var(--paper) repeating-linear-gradient(0deg,transparent 0 31px,var(--grid) 31px 32px)}
+main{max-width:980px;margin:auto;padding:24px 16px 56px;border-left:3px solid var(--red);margin-left:max(16px,calc(50vw - 490px))}
+h1{font:800 clamp(2.2rem,8vw,3.8rem)/1 Spectral;margin:0}.sub{color:var(--mute);margin:6px 0 18px}
+.stats{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px}.s{background:var(--paper);border:2px solid var(--ink);padding:6px 16px}.s b{display:block;font:800 1.9rem Spectral;color:var(--blue)}.s span{font-size:.8rem;color:var(--mute)}
+.day{position:relative;height:640px;background:var(--paper);border:2px solid var(--ink)}.hr{position:absolute;left:0;right:0;border-top:1px solid var(--grid);font-size:.72rem;color:var(--mute);padding-left:6px}
+.blk{position:absolute;left:64px;right:12px;border-radius:4px;padding:2px 10px;font-size:.88rem;overflow:hidden;animation:in .3s both}.ev{background:var(--event);color:var(--mute);border:1px dashed var(--mute)}.tk{color:#fff;font-weight:600}
+.p1,.p2{color:var(--ink)}.drop{margin-top:14px;color:var(--mute)}.drop b{color:var(--red)}
+@keyframes in{from{opacity:0;transform:translateX(-6px)}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head><body><main>
+<h1>Day Boxes</h1><p class="sub">Nine tasks, four meetings, one day. The most valuable set that really fits, drawn on the timeline.</p>
+<div class="stats" id="st" aria-live="polite"></div><div class="day" id="d" role="img" aria-label="Day timeline"></div><p class="drop" id="dr"></p></main>
+<script>
+const $=i=>document.getElementById(i),H=640/9,Y=t=>(t-9)*H,tm=s=>{const [a,b]=s.split(":").map(Number);return a+b/60};
+(async()=>{const s=await (await fetch("/sample")).json();const r=await (await fetch("/plan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)})).json();
+$("st").innerHTML=`<div class="s"><b>${r.priority}</b><span>priority points scheduled</span></div><div class="s"><b>${r.in_order_priority}</b><span>doing them in the order written</span></div><div class="s"><b>${r.plan.length}/${s.tasks.length}</b><span>tasks fit</span></div><div class="s"><b>${r.free_hours} h</b><span>free time</span></div>`;
+let h="";for(let t=9;t<=18;t++)h+=`<div class="hr" style="top:${Y(t)}px">${String(t).padStart(2,"0")}:00</div>`;
+s.events.forEach(e=>h+=`<div class="blk ev" style="top:${Y(e.start)}px;height:${(e.end-e.start)*H-2}px">${e.title}</div>`);
+r.plan.forEach((p,i)=>h+=`<div class="blk tk p${p.priority}" style="top:${Y(tm(p.start))}px;height:${(tm(p.end)-tm(p.start))*H-2}px;background:var(--p${p.priority});animation-delay:${i*50}ms">${p.title} <small>(${p.start}-${p.end}, priority ${p.priority})</small></div>`);
+$("d").innerHTML=h;$("dr").innerHTML=r.dropped.length?`Left for another day: <b>${r.dropped.join(", ")}</b>`:"Everything fits."})();
+</script></body></html>
