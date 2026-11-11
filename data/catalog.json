@@ -1,0 +1,27 @@
+{"source": "Invented course catalogue (times in 24h HH:MM, days Mon-Fri). MIT.", "max_credits": 15,
+ "courses": [
+  {"name": "Algorithms", "credits": 4, "required": true, "sections": [
+    {"code": "ALG-A", "meetings": [["Mon", "09:00", "10:30"], ["Wed", "09:00", "10:30"]]},
+    {"code": "ALG-B", "meetings": [["Tue", "13:00", "14:30"], ["Thu", "13:00", "14:30"]]}]},
+  {"name": "Databases", "credits": 3, "required": true, "sections": [
+    {"code": "DB-A", "meetings": [["Mon", "10:00", "11:30"], ["Wed", "10:00", "11:30"]]},
+    {"code": "DB-B", "meetings": [["Tue", "09:00", "10:30"], ["Thu", "09:00", "10:30"]]},
+    {"code": "DB-C", "meetings": [["Wed", "14:00", "17:00"]]}]},
+  {"name": "Machine Learning", "credits": 4, "required": false, "sections": [
+    {"code": "ML-A", "meetings": [["Mon", "09:30", "11:00"], ["Wed", "09:30", "11:00"]]},
+    {"code": "ML-B", "meetings": [["Tue", "14:00", "15:30"], ["Thu", "14:00", "15:30"]]}]},
+  {"name": "Statistics", "credits": 3, "required": false, "sections": [
+    {"code": "ST-A", "meetings": [["Tue", "10:30", "12:00"], ["Thu", "10:30", "12:00"]]},
+    {"code": "ST-B", "meetings": [["Mon", "13:00", "14:30"], ["Wed", "13:00", "14:30"]]}]},
+  {"name": "Technical Writing", "credits": 2, "required": false, "sections": [
+    {"code": "TW-A", "meetings": [["Fri", "09:00", "11:00"]]},
+    {"code": "TW-B", "meetings": [["Fri", "13:00", "15:00"]]}]},
+  {"name": "Ethics in Computing", "credits": 2, "required": false, "sections": [
+    {"code": "EC-A", "meetings": [["Mon", "11:00", "12:00"], ["Wed", "11:00", "12:00"]]},
+    {"code": "EC-B", "meetings": [["Thu", "16:00", "18:00"]]}]},
+  {"name": "Web Development", "credits": 3, "required": false, "sections": [
+    {"code": "WEB-A", "meetings": [["Tue", "13:30", "15:00"], ["Thu", "13:30", "15:00"]]},
+    {"code": "WEB-B", "meetings": [["Mon", "14:00", "17:00"]]}]},
+  {"name": "Entrepreneurship", "credits": 2, "required": false, "sections": [
+    {"code": "ENT-A", "meetings": [["Fri", "10:00", "12:00"]]},
+    {"code": "ENT-B", "meetings": [["Wed", "15:00", "17:00"]]}]}]}

@@ -1,0 +1,33 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Timetable Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#fffdf0;--grid:#cfe0f5;--ink:#1d3fbb;--text:#1f2a44;--mute:#5d6b8c;--hl:#ffe14d;--red:#d23a3a;--c0:#ffd966;--c1:#9ad7a8;--c2:#f4a6b8;--c3:#9cc4f5;--c4:#d3b4f0;--c5:#ffb98a;--c6:#8fe0dd;--c7:#e2e08a}
+@media(prefers-color-scheme:dark){:root{--paper:#14192b;--grid:#26304d;--ink:#8fb0ff;--text:#eef1ff;--mute:#9aa6cc;--hl:#e8c52f;--red:#ff7a7a}}
+*{box-sizing:border-box}body{margin:0;color:var(--text);font:18px/1.4 "Patrick Hand",cursive;background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px}
+main{max-width:980px;margin:auto;padding:24px 16px 56px}
+h1{font:400 clamp(2.4rem,9vw,4rem)/1 "Caveat Brush";color:var(--ink);margin:0}h1 span{background:var(--hl);color:#1f2a44;padding:0 .15em;transform:rotate(-1deg);display:inline-block}
+.sub{color:var(--mute);margin:8px 0 14px;max-width:58ch}
+.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}.tabs button{font:inherit;border:2px solid var(--ink);background:var(--paper);color:var(--text);padding:4px 16px;border-radius:6px;cursor:pointer}.tabs button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.stats{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:10px}.stats div{background:var(--paper);border:2px dashed var(--ink);padding:2px 12px}.stats b{font:400 1.6rem "Caveat Brush";color:var(--ink)}
+.warn{color:var(--red);font-weight:bold}
+.wk{display:grid;grid-template-columns:44px repeat(5,minmax(0,1fr));background:var(--paper);border:2px solid var(--ink);position:relative;overflow:hidden}
+.hd{padding:2px 6px;border-bottom:2px solid var(--ink);font-weight:bold;text-align:center}.col{position:relative;border-left:1px solid var(--grid);height:480px}
+.hr{position:absolute;left:0;right:0;border-top:1px dashed var(--grid)}.tm{position:relative;height:480px;font-size:.7rem;color:var(--mute)}.tm span{position:absolute;right:3px;transform:translateY(-50%)}
+.cls{position:absolute;left:3px;right:3px;border:2px solid var(--text);border-radius:6px;padding:1px 5px;font-size:.78rem;line-height:1.15;overflow:hidden}
+</style></head><body><main>
+<h1>Timetable <span>Builder</span></h1><p class="sub">Eight courses, two or three sections each, a 15 credit cap and two required courses. Sign up in catalogue order, or let the solver search every combination.</p>
+<div class="tabs"><button id="bb" aria-pressed="true">Best timetable</button><button id="bo" aria-pressed="false">Catalogue order</button></div>
+<div class="stats" id="st" aria-live="polite"></div><div class="wk" id="wk"></div></main>
+<script>
+const $=i=>document.getElementById(i),DAYS=["Mon","Tue","Wed","Thu","Fri"],S=8*60,E=18*60,H=480;let R,names=[],cur="best";
+const y=m=>(m-S)/(E-S)*H,hm=m=>String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+function show(){const x=R[cur];$("bb").setAttribute("aria-pressed",cur=="best");$("bo").setAttribute("aria-pressed",cur!="best");
+$("st").innerHTML=`<div><b>${x.credits}</b> credits</div><div><b>${x.days}</b> days on campus</div><div><b>${x.idle_minutes}</b> idle min</div>`+(x.missing_required.length?`<div class="warn">Missing required: ${x.missing_required.join(", ")}</div>`:`<div>all required courses in</div>`);
+let g=`<div></div>${DAYS.map(d=>`<div class="hd">${d}</div>`).join("")}<div class="tm">${[8,10,12,14,16,18].map(h=>`<span style="top:${y(h*60)}px">${h}:00</span>`).join("")}</div>`;
+DAYS.forEach(d=>{let c=`<div class="col">${[8,10,12,14,16].map(h=>`<div class="hr" style="top:${y(h*60)}px"></div>`).join("")}`;
+x.classes.forEach(k=>k.meetings.filter(m=>m[0]==d).forEach(m=>{c+=`<div class="cls" style="top:${y(m[1])}px;height:${y(m[2])-y(m[1])}px;background:var(--c${names.indexOf(k.course)%8})"><b>${k.course}</b><br>${k.code} ${hm(m[1])}-${hm(m[2])}</div>`}));g+=c+"</div>"});
+$("wk").innerHTML=g}
+$("bb").onclick=()=>{cur="best";show()};$("bo").onclick=()=>{cur="in_order";show()};
+(async()=>{const d=await (await fetch("/sample")).json();names=d.courses.map(c=>c.name);
+R=await (await fetch("/build",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({max_credits:d.max_credits,courses:d.courses})})).json();show()})();
+</script></body></html>
