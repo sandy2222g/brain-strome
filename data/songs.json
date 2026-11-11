@@ -1,0 +1,102 @@
+{
+ "source": "Invented song titles and lengths. MIT.",
+ "target_minutes": 60,
+ "songs": [
+  {
+   "title": "Glass Wave 0",
+   "seconds": 269
+  },
+  {
+   "title": "Glass Wave 1",
+   "seconds": 300
+  },
+  {
+   "title": "Static Rain 2",
+   "seconds": 281
+  },
+  {
+   "title": "Tide Road 3",
+   "seconds": 307
+  },
+  {
+   "title": "Copper Hearts 4",
+   "seconds": 264
+  },
+  {
+   "title": "Velvet Rain 5",
+   "seconds": 173
+  },
+  {
+   "title": "Parade Light 6",
+   "seconds": 312
+  },
+  {
+   "title": "Harbour Dance 7",
+   "seconds": 251
+  },
+  {
+   "title": "Glass Road 8",
+   "seconds": 307
+  },
+  {
+   "title": "Rooftop Rain 9",
+   "seconds": 309
+  },
+  {
+   "title": "Neon Wave 10",
+   "seconds": 166
+  },
+  {
+   "title": "Harbour Drive 11",
+   "seconds": 198
+  },
+  {
+   "title": "Lanterns Dance 12",
+   "seconds": 157
+  },
+  {
+   "title": "Glass Garden 13",
+   "seconds": 262
+  },
+  {
+   "title": "Window Summer 14",
+   "seconds": 282
+  },
+  {
+   "title": "Lanterns Road 15",
+   "seconds": 225
+  },
+  {
+   "title": "Tide Drive 16",
+   "seconds": 319
+  },
+  {
+   "title": "Paper Letters 17",
+   "seconds": 317
+  },
+  {
+   "title": "Orbit Fire 18",
+   "seconds": 291
+  },
+  {
+   "title": "Paper Light 19",
+   "seconds": 215
+  },
+  {
+   "title": "Echo Summer 20",
+   "seconds": 281
+  },
+  {
+   "title": "Velvet Drive 21",
+   "seconds": 167
+  },
+  {
+   "title": "Window Hearts 22",
+   "seconds": 252
+  },
+  {
+   "title": "Slow Signal 23",
+   "seconds": 248
+  }
+ ]
+}
