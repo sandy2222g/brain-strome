@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Wash Rota</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Lexend:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#dff3f2;--card:#fff;--ink:#12324a;--mute:#51728a;--coral:#ff6f5e;--aqua:#2bb5b0;--line:#bfe3e1}
+@media(prefers-color-scheme:dark){:root{--bg:#0d2230;--card:#143347;--ink:#e6f4f6;--mute:#8fb3c4;--coral:#ff8a7a;--aqua:#4fd1cb;--line:#24506b}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Lexend,sans-serif}
+main{max-width:1000px;margin:auto;padding:24px 16px 56px}h1{font:700 clamp(2rem,7vw,3.2rem)/1.05 Quicksand;margin:0}h1 span{color:var(--coral)}.sub{color:var(--mute);margin:6px 0 20px}
+.stats{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:18px}.pill{background:var(--card);border-radius:999px;padding:8px 18px;border:2px solid var(--line);font-weight:600}.pill b{color:var(--coral);font:700 1.3rem Quicksand}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:14px}
+.slot{background:var(--card);border-radius:24px 24px 12px 12px;padding:14px;border:2px solid var(--line);min-height:110px;position:relative;animation:in .3s both;transition:transform 150ms}
+.slot:hover{transform:translateY(-2px)}.slot.taken{border-color:var(--aqua)}.slot.taken:before{content:"";position:absolute;top:10px;right:12px;width:18px;height:18px;border-radius:50%;border:3px solid var(--aqua)}
+.time{color:var(--mute);font-size:.8rem}.who{font:700 1.3rem Quicksand;margin-top:6px}.tag{display:inline-block;margin-top:6px;padding:2px 10px;border-radius:999px;font-size:.8rem;background:var(--line)}.tag.bad{background:var(--coral);color:#fff}
+.free .who{color:var(--mute);font-weight:500}@keyframes in{from{opacity:0;transform:translateY(6px)}}:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><main>
+<h1>Wash <span>Rota</span></h1><p class="sub">One shared machine, ten flats, best possible slots. First choices count most.</p>
+<div class="stats" id="st" aria-live="polite"></div><div class="grid" id="g"></div></main>
+<script>
+const $=i=>document.getElementById(i);
+async function go(){const s=await (await fetch("/sample")).json();
+const d=await (await fetch("/assign",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)})).json();
+const by={};Object.entries(d.assignments).forEach(([w,t])=>by[t]=w);
+const b=d.summary,n=d.first_come_summary;
+$("st").innerHTML=`<span class="pill"><b>${b.first_choice}</b> first choices (first-come: ${n.first_choice})</span><span class="pill"><b>${b.no_choice}</b> without a listed slot (first-come: ${n.no_choice})</span><span class="pill">cost <b>${b.total_cost}</b> vs ${n.total_cost}</span>`;
+$("g").innerHTML=s.slots.map((t,i)=>{const w=by[t];if(!w)return `<div class="slot free" style="animation-delay:${i*30}ms"><div class="time">${t}</div><div class="who">free</div></div>`;
+const r=s.residents[w].indexOf(t);return `<div class="slot taken" style="animation-delay:${i*30}ms"><div class="time">${t}</div><div class="who">${w}</div><span class="tag ${r<0?"bad":""}">${r<0?"not on their list":r===0?"first choice":"choice "+(r+1)}</span></div>`}).join("")}
+go();
+</script></body></html>

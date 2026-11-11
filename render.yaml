@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: laundry-slot-scheduler
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
