@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Carry-on Capsule</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ece7dc;--tk:#fbf8f0;--ink:#161616;--mute:#6b665b;--red:#c8281e;--line:#b9b2a2}
+@media(prefers-color-scheme:dark){:root{--bg:#121212;--tk:#1d1d1b;--ink:#f1ede2;--mute:#a49f92;--red:#ff5a4d;--line:#444}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Courier Prime",monospace}
+main{max-width:1060px;margin:auto;padding:26px 16px 56px}
+h1{font:400 clamp(2.6rem,10vw,5rem)/.95 "Bebas Neue";letter-spacing:.02em;margin:0}h1 b{color:var(--red);font-weight:400}
+.sub{color:var(--mute);margin:8px 0 22px;max-width:60ch}
+.tickets{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}
+.t{background:var(--tk);border:2px solid var(--ink);padding:0;position:relative}
+.top{padding:12px 14px;border-bottom:2px dashed var(--ink)}.top small{color:var(--mute);letter-spacing:.12em;text-transform:uppercase;font-size:.7rem}
+.n{font:400 4.2rem/1 "Bebas Neue"}.n.win{color:var(--red)}.top span{font-size:.85rem;color:var(--mute)}
+.body{padding:12px 14px}.g{height:10px;border:2px solid var(--ink);margin:2px 0 12px}.g i{display:block;height:100%;background:var(--ink)}
+.k{margin:8px 0 2px;color:var(--mute);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase}
+.chips{display:flex;flex-wrap:wrap;gap:4px}.chip{border:1.5px solid var(--ink);padding:1px 7px;font-size:.8rem}.chip.smart{background:var(--ink);color:var(--tk)}.chip.neutral{border-style:dashed}
+.stamp{position:absolute;right:12px;top:12px;border:3px solid var(--red);color:var(--red);font:400 1.2rem "Bebas Neue";padding:0 8px;transform:rotate(-8deg);letter-spacing:.08em}
+.legend{margin-top:16px;color:var(--mute);font-size:.8rem}
+</style></head><body><main>
+<h1>Carry-on <b>Capsule</b></h1><p class="sub">Eighteen garments, a 3.2 kg clothing allowance. Same suitcase, three ways to pack it: how many outfits can you make?</p>
+<div class="tickets" id="tk" aria-live="polite"></div>
+<p class="legend">Filled chip = smart, plain = casual, dashed = goes with both. An outfit is a top, bottom and shoes of one style; layers multiply the count.</p></main>
+<script>
+const $=i=>document.getElementById(i);
+(async()=>{const d=await (await fetch("/sample")).json();const r=await (await fetch("/capsule",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({limit_g:d.limit_g,items:d.items})})).json();
+const by=Object.fromEntries(d.items.map(i=>[i.name,i]));const KS=["top","bottom","shoes","layer"];
+const T=[["in_order","Packed in listed order"],["lightest_first","Lightest first"],["best","Best capsule"]];
+$("tk").innerHTML=T.map(([k,t])=>{const x=r[k];return `<div class="t">${k=="best"?'<div class="stamp">BEST</div>':""}<div class="top"><small>${t}</small><div class="n ${k=="best"?"win":""}">${x.outfits}</div><span>outfits &middot; ${x.grams} of ${d.limit_g} g</span></div>
+<div class="body"><div class="g"><i style="width:${x.grams/d.limit_g*100}%"></i></div>${KS.map(s=>{const it=x.items.filter(n=>by[n].kind==s);return `<div class="k">${s}s (${it.length})</div><div class="chips">${it.map(n=>`<span class="chip ${by[n].style}">${n}</span>`).join("")||'<span class="chip" style="opacity:.5">none</span>'}</div>`}).join("")}</div></div>`}).join("")})();
+</script></body></html>

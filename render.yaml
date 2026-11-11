@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: carry-on-capsule
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
