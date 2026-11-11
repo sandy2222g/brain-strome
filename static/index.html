@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Jet Lag Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=Mulish:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--sky1:#1c1b4a;--sky2:#7a3b7a;--sky3:#ffb08a;--ink:#fff7ef;--mute:#ddc9d6;--card:rgba(24,12,48,.62);--line:rgba(255,255,255,.22);--sun:#ffd27a}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);font:16px/1.55 Mulish,sans-serif;background:linear-gradient(180deg,var(--sky1),var(--sky2) 60%,var(--sky3));min-height:100vh;background-attachment:fixed}
+main{max-width:960px;margin:auto;padding:24px 16px 56px}h1{font:800 clamp(2.2rem,8vw,4rem)/1 Syne;margin:0}h1 span{color:var(--sun)}.sub{color:var(--mute);margin:6px 0 18px}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:12px;margin-bottom:18px}label{display:grid;gap:4px;font-size:.8rem;color:var(--mute)}
+select,input{min-height:44px;border-radius:10px;border:1px solid var(--line);background:rgba(20,10,40,.55);color:var(--ink);padding:0 10px;font:inherit}
+button{min-height:44px;border:0;border-radius:999px;background:var(--sun);color:#2a1740;font:800 1rem Syne;padding:0 24px;cursor:pointer;transition:transform 150ms;align-self:end}button:hover{transform:translateY(-2px)}button:active{transform:none}:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.sum{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px}.s{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 18px}.s b{display:block;font:800 1.9rem Syne;color:var(--sun)}.s span{font-size:.8rem;color:var(--mute)}
+.tl{display:grid;gap:8px}.d{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;display:grid;grid-template-columns:minmax(120px,1fr) minmax(0,2fr) minmax(0,2fr);gap:10px;animation:in .3s both}.d.f{border-color:var(--sun)}
+.d small{color:#e8d8e4;display:block}.bar{height:6px;border-radius:3px;background:var(--line);margin-top:6px}.bar i{display:block;height:100%;border-radius:3px;background:var(--sun)}
+@media(max-width:640px){.d{grid-template-columns:1fr}}@keyframes in{from{opacity:0;transform:translateY(6px)}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.note{margin-top:18px;font-size:.82rem;color:var(--mute)}
+</style></head><body><main>
+<h1>Jet <span>Lag</span> Plan</h1><p class="sub">Pick your route and flight day. Get a sleep schedule that eases your body clock across.</p>
+<div class="form"><label>From<select id="o"></select></label><label>To<select id="t"></select></label><label>Flight day<input type="date" id="f"></label><label>Usual bedtime<input type="time" id="b" value="23:00"></label><label>Usual wake-up<input type="time" id="w" value="07:00"></label><label>Days before<select id="p"><option>0</option><option>1</option><option>2</option><option selected>3</option><option>4</option></select></label><button id="go">Plan it</button></div>
+<div class="sum" id="s" aria-live="polite"></div><div class="tl" id="tl"></div>
+<p class="note">A planning heuristic (body clock moves about 1 h/day earlier going east, 1.5 h/day later going west), not medical advice. Times in "home clock" are what to do before you land; "local" is the same moment on the destination's clock.</p></main>
+<script>
+const $=i=>document.getElementById(i),hh=v=>{const [a,b]=v.split(":").map(Number);return a+b/60};
+async function init(){const z=await (await fetch("/zones")).json();const opts=[...z.popular,...z.all.filter(x=>!z.popular.includes(x))].map(x=>`<option>${x}</option>`).join("");
+$("o").innerHTML=opts;$("t").innerHTML=opts;$("o").value="Asia/Kolkata";$("t").value="America/New_York";
+const d=new Date(Date.now()+14*864e5);$("f").value=d.toISOString().slice(0,10);$("go").onclick=go;go()}
+async function go(){const r=await fetch("/plan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({origin:$("o").value,dest:$("t").value,flight_day:$("f").value,bed:hh($("b").value),wake:hh($("w").value),pre_days:+$("p").value})});const d=await r.json();
+if(!r.ok){$("s").innerHTML="";$("tl").innerHTML=`<div class="d">${d.detail}</div>`;return}
+$("s").innerHTML=`<div class="s"><b>${Math.abs(d.shift_hours)} h</b><span>${d.direction==="none"?"no shift":d.direction+"ward shift"}</span></div><div class="s"><b>${d.days_to_adjust}</b><span>days to adjust (${d.rate_per_day} h/day)</span></div>`;
+const tot=Math.abs(d.shift_hours)||1;
+$("tl").innerHTML=d.days.map((x,i)=>`<div class="d ${x.label==="Flight day"?"f":""}" style="animation-delay:${i*40}ms"><div><b>${x.label}</b><small>${x.day}</small><div class="bar"><i style="width:${x.shift_done/tot*100}%"></i></div></div><div>Home clock<small>sleep ${x.bedtime}, wake ${x.wake}</small></div><div>Destination local<small>sleep ${x.bedtime_dest}, wake ${x.wake_dest}</small><small>${x.light}</small></div></div>`).join("")}
+init();
+</script></body></html>
