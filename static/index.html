@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Square Up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Lora:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6efe4;--card:#fffaf0;--ink:#2b2118;--mute:#6f6254;--accent:#b4472a;--line:#d9ccb8;--good:#2f6b4a}
+@media(prefers-color-scheme:dark){:root{--bg:#1d1813;--card:#27201a;--ink:#f1e8d8;--mute:#a69883;--accent:#e07a57;--line:#43392d;--good:#7fc99c}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Space Mono",monospace}
+main{max-width:980px;margin:0 auto;padding:24px 16px 56px}
+h1{font:700 2.2rem/1.1 Lora,serif;margin:0 0 4px}.sub{color:var(--mute);margin:0 0 24px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:20px;align-items:start}
+.slip{background:var(--card);border:1px solid var(--line);padding:16px;border-radius:4px;position:relative;animation:in .3s ease-out}
+.slip:after{content:"";position:absolute;left:0;right:0;bottom:-7px;height:8px;background:radial-gradient(circle at 6px -1px,var(--bg) 5px,transparent 6px) 0 0/12px 8px}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+h2{font:700 1.15rem Lora,serif;margin:0 0 12px;text-transform:uppercase;letter-spacing:.08em}
+.row{display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:.85rem}
+.row .n{text-align:right}
+button{font:inherit;min-height:44px;padding:0 18px;border:2px solid var(--ink);background:var(--accent);color:#fff;font-weight:700;cursor:pointer;transition:transform 150ms}
+button:hover{transform:translateY(-2px)}button:active{transform:translateY(0)}
+:focus-visible{outline:3px solid var(--good);outline-offset:2px}
+.pay{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.pay b{color:var(--accent)}.big{font:700 2.4rem Lora,serif;color:var(--good)}.mute{color:var(--mute);font-size:.85rem}
+.bal{display:flex;justify-content:space-between;padding:4px 0}.pos{color:var(--good)}.neg{color:var(--accent)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><main>
+<h1>Square Up</h1><p class="sub">Shared flat expenses in, fewest possible payments out.</p>
+<div class="cols">
+<section class="slip"><h2>Expenses</h2><div id="exp"></div><p class="mute" id="note"></p><button id="go">Settle up</button></section>
+<section class="slip" id="out" aria-live="polite"><h2>Settlement</h2><p class="mute">Press Settle up.</p></section>
+</div></main>
+<script>
+let data;const $=id=>document.getElementById(id);
+const money=n=>(n<0?"-":"")+"$"+Math.abs(n).toFixed(2);
+async function load(){data=await (await fetch("/sample")).json();
+$("exp").innerHTML=data.expenses.map(e=>`<div class="row"><span>${e.label}</span><span class="n">${money(e.amount)}</span><span>${e.payer} paid, ${e.split_among.length} share</span></div>`).join("");
+go()}
+async function go(){const r=await fetch("/settle",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});const d=await r.json();
+$("note").textContent=`Total spent ${money(d.total_spent)}.`;
+$("out").innerHTML=`<h2>Settlement</h2><div class="big">${d.payment_count} payments</div><p class="mute">instead of ${d.naive_count} if everyone repaid each bill separately</p>`+
+d.payments.map(p=>`<div class="pay"><span>${p.from} pays ${p.to}</span><b>${money(p.amount)}</b></div>`).join("")+
+`<h2 style="margin-top:18px">Net balances</h2>`+Object.entries(d.balances).map(([k,v])=>`<div class="bal"><span>${k}</span><span class="${v>=0?"pos":"neg"}">${v>=0?"is owed ":"owes "}${money(Math.abs(v))}</span></div>`).join("")}
+$("go").onclick=go;load();
+</script></body></html>

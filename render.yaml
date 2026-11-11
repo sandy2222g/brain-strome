@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: roommate-bill-settler
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

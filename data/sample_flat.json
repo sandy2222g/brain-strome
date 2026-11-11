@@ -1,0 +1,88 @@
+{
+ "expenses": [
+  {
+   "label": "Rent top-up",
+   "payer": "Asha",
+   "amount": 240,
+   "split_among": [
+    "Asha",
+    "Ben",
+    "Chen",
+    "Dara"
+   ]
+  },
+  {
+   "label": "Groceries",
+   "payer": "Ben",
+   "amount": 86.4,
+   "split_among": [
+    "Asha",
+    "Ben",
+    "Chen",
+    "Dara"
+   ]
+  },
+  {
+   "label": "Electricity",
+   "payer": "Chen",
+   "amount": 72,
+   "split_among": [
+    "Asha",
+    "Ben",
+    "Chen",
+    "Dara"
+   ]
+  },
+  {
+   "label": "Internet",
+   "payer": "Dara",
+   "amount": 45,
+   "split_among": [
+    "Asha",
+    "Ben",
+    "Chen",
+    "Dara"
+   ]
+  },
+  {
+   "label": "Movie night snacks",
+   "payer": "Asha",
+   "amount": 23.5,
+   "split_among": [
+    "Asha",
+    "Chen"
+   ]
+  },
+  {
+   "label": "Cleaning supplies",
+   "payer": "Chen",
+   "amount": 31.2,
+   "split_among": [
+    "Ben",
+    "Chen",
+    "Dara"
+   ]
+  },
+  {
+   "label": "Pizza",
+   "payer": "Dara",
+   "amount": 38,
+   "split_among": [
+    "Asha",
+    "Ben",
+    "Dara"
+   ]
+  },
+  {
+   "label": "Gas bottle",
+   "payer": "Ben",
+   "amount": 54,
+   "split_among": [
+    "Asha",
+    "Ben",
+    "Chen",
+    "Dara"
+   ]
+  }
+ ]
+}
