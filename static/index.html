@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chalk Digits</title>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1f3b32;--board:#264a3e;--chalk:#f4f1e6;--mute:#b9c9bf;--yellow:#ffd84a;--pink:#ff9db1;--line:#3d6a5a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--chalk);font:16px/1.5 Nunito,sans-serif}
+main{max-width:980px;margin:auto;padding:24px 16px 56px}h1{font:400 clamp(2.4rem,9vw,4.4rem)/1 "Patrick Hand";margin:0;transform:rotate(-1deg)}h1 span{color:var(--yellow)}
+.sub{color:var(--mute);margin:6px 0 20px}.board{background:var(--board);border:8px solid #8a6a3f;border-radius:6px;padding:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:24px;align-items:start}
+#g{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;touch-action:none;max-width:340px;aspect-ratio:1;user-select:none}
+.px{border:1px solid var(--line);background:transparent;min-width:0;border-radius:3px}.px:focus-visible{outline:3px solid var(--yellow)}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}button{min-height:44px;padding:0 18px;border:2px solid var(--chalk);background:transparent;color:var(--chalk);font:400 1.2rem "Patrick Hand";border-radius:8px;cursor:pointer;transition:transform 150ms}button:hover{transform:translateY(-2px)}button:active{transform:none}:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.big{font:400 7rem/1 "Patrick Hand";color:var(--yellow);min-height:1em}.conf{color:var(--mute)}
+.bars{margin-top:8px}.b{display:grid;grid-template-columns:1.2em 1fr 3.2em;gap:8px;align-items:center;font-size:.85rem}.b i{height:10px;background:var(--pink);border-radius:5px;display:block}
+.m{margin-top:22px;border-top:2px dashed var(--line);padding-top:12px;color:var(--mute);font-size:.9rem}.m b{color:var(--chalk)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body><main>
+<h1>Chalk <span>Digits</span></h1><p class="sub">Paint a digit on the 8 by 8 grid. A model trained on 1,347 scanned digits guesses it live.</p>
+<div class="board"><div><div id="g" role="grid" aria-label="Drawing grid"></div>
+<div class="row"><button id="clr">Wipe</button><button id="smp">Try a real scan</button></div></div>
+<div aria-live="polite"><div class="big" id="d">?</div><div class="conf" id="c">Draw something to begin.</div><div class="bars" id="b"></div></div></div>
+<div class="m" id="m"></div></main>
+<script>
+const $=i=>document.getElementById(i);const px=new Array(64).fill(0);let down=false,mode=1,samples=[],k=0,t;
+const g=$("g");for(let i=0;i<64;i++){const b=document.createElement("button");b.className="px";b.setAttribute("aria-label","pixel "+(i+1));b.dataset.i=i;g.appendChild(b)}
+function paint(i,v){px[i]=v;g.children[i].style.background=v?`rgba(255,216,74,${v/16})`:"transparent"}
+function brush(i,v){paint(i,v);if(v){for(const n of [i-1,i+1,i-8,i+8]){if(n<0||n>63||(Math.abs(n%8-i%8)>1))continue;if(px[n]<8)paint(n,8)}}schedule()}
+function at(e){const el=document.elementFromPoint(e.clientX,e.clientY);return el&&el.dataset&&el.dataset.i!==undefined?+el.dataset.i:null}
+g.addEventListener("pointerdown",e=>{const i=at(e);if(i===null)return;down=true;mode=px[i]===16?0:1;brush(i,mode?16:0);g.setPointerCapture(e.pointerId)});
+g.addEventListener("pointermove",e=>{if(!down)return;const i=at(e);if(i!==null)brush(i,mode?16:0)});
+window.addEventListener("pointerup",()=>down=false);
+g.addEventListener("keydown",e=>{if(e.key===" "||e.key==="Enter"){const i=+e.target.dataset.i;brush(i,px[i]===16?0:16);e.preventDefault()}});
+function schedule(){clearTimeout(t);t=setTimeout(guess,120)}
+async function guess(){if(!px.some(v=>v>0)){$("d").textContent="?";$("c").textContent="Draw something to begin.";$("b").innerHTML="";return}
+const r=await fetch("/predict",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pixels:px})});const d=await r.json();
+$("d").textContent=d.digit;$("c").textContent=`${Math.round(d.confidence*100)}% sure`;
+$("b").innerHTML=d.probabilities.map((p,i)=>`<div class="b"><span>${i}</span><i style="width:${Math.max(p*100,1)}%"></i><span>${Math.round(p*100)}%</span></div>`).join("")}
+$("clr").onclick=()=>{px.forEach((_,i)=>paint(i,0));guess()};
+$("smp").onclick=()=>{const s=samples[k++%samples.length];s.pixels.forEach((v,i)=>paint(i,v));guess()};
+(async()=>{samples=await (await fetch("/samples")).json();const m=await (await fetch("/metrics")).json();
+$("m").innerHTML=`<b>Test accuracy ${(m.accuracy*100).toFixed(1)}%</b> on ${m.test_images} unseen scans (plain logistic regression: ${(m.logistic_regression_accuracy*100).toFixed(1)}%). If a digit is nudged one pixel diagonally, accuracy is <b>${(m.shifted_accuracy*100).toFixed(0)}%</b> with centring but only ${(m.shifted_accuracy_without_centring*100).toFixed(0)}% without it. Your finger-painted digits look different from scans, so expect some mistakes.`;
+samples[3].pixels.forEach((v,i)=>paint(i,v));guess()})();
+</script></body></html>

@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: digit-sketchpad
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
