@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: home-energy-anomaly
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
