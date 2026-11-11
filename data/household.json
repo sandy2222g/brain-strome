@@ -1,0 +1,7 @@
+{"source": "Invented household of four. MIT.",
+ "chores": [{"name": "Bins", "effort": 1}, {"name": "Bathroom", "effort": 4}, {"name": "Kitchen", "effort": 3}, {"name": "Hoovering", "effort": 2}],
+ "people": [
+  {"name": "Sam", "dislike": {"Bins": 1, "Bathroom": 5, "Kitchen": 2, "Hoovering": 3}},
+  {"name": "Priya", "dislike": {"Bins": 3, "Bathroom": 2, "Kitchen": 5, "Hoovering": 1}},
+  {"name": "Joe", "dislike": {"Bins": 2, "Bathroom": 4, "Kitchen": 1, "Hoovering": 5}},
+  {"name": "Mei", "dislike": {"Bins": 5, "Bathroom": 1, "Kitchen": 3, "Hoovering": 2}}]}

@@ -1,0 +1,33 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chore Rota</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e9efe6;--card:#f8faf5;--ink:#1f2e24;--mute:#5d6f61;--plum:#6b2d5c;--line:#c7d3c3;--p0:#4f8a5b;--p1:#c9772e;--p2:#3b6fa8;--p3:#a8457d}
+@media(prefers-color-scheme:dark){:root{--bg:#141d17;--card:#1c2820;--ink:#e8f0e6;--mute:#a1b5a5;--plum:#e19ad0;--line:#33473a;--p0:#6fb27c;--p1:#e69a55;--p2:#6a9ad4;--p3:#d777ad}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "DM Sans",sans-serif}
+main{max-width:980px;margin:auto;padding:28px 16px 56px}
+h1{font:800 clamp(2.2rem,8vw,3.6rem)/1 Fraunces,serif;margin:0 0 6px;color:var(--plum)}.sub{color:var(--mute);margin:0 0 20px;max-width:55ch}
+.switch{display:inline-flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden;margin-bottom:16px}
+.switch button{font:600 .9rem "DM Sans";padding:8px 18px;border:0;background:transparent;color:var(--ink);cursor:pointer}.switch button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.layout{display:grid;grid-template-columns:2fr 1fr;gap:16px}@media(max-width:760px){.layout{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:18px;padding:16px;border:1px solid var(--line);overflow-x:auto}
+table{border-collapse:separate;border-spacing:4px;width:100%;font-size:.9rem}th{font:600 .75rem "DM Sans";color:var(--mute);text-align:left}
+td.w{color:var(--mute);font-size:.8rem}td.c{border-radius:8px;padding:5px 8px;color:#fff;font-weight:600;text-align:center}
+h2{font:600 1.15rem Fraunces,serif;margin:0 0 10px}.row{margin-bottom:12px}.row div{display:flex;justify-content:space-between;font-size:.88rem}
+.bar{height:10px;border-radius:5px;background:var(--line)}.bar i{display:block;height:100%;border-radius:5px}
+.big{font:800 2.2rem/1 Fraunces,serif;color:var(--plum)}.k{color:var(--mute);font-size:.8rem;margin-bottom:12px}
+</style></head><body><main>
+<h1>Chore Rota</h1><p class="sub">Four housemates, four chores, eight weeks. Same people, same chores: compare a plain rotation with a rota that weighs dislikes and workload.</p>
+<div class="switch" role="group"><button id="bf" aria-pressed="true">Fair rota</button><button id="br" aria-pressed="false">Round-robin</button></div>
+<div class="layout"><div class="card"><table id="t"></table></div><div class="card" id="side" aria-live="polite"></div></div></main>
+<script>
+const $=i=>document.getElementById(i);let R,P=[],cur="fair";
+const col=n=>`var(--p${P.indexOf(n)%4})`;
+function show(){const x=R[cur];$("bf").setAttribute("aria-pressed",cur=="fair");$("br").setAttribute("aria-pressed",cur!="fair");
+$("t").innerHTML=`<tr><th>Week</th>${R.chores.map(c=>`<th>${c}</th>`).join("")}</tr>`+x.weeks.map((w,i)=>`<tr><td class="w">${i+1}</td>${w.map(n=>`<td class="c" style="background:${col(n)}">${n}</td>`).join("")}</tr>`).join("");
+const mx=Math.max(...Object.values(x.effort_by_person));
+$("side").innerHTML=`<div class="big">${x.dislike}</div><div class="k">total dislike (${R.round_robin.dislike} for round-robin, ${R.fair.dislike} for fair)</div>
+<h2>Effort per person</h2>${Object.entries(x.effort_by_person).map(([n,e])=>`<div class="row"><div><span>${n}</span><span>${e} pts</span></div><div class="bar"><i style="width:${e/mx*100}%;background:${col(n)}"></i></div></div>`).join("")}
+<div class="k">Spread between busiest and lightest: ${x.effort_spread} pts. Longest run on one chore: ${x.worst_streak} week(s).</div>`}
+$("bf").onclick=()=>{cur="fair";show()};$("br").onclick=()=>{cur="round_robin";show()};
+(async()=>{const d=await (await fetch("/sample")).json();P=d.people.map(p=>p.name);R=await (await fetch("/rota",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({people:d.people,chores:d.chores,weeks:8})})).json();show()})();
+</script></body></html>
