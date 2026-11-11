@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Leave By</title>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ecebe6;--ink:#161616;--mute:#606058;--red:#d4202a;--card:#fff;--line:#cfcdc4}
+@media(prefers-color-scheme:dark){:root{--bg:#161616;--ink:#f1f0ea;--mute:#a6a59b;--red:#ff4b55;--card:#222;--line:#3a3a36}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Chivo,sans-serif}
+main{max-width:860px;margin:auto;padding:24px 16px 56px}h1{font:900 clamp(2.2rem,8vw,4rem)/.95 Chivo;text-transform:uppercase;margin:0;letter-spacing:-.02em}h1 b{color:var(--red)}.sub{color:var(--mute);margin:8px 0 22px}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:18px;margin-bottom:22px}label{display:grid;gap:4px;font-weight:700;font-size:.85rem;text-transform:uppercase}label b{font-size:1.4rem;color:var(--red)}
+input[type=range]{accent-color:var(--red);min-height:44px}:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.board{background:#101010;color:#ffd84a;padding:24px;border-radius:6px;font-family:"Courier New",monospace;animation:in .3s}.board small{color:#c8c4b0;text-transform:uppercase;letter-spacing:.15em}
+.board .t{font:900 clamp(3rem,16vw,6.5rem)/1 Chivo;letter-spacing:.02em}.board p{margin:6px 0 0;color:#e7e3d0}
+.cal{margin-top:22px;background:var(--card);border:2px solid var(--ink);padding:16px}.cal h2{margin:0 0 10px;font:900 1.1rem Chivo;text-transform:uppercase}
+.r{display:grid;grid-template-columns:70px 1fr 90px;gap:10px;align-items:center;padding:4px 0;font-size:.9rem}.bar{position:relative;height:14px;background:var(--line)}.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--ink)}.bar u{position:absolute;top:-4px;bottom:-4px;width:3px;background:var(--red)}
+.mute{color:var(--mute);font-size:.85rem;margin:10px 0 0}@keyframes in{from{opacity:0;transform:translateY(6px)}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head><body><main>
+<h1>Leave <b>by</b></h1><p class="sub">Pick when you must arrive and how sure you want to be. Based on 120 days of logged commutes.</p>
+<div class="ctl"><label><span>Arrive by <b id="av">09:00</b></span><input type="range" id="a" min="7.5" max="19" step="0.25" value="9" aria-label="Arrival time"></label>
+<label><span>Be on time <b id="cv">90%</b> of days</span><input type="range" id="c" min="0.6" max="0.98" step="0.01" value="0.9" aria-label="Confidence"></label></div>
+<div class="board" id="bd" aria-live="polite"></div>
+<div class="cal"><h2>Does it hold up? Promised vs actual on later, unseen days</h2><div id="cal"></div><p class="mute" id="note"></p></div></main>
+<script>
+const $=i=>document.getElementById(i),hh=h=>{const m=Math.round(h*60);return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")};
+async function go(){const a=+$("a").value,c=+$("c").value;$("av").textContent=hh(a);$("cv").textContent=Math.round(c*100)+"%";
+const r=await fetch("/plan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({arrive_hour:a,confidence:c})});const d=await r.json();
+$("bd").innerHTML=r.ok?`<small>Leave at</small><div class="t">${d.leave_time}</div><p>Allow ${d.minutes_needed} min. A typical day takes ${d.typical_minutes}, so that is +${d.buffer_minutes} min of safety.</p>`:`<p>${d.detail}</p>`}
+async function cal(){const d=await (await fetch("/calibration")).json();
+$("cal").innerHTML=d.levels.map(l=>`<div class="r"><span>${Math.round(l.target*100)}% target</span><span class="bar"><i style="width:${l.actual*100}%"></i><u style="left:${l.target*100}%"></u></span><span>${(l.actual*100).toFixed(0)}% actual</span></div>`).join("");
+$("note").textContent=`Red tick = promised. Tested on ${d.test_trips} later trips. A flat 20% buffer on the average trip is on time ${(d.fixed_buffer_20pct*100).toFixed(0)}% of days, but cannot adapt to rush hour or a chosen confidence.`}
+$("a").oninput=$("c").oninput=go;go();cal();
+</script></body></html>

@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: commute-leave-time
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
