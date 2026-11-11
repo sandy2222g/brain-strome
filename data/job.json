@@ -1,0 +1,27 @@
+{
+ "source": "Invented rooms and can prices for a fictional paint shop. MIT.",
+ "coats": 2,
+ "coverage": 10.0,
+ "cans": {
+  "1": 9.0,
+  "2.5": 20.0,
+  "5": 34.0,
+  "10": 60.0
+ },
+ "rooms": [
+  {
+   "name": "Living room",
+   "width": 5.0,
+   "length": 4.0,
+   "height": 2.5,
+   "openings": 6.0
+  },
+  {
+   "name": "Bedroom",
+   "width": 4.0,
+   "length": 3.5,
+   "height": 2.5,
+   "openings": 7.0
+  }
+ ]
+}
