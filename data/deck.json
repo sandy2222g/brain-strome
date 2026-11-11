@@ -1,0 +1,8 @@
+{"source": "Invented 12-card study deck; hardness is an assumed difficulty (0.5 easy to 3 hard). MIT.", "days": 60,
+ "cards": [
+  {"name": "Mitochondria role", "hardness": 0.6}, {"name": "Krebs cycle steps", "hardness": 2.6},
+  {"name": "Bayes rule", "hardness": 1.0}, {"name": "Central limit theorem", "hardness": 1.6},
+  {"name": "Big-O of quicksort", "hardness": 0.8}, {"name": "Master theorem cases", "hardness": 2.4},
+  {"name": "TCP three-way handshake", "hardness": 0.9}, {"name": "CAP theorem", "hardness": 1.3},
+  {"name": "French: avoir conjugation", "hardness": 1.1}, {"name": "French: subjunctive triggers", "hardness": 2.8},
+  {"name": "Capital of Australia", "hardness": 0.5}, {"name": "Newton's third law", "hardness": 0.7}]}

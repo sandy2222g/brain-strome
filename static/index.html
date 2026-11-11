@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Flashcard Scheduler</title>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Karla:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#2b2a4c;--card:#fffdf6;--ink:#232240;--mute:#6b6a8a;--rule:#bcd4ee;--margin:#e0505a;--lime:#c6f24e;--lilac:#b6a4ff}
+@media(prefers-color-scheme:dark){:root{--bg:#14132a;--card:#23223d;--ink:#f1f0ff;--mute:#a9a8cc;--rule:#33345a;--margin:#ff7f87}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Karla,sans-serif}
+main{max-width:1040px;margin:auto;padding:28px 16px 56px}
+h1{font:400 clamp(2.2rem,8vw,3.8rem)/1 "Permanent Marker";color:var(--lime);margin:0;transform:rotate(-1deg)}
+.sub{color:#cfcdf5;max-width:62ch;margin:10px 0 22px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:16px}
+.c{background:var(--card);border-radius:6px;padding:14px 14px 14px 36px;position:relative;box-shadow:5px 6px 0 rgba(0,0,0,.35);
+background-image:repeating-linear-gradient(transparent 0 25px,var(--rule) 25px 26px);background-color:var(--card)}
+.c::before{content:"";position:absolute;left:24px;top:0;bottom:0;border-left:2px solid var(--margin)}
+.c h2{font:400 1.35rem "Permanent Marker";margin:0 0 6px}.c.win h2{color:var(--margin)}
+.n{font:700 2.4rem/1.1 Karla}.u{font-size:.8rem;color:var(--mute);margin-bottom:6px}
+.bar{height:10px;background:var(--rule);margin:2px 0 8px}.bar i{display:block;height:100%}.rv i{background:var(--lilac)}.rc i{background:var(--margin)}
+.note{color:#cfcdf5;font-size:.85rem;margin-top:18px;max-width:70ch}
+</style></head><body><main>
+<h1>Flashcard Scheduler</h1><p class="sub">Twelve cards, sixty days, a simulated learner who forgets. How many reviews does each schedule cost, and how much do you remember on the last day?</p>
+<div class="grid" id="g" aria-live="polite"></div>
+<p class="note" id="n"></p></main>
+<script>
+const $=i=>document.getElementById(i);
+const N={daily:["Every day","review every card daily"],fixed:["Every 3 days","same gap, forever"],leitner:["Leitner boxes","1,2,4,8,16,32 days"],sm2:["SM-2 style","gaps grow with success"]};
+(async()=>{const d=await (await fetch("/sample")).json();const r=await (await fetch("/compare",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cards:d.cards,days:d.days})})).json();
+const s=r.strategies,mx=Math.max(...Object.values(s).map(x=>x.reviews_per_card));
+$("g").innerHTML=Object.keys(N).map(k=>{const x=s[k];return `<div class="c ${k=="sm2"?"win":""}"><h2>${N[k][0]}</h2><div class="u">${N[k][1]}</div>
+<div class="n">${Math.round(x.recall*100)}%</div><div class="u">recalled on day ${r.days}</div><div class="bar rc"><i style="width:${x.recall*100}%"></i></div>
+<div class="n">${x.reviews_per_card.toFixed(0)}</div><div class="u">reviews per card</div><div class="bar rv"><i style="width:${x.reviews_per_card/mx*100}%"></i></div></div>`}).join("");
+$("n").textContent=`SM-2 style recalls ${Math.round(s.sm2.recall*100)}% for ${Math.round(s.sm2.reviews/s.daily.reviews*100)}% of the reviews that daily practice needs. Averages over 40 simulated learners; the forgetting model is an assumption, not measured data.`})();
+</script></body></html>

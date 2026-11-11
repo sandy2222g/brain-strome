@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: flashcard-review-scheduler
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
