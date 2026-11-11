@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tip Pool Splitter</title>
+<style>
+:root{--bg:#1c1a17;--ink:#f4ead8;--accent:#e0a458;--card:#2a2723;--mute:#a89b86;--bad:#e5735c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Courier New",monospace}
+main{max-width:680px;margin:0 auto;padding:32px 16px}
+h1{margin:0;font-size:2rem;color:var(--accent)}p{color:var(--mute)}
+button{background:var(--accent);color:#1c1a17;border:0;padding:.6rem 1.2rem;font:bold 1rem "Courier New",monospace;cursor:pointer}
+.receipt{background:var(--card);margin-top:20px;padding:18px;border:1px dashed var(--mute)}
+.receipt h2{margin:0 0 10px;font-size:1rem;color:var(--mute);text-transform:uppercase;letter-spacing:.1em}
+.line{display:flex;justify-content:space-between;padding:3px 0}.total{border-top:1px dashed var(--mute);margin-top:8px;padding-top:8px;font-weight:bold}
+.bad{color:var(--bad)}
+</style></head><body><main>
+<h1>Tip Pool Splitter</h1>
+<p id="sub">Split to the cent so the payouts add up exactly.</p>
+<button id="go">Split the sample pool</button><div id="out"></div></main>
+<script>
+const out=document.getElementById("out"),$=c=>"$"+(c/100).toFixed(2);
+document.getElementById("go").onclick=async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/split",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)})).json();
+  document.getElementById("sub").textContent=`Pool ${$(r.pool_cents)} split by hours worked.`;
+  const card=(t,m,tot)=>{let h=`<div class="receipt"><h2>${t}</h2>`;
+    for(const [n,c] of Object.entries(m))h+=`<div class="line"><span>${n}</span><span>${$(c)}</span></div>`;
+    return h+`<div class="line total ${tot!==r.pool_cents?"bad":""}"><span>Total paid</span><span>${$(tot)}</span></div></div>`;};
+  out.innerHTML=card("Largest remainder",r.fair,r.fair_total)+card("Naive rounding",r.naive,r.naive_total);
+};
+document.getElementById("go").click();
+</script></body></html>

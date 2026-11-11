@@ -1,0 +1,7 @@
+{
+ "source": "Invented staff and hours for a fictional cafe. MIT.",
+ "pool_cents": 10000,
+ "workers": [
+  {"name": "Asha", "hours": 10}, {"name": "Ben", "hours": 10}, {"name": "Chen", "hours": 10}
+ ]
+}
