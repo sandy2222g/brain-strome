@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: meal-prep-budget-mixer
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

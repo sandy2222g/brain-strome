@@ -1,0 +1,13 @@
+{"source": "Invented foods; costs per serving in dollars, nutrition per serving (typical values, rounded). MIT.",
+ "targets": {"kcal_min": 2000, "kcal_max": 2300, "protein_min": 110},
+ "max_servings": 4,
+ "foods": [
+  {"name": "Rice", "cost": 0.30, "kcal": 205, "protein": 4},
+  {"name": "Lentils", "cost": 0.45, "kcal": 230, "protein": 18},
+  {"name": "Chicken breast", "cost": 1.80, "kcal": 165, "protein": 31},
+  {"name": "Eggs (2)", "cost": 0.70, "kcal": 140, "protein": 12},
+  {"name": "Oats", "cost": 0.25, "kcal": 150, "protein": 5},
+  {"name": "Peanut butter", "cost": 0.40, "kcal": 190, "protein": 7},
+  {"name": "Greek yoghurt", "cost": 0.90, "kcal": 100, "protein": 17},
+  {"name": "Tofu", "cost": 0.85, "kcal": 145, "protein": 15},
+  {"name": "Bananas", "cost": 0.25, "kcal": 105, "protein": 1}]}

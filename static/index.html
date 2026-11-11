@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Meal Prep Mixer</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Archivo+Narrow:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#bfe3d4;--paper:#fffefa;--ink:#1b1b1b;--mute:#6a6a62;--red:#d12c2c;--ok:#157a4a;--title:#0e4d38}
+@media(prefers-color-scheme:dark){:root{--bg:#0d2a21;--paper:#1d1f1c;--ink:#f1f0e6;--mute:#a8a89c;--red:#ff7070;--ok:#5ee0a0;--title:#a6f0d0}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Share Tech Mono",monospace}
+main{max-width:860px;margin:auto;padding:28px 16px 56px;text-align:center}
+h1{font:700 clamp(2.2rem,8vw,3.6rem)/1 "Archivo Narrow",sans-serif;text-transform:uppercase;margin:0;color:var(--title);letter-spacing:.04em}
+.sub{max-width:58ch;margin:8px auto 22px;color:var(--title)}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px;align-items:start}
+.rc{background:var(--paper);padding:18px 18px 26px;text-align:left;box-shadow:0 8px 0 rgba(0,0,0,.12);
+-webkit-mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/14px 100%;mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/14px 100%}
+.rc h2{font:700 1.25rem "Archivo Narrow";text-transform:uppercase;text-align:center;margin:0 0 4px;letter-spacing:.1em}.c{text-align:center;color:var(--mute);font-size:.8rem;margin-bottom:10px}
+.l{display:flex;justify-content:space-between;border-bottom:1px dotted var(--mute);padding:2px 0}hr{border:0;border-top:2px dashed var(--mute);margin:10px 0}
+.t{display:flex;justify-content:space-between;font-size:1.25rem;font-weight:bold}.bad{color:var(--red);font-weight:bold}.good{color:var(--ok);font-weight:bold}
+</style></head><body><main>
+<h1>Meal Prep Mixer</h1><p class="sub">Nine cheap foods, a day's targets: 2,000 to 2,300 kcal and at least 110 g protein. Cheapest-calories-first, or the exact cheapest mix that hits every target?</p>
+<div class="row" id="r" aria-live="polite"></div></main>
+<script>
+const $=i=>document.getElementById(i),f=n=>"$"+n.toFixed(2);
+(async()=>{const d=await (await fetch("/sample")).json();const r=await (await fetch("/mix",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)})).json();
+const cost=Object.fromEntries(d.foods.map(x=>[x.name,x.cost]));
+const rc=(t,sub,x)=>`<div class="rc"><h2>${t}</h2><div class="c">${sub}</div>${Object.entries(x.servings).map(([n,s])=>`<div class="l"><span>${s} x ${n}</span><span>${f(s*cost[n])}</span></div>`).join("")}<hr>
+<div class="l"><span>Calories</span><span class="${x.kcal>=d.targets.kcal_min&&x.kcal<=d.targets.kcal_max?"good":"bad"}">${x.kcal}</span></div>
+<div class="l"><span>Protein</span><span class="${x.protein>=d.targets.protein_min?"good":"bad"}">${x.protein} g${x.protein<d.targets.protein_min?" (short "+(d.targets.protein_min-x.protein)+" g)":""}</span></div><hr>
+<div class="t"><span>TOTAL / DAY</span><span>${f(x.cost)}</span></div><div class="c" style="margin-top:8px">${x.meets_targets?"** ALL TARGETS MET **":"!! TARGETS MISSED !!"}</div></div>`;
+$("r").innerHTML=rc("Cheapest per kcal","fills calories, ignores protein",r.baseline)+rc("Best mix","exact search, all targets",r.best)})();
+</script></body></html>
