@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: secret-santa-matcher
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

@@ -1,0 +1,3 @@
+{"names":["Asha","Ben","Chen","Dara","Elif","Femi","Gus","Hana"],
+"exclusions":[["Asha","Ben"],["Chen","Dara"],["Elif","Femi"]],
+"last_year":{"Asha":"Chen","Chen":"Gus","Gus":"Asha","Ben":"Hana","Hana":"Elif","Elif":"Ben","Dara":"Femi","Femi":"Dara"}}
