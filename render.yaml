@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: transit-pass-chooser
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

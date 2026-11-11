@@ -1,0 +1,5 @@
+{
+ "source": "Invented book and dates. MIT.",
+ "title": "A Long Novel", "pages": 640, "pages_read": 40,
+ "start": "2026-11-16", "deadline": "2026-12-13", "rest_weekdays": [5, 6]
+}

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reading Pace Planner</title>
+<style>
+:root{--bg:#fff7ec;--ink:#2d2a26;--accent:#d9480f;--card:#fff;--mute:#8a7f72;--rest:#efe6d8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Charter,"Bitstream Charter",Georgia,serif}
+main{max-width:760px;margin:0 auto;padding:32px 16px}
+h1{margin:0;font-size:2.2rem}p{color:var(--mute)}
+button{background:var(--accent);color:#fff;border:0;border-radius:4px;padding:.6rem 1.3rem;font:inherit;cursor:pointer}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:20px}
+.h{font-size:.75rem;color:var(--mute);text-align:center;text-transform:uppercase}
+.d{background:var(--card);border-radius:6px;padding:6px 4px;text-align:center;min-height:56px}
+.d.rest{background:var(--rest);color:var(--mute)}.d b{display:block;font-size:1.2rem;color:var(--accent)}.d span{font-size:.7rem;color:var(--mute)}
+.note{margin-top:16px}
+</style></head><body><main>
+<h1>Reading Pace Planner</h1>
+<p id="sub">Pages per day, skipping rest days.</p>
+<button id="go">Plan the sample book</button><div id="out"></div></main>
+<script>
+const out=document.getElementById("out"),names=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+document.getElementById("go").onclick=async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/plan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)})).json();
+  document.getElementById("sub").textContent=`${r.title}: ${r.pages_left} pages left over ${r.reading_days} reading days.`;
+  const first=new Date(r.schedule[0].date+"T00:00:00Z"),lead=r.schedule[0].weekday;
+  let h='<div class="cal">'+names.map(n=>`<div class="h">${n}</div>`).join("");
+  const map=Object.fromEntries(r.schedule.map(x=>[x.date,x.pages]));
+  const last=new Date(r.schedule[r.schedule.length-1].date+"T00:00:00Z");
+  const start=new Date(first);start.setUTCDate(start.getUTCDate()-lead);
+  for(let d=new Date(start);d<=last||d.getUTCDay()!==1;d.setUTCDate(d.getUTCDate()+1)){
+    const k=d.toISOString().slice(0,10),inRange=d>=first&&d<=last;
+    if(map[k]!==undefined)h+=`<div class="d"><b>${map[k]}</b><span>${k.slice(5)}</span></div>`;
+    else h+=`<div class="d rest"><span>${inRange?"rest":""} ${k.slice(5)}</span></div>`;
+  }
+  out.innerHTML=h+`</div><p class="note">A plan that divides by all calendar days says ${r.naive_per_day} pages a day, which only reaches ${r.naive_total} of ${r.pages_left} pages if you skip rest days.</p>`;
+};
+document.getElementById("go").click();
+</script></body></html>
