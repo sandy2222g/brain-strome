@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Same Time Zone</title>
+<meta name="description" content="Find the meeting time that hurts the fewest people least, and rotate it so the same people do not always stay up late.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Figtree:wght@400..600&display=swap" rel="stylesheet">
+<style>
+/* Visual system dealt with taste-skill: palette "cool-white-slate" (frost and slate with a teal accent; slate night set below), type "fraunces" (Fraunces + Figtree), soft radius. Layout: a 24-hour timeline per person. */
+:root {
+  --bg:#f7f9fa; --surface:#ecf0f2; --card:#ffffff; --ink:#1f3038; --muted:#5a6b73; --accent:#0d7480; --on-accent:#ffffff; --line:#d5dde1;
+  --ok:#cfe9e1; --mild:#f3e3b4; --bad:#f0b9a8; --sleep:#2b3a42; --serif:"Fraunces", Georgia, serif; --sans:"Figtree", system-ui, sans-serif; --ease:cubic-bezier(.2,.8,.2,1); --r:12px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#12191c; --surface:#192226; --card:#161e22; --ink:#e6eef1; --muted:#93a5ad; --accent:#4fc3d1; --on-accent:#06222a; --line:#2a373d;
+  --ok:#1f4a45; --mild:#5a4a1f; --bad:#6a352a; --sleep:#0b1013; color-scheme:dark; } }
+:root[data-theme="dark"] {
+  --bg:#12191c; --surface:#192226; --card:#161e22; --ink:#e6eef1; --muted:#93a5ad; --accent:#4fc3d1; --on-accent:#06222a; --line:#2a373d;
+  --ok:#1f4a45; --mild:#5a4a1f; --bad:#6a352a; --sleep:#0b1013; color-scheme:dark; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:400 16px/1.5 var(--sans); }
+.wrap { max-width:1180px; margin:0 auto; padding-block:26px 56px; padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); }
+h1 { font:500 clamp(2.1rem,5.5vw,3.6rem)/1.02 var(--serif); letter-spacing:-.03em; margin:0 0 10px; text-wrap:balance; max-width:20ch; }
+h2 { font:500 1.25rem var(--serif); margin:0 0 10px; }
+.lead { color:var(--muted); max-width:56ch; margin:0 0 22px; }
+.panel { background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:18px; margin-bottom:16px; }
+.controls { display:flex; gap:22px; flex-wrap:wrap; align-items:end; margin-bottom:16px; }
+.controls label { font-size:.88rem; display:block; } .controls output { font-weight:600; margin-left:6px; }
+input[type=range], select { min-height:44px; accent-color:var(--accent); } select { padding:0 10px; background:var(--card); color:var(--ink); border:1px solid var(--line); border-radius:10px; font:inherit; }
+:focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
+.btn { min-height:44px; padding:0 18px; border-radius:10px; border:1px solid var(--accent); background:var(--accent); color:var(--on-accent); font:600 .95rem var(--sans); cursor:pointer; transition:transform 150ms var(--ease), filter 150ms var(--ease); }
+.btn:hover { transform:translateY(-2px); filter:brightness(1.08); } .btn:active { transform:translateY(1px); transition-duration:90ms; }
+.scroll { overflow-x:auto; }
+.tl { min-width:640px; }
+.row { display:grid; grid-template-columns:140px minmax(0,1fr); gap:10px; align-items:center; margin-bottom:6px; }
+.row .who { font-size:.9rem; } .row .who small { display:block; color:var(--muted); font-size:.72rem; }
+.band { position:relative; display:grid; grid-template-columns:repeat(48,1fr); height:32px; border-radius:8px; overflow:hidden; background:var(--surface); }
+.band i { display:block; } .band i.ok { background:var(--ok); } .band i.mild { background:var(--mild); } .band i.bad { background:var(--bad); }
+.band i.sleep { background:var(--sleep); background-image:repeating-linear-gradient(135deg, transparent 0 4px, rgba(255,255,255,.12) 4px 6px); }
+.pick { position:absolute; top:-3px; bottom:-3px; border:2.5px solid var(--accent); border-radius:6px; pointer-events:none; background:rgba(13,116,128,.14); }
+.axis { display:grid; grid-template-columns:140px minmax(0,1fr); gap:10px; margin-bottom:4px; } .axis div { display:flex; justify-content:space-between; font-size:.7rem; color:var(--muted); }
+.legend { display:flex; flex-wrap:wrap; gap:6px 16px; font-size:.8rem; color:var(--muted); margin-top:8px; } .legend b { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:-2px; }
+.opts { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+.opt { min-height:44px; padding:6px 14px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font:500 .9rem var(--sans); cursor:pointer; text-align:left; transition:transform 150ms var(--ease); } .opt:hover { transform:translateY(-2px); } .opt[aria-pressed="true"] { border-color:var(--accent); box-shadow:inset 0 0 0 1.5px var(--accent); }
+.opt small { display:block; color:var(--muted); font-weight:400; }
+.warn { color:#b3261e; font-weight:600; } @media (prefers-color-scheme: dark) { .warn { color:#ff8a7e; } }
+.cmp { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+.bars div { display:grid; grid-template-columns:90px minmax(0,1fr) 40px; gap:8px; align-items:center; font-size:.85rem; margin-bottom:4px; } .bars i { display:block; height:10px; border-radius:99px; background:var(--accent); width:var(--w); } .bars i.f { background:var(--muted); }
+.weeks { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:8px; } .week { background:var(--surface); border-radius:10px; padding:8px 10px; font-size:.82rem; } .week b { display:block; font:600 .8rem var(--sans); }
+.big { font:500 2rem/1 var(--serif); } .note { color:var(--muted); font-size:.85rem; margin-top:14px; } .note a { color:var(--ink); }
+.enter { animation:enter 900ms cubic-bezier(.22,1,.36,1) both; } @keyframes enter { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) { .enter { animation:none; } * { transition:none !important; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="enter"><h1>One meeting, six time zones, nobody always up at night</h1>
+  <p class="lead">Each row is a day in UTC. Teal-green is fine, yellow is awkward, orange is bad, dark hatched is someone's sleep. Pick a time from the list, then see how rotating it week to week shares the pain.</p></header>
+  <section class="panel"><div class="controls">
+    <div><label for="dur">Length<output id="o-dur">60 min</output></label><input id="dur" type="range" min="30" max="120" step="30" value="60"></div>
+    <div><label for="fair">Protect the worst-off<output id="o-fair">1.0</output></label><input id="fair" type="range" min="0" max="4" step="0.5" value="1"></div>
+    <div><label for="weeks">Weeks<output id="o-weeks">8</output></label><input id="weeks" type="range" min="4" max="16" step="1" value="8"></div>
+  </div>
+  <div class="opts" id="opts" role="group" aria-label="Best meeting times"></div><p class="warn" id="warn"></p>
+  <div class="scroll"><div class="tl"><div class="axis"><span></span><div><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00 UTC</span></div></div><div id="rows"></div></div></div>
+  <div class="legend"><span><b style="background:var(--ok)"></b>working hours</span><span><b style="background:var(--mild)"></b>a bit outside</span><span><b style="background:var(--bad)"></b>well outside</span><span><b style="background:var(--sleep)"></b>sleeping</span></div></section>
+  <section class="panel"><h2>Rotating the time</h2><div class="cmp"><div><p class="note" style="margin:0 0 6px">Pain added up over the weeks</p><div class="bars" id="rot"></div></div><div><p class="note" style="margin:0 0 6px">If the same best time is used every week</p><div class="bars" id="fix"></div></div></div>
+    <p id="verdict" style="margin:12px 0 10px"></p><div class="weeks" id="weeks-list"></div></section>
+  <p class="note">Invented team. Uses real time-zone rules, so daylight saving is respected. <a href="/docs">API docs</a></p>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; };
+let sample = null, chosen = 0, best = null;
+const body = () => ({ ...sample, duration_min: +$("dur").value, fairness: +$("fair").value, weeks: +$("weeks").value });
+const post = async (p) => (await fetch(p, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body()) })).json();
+const cls = (p) => (p >= 50 ? "sleep" : p >= 9 ? "bad" : p > 0 ? "mild" : "ok");
+const dur = () => +$("dur").value;
+function drawBands(b) {
+  const rows = $("rows"); rows.textContent = ""; const cells = dur() / 30;
+  sample.people.forEach((p) => { const r = el("div", "row"); const w = el("div", "who", p.name); w.append(el("small", "", p.tz.split("/").pop().replace("_", " "))); r.append(w);
+    const band = el("div", "band"); b[p.name].forEach((pain) => band.append(el("i", cls(pain)))); const s = best.slots[chosen], hh = s.start_utc.slice(11, 16).split(":"), idx = (+hh[0] * 60 + +hh[1]) / 30;
+    const pick = el("div", "pick"); pick.style.left = (idx / 48 * 100) + "%"; pick.style.width = (cells / 48 * 100) + "%"; band.append(pick); r.append(band); rows.append(r); });
+}
+function showOpts() {
+  const box = $("opts"); box.textContent = ""; best.slots.forEach((s, i) => { const b = el("button", "opt", s.start_utc.slice(11, 16) + " UTC"); b.type = "button"; b.setAttribute("aria-pressed", String(i === chosen));
+    b.append(el("small", "", s.sleepers ? s.sleepers + " in sleep hours" : "no one asleep, worst pain " + s.worst_pain)); b.addEventListener("click", () => { chosen = i; showOpts(); redraw(); }); box.append(b); });
+  $("warn").textContent = best.warning || "";
+}
+let bandsCache = null;
+function redraw() { if (bandsCache) drawBands(bandsCache); }
+function bars(box, data, fixed) { box.textContent = ""; const mx = Math.max(...Object.values(data), 1); Object.entries(data).forEach(([n, v]) => { const d = el("div"); const i = el("i", fixed ? "f" : ""); i.style.setProperty("--w", (v / mx * 100) + "%"); d.append(el("span", "", n), i, el("span", "", String(Math.round(v)))); box.append(d); }); }
+async function refresh() {
+  $("o-dur").textContent = $("dur").value + " min"; $("o-fair").textContent = (+$("fair").value).toFixed(1); $("o-weeks").textContent = $("weeks").value;
+  const [b, bands, rot] = await Promise.all([post("/best"), post("/bands"), post("/rotation")]); best = b; bandsCache = bands; chosen = Math.min(chosen, b.slots.length - 1);
+  showOpts(); redraw(); const mx = Math.max(...Object.values(rot.cumulative), ...Object.values(rot.fixed_cumulative), 1);
+  bars($("rot"), rot.cumulative, false); bars($("fix"), rot.fixed_cumulative, true);
+  const v = $("verdict"); v.textContent = ""; v.append(el("span", "big", Math.round(rot.max_pain)), document.createTextNode(" is the most any one person carries with rotation, against "), el("b", "", String(Math.round(rot.fixed_max_pain))), document.createTextNode(" with a fixed time. The gap between the most and least burdened person is " + Math.round(rot.spread) + " against " + Math.round(rot.fixed_spread) + "."));
+  const wl = $("weeks-list"); wl.textContent = ""; rot.weeks.forEach((s, i) => { const w = el("div", "week"); w.append(el("b", "", "Week " + (i + 1)), document.createTextNode(s.start_utc.slice(5, 10) + " " + s.start_utc.slice(11, 16) + " UTC")); wl.append(w); });
+}
+["dur", "fair", "weeks"].forEach((k) => $(k).addEventListener("change", refresh)); ["dur", "fair", "weeks"].forEach((k) => $(k).addEventListener("input", () => { $("o-dur").textContent = $("dur").value + " min"; $("o-fair").textContent = (+$("fair").value).toFixed(1); $("o-weeks").textContent = $("weeks").value; }));
+(async () => { sample = await (await fetch("/sample")).json(); await refresh(); })();
+</script>
+</body>
+</html>
