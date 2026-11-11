@@ -1,0 +1,5 @@
+{
+ "source": "Invented coin values and stock for a fictional machine. MIT.",
+ "till": {"1": 10, "10": 4, "25": 2},
+ "amounts": [30, 40, 55, 60, 75]
+}

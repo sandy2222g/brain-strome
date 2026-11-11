@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coin Change Maker</title>
+<style>
+:root{--bg:#e6f4f1;--ink:#0b3d3a;--accent:#00897b;--card:#fff;--bad:#c62828}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Rockwell,"Roboto Slab",Georgia,serif}
+main{max-width:760px;margin:0 auto;padding:32px 16px}
+h1{margin:0;font-size:2.2rem}p{color:#3d6b67}
+button{background:var(--accent);color:#fff;border:0;padding:.6rem 1.3rem;font:inherit;cursor:pointer}
+table{width:100%;border-collapse:collapse;background:var(--card);margin-top:20px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid #cfe7e2}th{background:var(--ink);color:#fff;font-weight:normal}
+.good{color:var(--accent);font-weight:bold}.bad{color:var(--bad)}
+</style></head><body><main>
+<h1>Coin Change Maker</h1>
+<p>A till with 1, 10 and 25 coins in limited stock. Fewest coins vs always handing over the biggest coin.</p>
+<button id="go">Make change for the sample amounts</button><div id="out"></div></main>
+<script>
+const out=document.getElementById("out"),d=x=>x.possible?Object.entries(x.detail).map(([k,v])=>`${v}&times;${k}`).join(" + "):"cannot";
+document.getElementById("go").onclick=async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/change",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)})).json();
+  let h="<table><tr><th>Amount</th><th>Fewest coins</th><th>Biggest-first</th></tr>";
+  for(const x of r.rows){const worse=x.greedy.coins>x.fewest.coins;
+    h+=`<tr><td>${x.amount}</td><td class="good">${x.fewest.coins} coins: ${d(x.fewest)}</td><td class="${worse?"bad":""}">${x.greedy.coins} coins: ${d(x.greedy)}</td></tr>`;}
+  out.innerHTML=h+"</table>";
+};
+document.getElementById("go").click();
+</script></body></html>
