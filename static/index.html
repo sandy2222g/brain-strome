@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>League Fixture Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3efe6;--panel:#fffdf7;--ink:#17140f;--mute:#6f685b;--amber:#c76a00;--led:#17140f;--home:#17140f;--away:#fffdf7;--brk:#d8341f;--line:#d9d1bf}
+@media(prefers-color-scheme:dark){:root{--bg:#0b0a08;--panel:#16130e;--ink:#ffe2a8;--mute:#a58f63;--amber:#ffb02e;--led:#ffb02e;--home:#ffb02e;--away:#16130e;--brk:#ff5a45;--line:#3a3220}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Chakra Petch",sans-serif}
+main{max-width:980px;margin:auto;padding:26px 16px 56px}
+h1{font:700 clamp(2rem,8vw,3.6rem)/1 "Chakra Petch";text-transform:uppercase;letter-spacing:.06em;margin:0;color:var(--amber)}.sub{color:var(--mute);margin:8px 0 18px;max-width:62ch}
+.tabs{display:flex;gap:8px;margin-bottom:12px}.tabs button{font:600 .9rem "Chakra Petch";border:2px solid var(--amber);background:transparent;color:var(--ink);padding:5px 16px;cursor:pointer;text-transform:uppercase;letter-spacing:.08em}.tabs button[aria-pressed=true]{background:var(--amber);color:var(--panel)}
+.board{display:flex;gap:26px;flex-wrap:wrap;background:var(--panel);border:2px solid var(--ink);padding:12px 18px;margin-bottom:14px}.board div b{display:block;font:700 2.6rem/1 "Chakra Petch";color:var(--led);font-variant-numeric:tabular-nums}.board span{font-size:.72rem;color:var(--mute);text-transform:uppercase;letter-spacing:.1em}
+.grid{background:var(--panel);border:2px solid var(--ink);padding:12px;overflow-x:auto}
+table{border-collapse:separate;border-spacing:4px;width:100%}th{font-size:.7rem;color:var(--mute);font-weight:600}td.t{text-align:left;font-weight:600;padding-right:10px;white-space:nowrap}
+td.c{width:40px;height:34px;text-align:center;font-weight:700;border:2px solid var(--home)}td.h{background:var(--home);color:var(--panel)}td.a{background:var(--away);color:var(--home)}td.b{outline:3px solid var(--brk);outline-offset:1px}
+.note{color:var(--mute);font-size:.82rem;margin-top:10px}
+</style></head><body><main>
+<h1>League Fixture Planner</h1><p class="sub">Eight under-12 teams, seven Sundays, everyone plays everyone once. H is a home game, A is away; a red outline means a team plays home (or away) twice in a row.</p>
+<div class="tabs"><button id="bb" aria-pressed="true">Balanced</button><button id="bn" aria-pressed="false">Naive: first listed is home</button></div>
+<div class="board" id="bd" aria-live="polite"></div><div class="grid"><table id="t"></table></div>
+<p class="note">Circle method with alternating home and away. With n teams the minimum possible number of breaks is n - 2; the balanced plan reaches it.</p></main>
+<script>
+const $=i=>document.getElementById(i);let D,R,cur="balanced";
+function show(){const x=R[cur];$("bb").setAttribute("aria-pressed",cur=="balanced");$("bn").setAttribute("aria-pressed",cur!="balanced");
+$("bd").innerHTML=`<div><b>${x.breaks}</b><span>breaks</span></div><div><b>${x.home_spread}</b><span>home games spread</span></div><div><b>${x.rounds.length}</b><span>rounds</span></div>`;
+const teams=D.teams,side=teams.map(()=>[]);x.rounds.forEach((rd,r)=>{rd.forEach(g=>{side[teams.indexOf(g.home)][r]="H";side[teams.indexOf(g.away)][r]="A"})});
+$("t").innerHTML=`<tr><th></th>${x.rounds.map((_,i)=>`<th>R${i+1}</th>`).join("")}<th>Home</th></tr>`+teams.map((t,i)=>`<tr><td class="t">${t}</td>${side[i].map((s,r)=>`<td class="c ${s=="H"?"h":"a"} ${r&&side[i][r-1]==s?"b":""}">${s||"-"}</td>`).join("")}<td>${x.home_games[t]}</td></tr>`).join("")}
+$("bb").onclick=()=>{cur="balanced";show()};$("bn").onclick=()=>{cur="naive";show()};
+(async()=>{D=await (await fetch("/sample")).json();R=await (await fetch("/schedule",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(D)})).json();show()})();
+</script></body></html>
