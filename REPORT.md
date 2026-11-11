@@ -123,4 +123,4 @@ Deploy two to Render, confirm CI green on the newest branches, rebuild perishabl
 - 06:46 IST: dinner-sync-planner pushed (170 vs 210 min, food waits 142 vs 421 min).
 - 06:46 IST (container clock): flat-pack-packer built (14 boxes in listed order, 11 first-fit-decreasing, 10 exact = lower bound).
 - 06:50 IST (container clock): chore-rota-planner built (dislike 59 vs 90 for round-robin; effort spread 2 pts vs 0, a real trade-off).
-- 06:52 IST (container clock): carry-on-capsule built (24 outfits exact vs 12 lightest-first vs 0 packed in order; greedy marginal-gain heuristic dropped because it stalls at 0 outfits).
+- 06:50 IST (container clock): carry-on-capsule built (24 outfits exact vs 12 lightest-first vs 0 packed in order; greedy marginal-gain heuristic dropped because it stalls at 0 outfits).
