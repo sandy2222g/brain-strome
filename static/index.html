@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gift Budget Splitter</title>
+<style>
+:root{--bg:#fde8ef;--ink:#3b1f2b;--accent:#c2185b;--card:#fff;--mute:#7a5565}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Trebuchet MS",sans-serif}
+main{max-width:900px;margin:0 auto;padding:32px 16px}
+h1{margin:0;font-size:2.4rem;color:var(--accent)}p{color:var(--mute)}
+button{background:var(--accent);color:#fff;border:0;padding:.6rem 1.4rem;font:inherit;border-radius:8px;cursor:pointer}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:20px}
+.col{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 2px 0 #e8b4c8}
+.col h2{margin:0;font-size:1.1rem}.big{font-size:2rem;font-weight:bold;color:var(--accent)}
+ul{list-style:none;padding:0;margin:10px 0 0}li{display:flex;justify-content:space-between;border-top:1px dashed #e8b4c8;padding:6px 0;font-size:.95rem}
+</style></head><body><main>
+<h1>Gift Budget Splitter</h1>
+<p id="sub">One budget, five people: who gets what?</p>
+<button id="go">Plan the sample budget</button><div class="cols" id="out"></div></main>
+<script>
+const out=document.getElementById("out");
+document.getElementById("go").onclick=async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/plan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)})).json();
+  document.getElementById("sub").textContent=`Budget $${s.budget}.`;
+  out.innerHTML="";
+  for(const [k,t] of [["optimal","Best joy for the budget"],["equal_share","Equal allowance each"]]){
+    const p=r[k],d=document.createElement("div");d.className="col";
+    let h=`<h2>${t}</h2><div class="big">${p.joy} joy</div><div>spent $${p.spent}</div><ul>`;
+    for(const [n,g] of Object.entries(p.gifts))h+=`<li><span>${n}: ${g?g.name:"nothing"}</span><span>${g?"$"+g.price:""}</span></li>`;
+    d.innerHTML=h+"</ul>";out.appendChild(d);
+  }
+};
+document.getElementById("go").click();
+</script></body></html>

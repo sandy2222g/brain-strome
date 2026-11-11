@@ -1,0 +1,11 @@
+{
+ "source": "Invented people and gifts. MIT.",
+ "budget": 120,
+ "people": {
+  "Mum": [{"name": "Herb planter", "price": 15, "joy": 5}, {"name": "Silk scarf", "price": 40, "joy": 8}, {"name": "Spa voucher", "price": 60, "joy": 9}],
+  "Dad": [{"name": "Socks", "price": 10, "joy": 3}, {"name": "Grill tools", "price": 35, "joy": 7}, {"name": "Whisky set", "price": 55, "joy": 8}],
+  "Sister": [{"name": "Sticker pack", "price": 8, "joy": 4}, {"name": "Headphones", "price": 45, "joy": 9}],
+  "Best friend": [{"name": "Mug", "price": 12, "joy": 5}, {"name": "Board game", "price": 30, "joy": 8}],
+  "Neighbour": [{"name": "Chocolates", "price": 10, "joy": 6}, {"name": "Candle", "price": 20, "joy": 7}]
+ }
+}
