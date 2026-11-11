@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: bake-sale-pricer
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

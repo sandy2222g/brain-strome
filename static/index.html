@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bake Sale Pricer</title>
+<link href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ffe9ef;--card:#fffafb;--ink:#4a2a24;--mute:#8c6a63;--pink:#e5527f;--choc:#5b3028;--line:#f2c6d3;--mint:#2f9e7a}
+@media(prefers-color-scheme:dark){:root{--bg:#2a1a1d;--card:#38242a;--ink:#fde9ee;--mute:#cfa9b3;--pink:#ff7fa5;--choc:#fde9ee;--line:#5a3a43;--mint:#59d1a7}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Nunito,sans-serif}
+main{max-width:920px;margin:auto;padding:26px 16px 56px}
+h1{font:400 clamp(2.4rem,9vw,4rem)/1 Chewy;color:var(--pink);margin:0}.sub{color:var(--mute);margin:6px 0 16px;max-width:58ch}
+.total{display:inline-block;background:var(--choc);color:var(--card);border-radius:14px;padding:8px 18px;margin-bottom:18px;font-weight:700}.total b{font:400 1.6rem Chewy;color:#ffd1de;margin-right:6px}
+.item{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:16px;background:var(--card);border:2px solid var(--line);border-radius:22px;padding:14px;margin-bottom:12px}
+@media(max-width:640px){.item{grid-template-columns:1fr}}
+h2{font:400 1.5rem Chewy;margin:0}.meta{color:var(--mute);font-size:.82rem}
+svg{width:100%;height:auto;display:block}.nums{display:grid;gap:6px;align-content:center}.nums div{display:flex;justify-content:space-between;font-size:.9rem}.nums b{font-weight:800}
+.big{font:400 1.8rem Chewy;color:var(--pink)}.up{color:var(--mint);font-weight:800}
+</style></head><body><main>
+<h1>Bake Sale Pricer</h1><p class="sub">Twelve weeks of prices and sales for five bakes. A demand curve fitted to each tells you where profit peaks.</p>
+<div class="total" id="tot" aria-live="polite"></div><div id="list"></div></main>
+<script>
+const $=i=>document.getElementById(i),f=n=>n.toFixed(2);
+function chart(it,data){const W=520,H=190,m=34,xs=it.curve.map(p=>p.price),ys=it.curve.map(p=>p.units),x0=Math.min(...xs),x1=Math.max(...xs),y1=Math.max(...ys,...data.map(d=>d.units))*1.05;
+const X=p=>m+(p-x0)/(x1-x0)*(W-m-8),Y=u=>H-24-(u/y1)*(H-34);
+let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Demand curve for ${it.name}"><line x1="${m}" y1="${H-24}" x2="${W-8}" y2="${H-24}" stroke="var(--line)" stroke-width="2"/>`;
+s+=`<polyline fill="none" stroke="var(--pink)" stroke-width="3" points="${it.curve.map(p=>X(p.price)+","+Y(p.units)).join(" ")}"/>`;
+data.forEach(d=>s+=`<circle cx="${X(d.price)}" cy="${Y(d.units)}" r="3.5" fill="var(--choc)" opacity=".7"/>`);
+[[it.baseline_price,"var(--mute)","cost x2"],[it.best_price,"var(--mint)","best"]].forEach(([p,c,l],i)=>s+=`<line x1="${X(p)}" y1="8" x2="${X(p)}" y2="${H-24}" stroke="${c}" stroke-width="2.5" stroke-dasharray="${i?0:"5 4"}"/><text x="${X(p)+(i?4:-4)}" y="${i?20:34}" text-anchor="${i?"start":"end"}" font-size="12" font-weight="700" fill="${c}">${l} $${f(p)}</text>`);
+s+=`<text x="${m}" y="${H-6}" font-size="11" fill="var(--mute)">$${f(x0)}</text><text x="${W-8}" y="${H-6}" text-anchor="end" font-size="11" fill="var(--mute)">$${f(x1)} &middot; price</text></svg>`;return s}
+(async()=>{const d=await (await fetch("/sample")).json();const r=await (await fetch("/price",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)})).json();
+const tb=r.items.reduce((a,i)=>a+i.best_profit,0),tp=r.items.reduce((a,i)=>a+i.baseline_profit,0);
+$("tot").innerHTML=`<b>+${((tb/tp-1)*100).toFixed(0)}%</b>weekly profit vs charging double the cost ($${tb.toFixed(0)} vs $${tp.toFixed(0)}, by the fitted curves)`;
+$("list").innerHTML=r.items.map((it,k)=>`<div class="item"><div><h2>${it.name}</h2><div class="meta">elasticity ${it.elasticity} &middot; fit R&sup2; ${it.r2}</div>${chart(it,d.items[k].sales)}</div>
+<div class="nums"><div><span>Best price</span><span class="big">$${f(it.best_price)}</span></div><div><span>Double-cost price</span><b>$${f(it.baseline_price)}</b></div><div><span>Profit / week</span><b>$${it.best_profit.toFixed(0)} <span class="up">vs $${it.baseline_profit.toFixed(0)}</span></b></div></div></div>`).join("")})();
+</script></body></html>

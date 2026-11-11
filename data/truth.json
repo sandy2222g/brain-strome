@@ -1,0 +1,27 @@
+{
+ "Brownie": {
+  "unit_cost": 0.6,
+  "a": 600.0,
+  "elasticity": -1.8
+ },
+ "Sourdough loaf": {
+  "unit_cost": 1.8,
+  "a": 900.0,
+  "elasticity": -1.3
+ },
+ "Cupcake": {
+  "unit_cost": 0.5,
+  "a": 500.0,
+  "elasticity": -2.4
+ },
+ "Cookie": {
+  "unit_cost": 0.25,
+  "a": 300.0,
+  "elasticity": -1.6
+ },
+ "Millionaire shortbread": {
+  "unit_cost": 0.9,
+  "a": 200.0,
+  "elasticity": -1.2
+ }
+}
