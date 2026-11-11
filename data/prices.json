@@ -1,0 +1,5 @@
+{
+ "source": "Invented lengths (cm) and prices for a fictional timber yard. MIT.",
+ "length": 240,
+ "prices": {"30": 4.0, "50": 7.5, "80": 13.0, "90": 15.5}
+}

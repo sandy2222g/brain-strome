@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plank Cutting Planner</title>
+<style>
+:root{--bg:#f6ecd9;--ink:#3e2a14;--accent:#a8501c;--wood:#d9a566;--mute:#7b6347}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Palatino Linotype",Palatino,serif}
+main{max-width:860px;margin:0 auto;padding:32px 16px}
+h1{margin:0;font-size:2.3rem;font-variant:small-caps;color:var(--accent)}p{color:var(--mute)}
+button{background:var(--ink);color:var(--bg);border:0;padding:.6rem 1.3rem;font:inherit;cursor:pointer}
+.plan{margin-top:24px}.plan h2{margin:0 0 6px;font-size:1.05rem}
+.plank{display:flex;height:48px;border:2px solid var(--ink);background:repeating-linear-gradient(90deg,#efe0c4,#efe0c4 6px,#e8d6b4 6px,#e8d6b4 12px)}
+.cut{background:var(--wood);border-right:3px solid var(--ink);display:flex;align-items:center;justify-content:center;font:bold 13px sans-serif}
+.plan.win .cut{background:var(--accent);color:#fff}
+.meta{margin-top:6px;color:var(--mute)}
+</style></head><body><main>
+<h1>Plank Cutting Planner</h1>
+<p id="sub">Which pieces to cut for the most money?</p>
+<button id="go">Plan the sample plank</button><div id="out"></div></main>
+<script>
+const out=document.getElementById("out");
+document.getElementById("go").onclick=async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/cut",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)})).json();
+  document.getElementById("sub").textContent=`${r.length} cm plank.`;
+  out.innerHTML="";
+  for(const [k,t] of [["best","Best cuts"],["single_size","Best-price-per-cm size only"]]){
+    const p=r[k],d=document.createElement("div");d.className="plan"+(k==="best"?" win":"");
+    let h=`<h2>${t}: $${p.value.toFixed(2)}</h2><div class="plank">`;
+    for(const x of p.pieces)h+=`<div class="cut" style="width:${x/r.length*100}%">${x}</div>`;
+    d.innerHTML=h+`</div><div class="meta">${p.waste} cm offcut</div>`;out.appendChild(d);
+  }
+};
+document.getElementById("go").click();
+</script></body></html>
