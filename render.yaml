@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: plain-words-checker
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

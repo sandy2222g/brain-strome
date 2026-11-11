@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Plain Words</title>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,800&family=Hanken+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbfaf6;--ink:#1c1c1a;--mute:#6a6a62;--hl:#fff1a8;--hp:#ffc9d6;--hg:#c8f0cf;--line:#dedbd0}
+@media(prefers-color-scheme:dark){:root{--bg:#171715;--ink:#eeede6;--mute:#a8a89e;--hl:#6b5d12;--hp:#6e2f40;--hg:#26503a;--line:#3a3a35}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.65 "Hanken Grotesk",sans-serif}
+main{max-width:1000px;margin:auto;padding:24px 16px 56px}h1{font:800 clamp(2.1rem,7vw,3.4rem)/1.05 Literata;margin:0}.sub{color:var(--mute);margin:6px 0 20px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr));gap:20px}textarea{width:100%;min-height:300px;padding:14px;font:inherit;background:transparent;color:var(--ink);border:2px solid var(--ink);resize:vertical}
+:focus-visible{outline:3px solid #e0a419;outline-offset:2px}.meta{display:flex;flex-wrap:wrap;gap:20px;margin-bottom:12px}.k b{display:block;font:800 2rem Literata}.k span{color:var(--mute);font-size:.8rem;text-transform:uppercase;letter-spacing:.08em}
+mark{padding:1px 3px;border-radius:2px;color:inherit}.sw{background:var(--hl)}.pa{background:var(--hp)}.lg{background:var(--hg)}
+.sent{padding:8px 10px;border-left:4px solid var(--line);margin:8px 0}.sent.flag{border-left-color:#d4202a}.tags{font-size:.78rem;color:var(--mute)}
+.legend{font-size:.85rem;color:var(--mute);margin:0 0 10px}@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head><body><main>
+<h1>Plain Words</h1><p class="sub">Paste a notice or email. Hard words, passive voice and long sentences get highlighted.</p>
+<div class="two"><textarea id="t" aria-label="Your text"></textarea>
+<div aria-live="polite"><div class="meta" id="m"></div><p class="legend"><mark class="sw">simpler word exists</mark> <mark class="pa">passive</mark> <mark class="lg">long sentence</mark></p><div id="o"></div></div></div></main>
+<script>
+const $=i=>document.getElementById(i);let timer;
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+function mark(s){let h=esc(s.text);const sw=s.swaps.map(x=>x.found).sort((a,b)=>b.length-a.length);
+sw.forEach(f=>{h=h.replace(new RegExp("\\b"+f.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\b","i"),m=>`<mark class="sw" title="try: ${s.swaps.find(x=>x.found.toLowerCase()===m.toLowerCase()).use}">${m}</mark>`)});
+return h}
+async function go(){const text=$("t").value;if(!text.trim()){$("o").innerHTML="";$("m").innerHTML="";return}
+const r=await fetch("/review",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text})});const d=await r.json();if(!r.ok){$("o").textContent=d.detail;return}
+$("m").innerHTML=`<div class="k"><b>${d.scores.reading_ease}</b><span>${d.label}</span></div><div class="k"><b>${d.scores.grade}</b><span>reading grade</span></div><div class="k"><b>${d.scores.avg_sentence_words}</b><span>words/sentence</span></div>`;
+$("o").innerHTML=d.sentences.map(s=>{const tags=[...(s.long?["long: "+s.words+" words"]:[]),...(s.passive?["passive"]:[]),...s.swaps.map(x=>x.found+" → "+x.use)];
+return `<div class="sent ${s.long||s.passive?"flag":""}">${s.long?`<mark class="lg">${mark(s)}</mark>`:s.passive?`<mark class="pa">${mark(s)}</mark>`:mark(s)}<div class="tags">${tags.join(" · ")}</div></div>`}).join("")}
+$("t").oninput=()=>{clearTimeout(timer);timer=setTimeout(go,250)};
+fetch("/sample").then(r=>r.json()).then(d=>{$("t").value=d.text;go()});
+</script></body></html>
