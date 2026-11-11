@@ -36,6 +36,7 @@ Goal: build as many deployable, resume-ready open-source projects as time allows
 - 06:30 IST: garden-planting-calendar built: 14 tests, rule-based planner, window/succession/layout invariants tested.
 - 06:20 IST: recipe-scaler-shopping-list built: 12 tests; shared shop $22.70 vs $28.50 separate (sample).
 - 06:35 IST: gym-week-planner built: 12 tests; fixed uneven day spacing (round -> floor).
+- 06:40 IST: gym-week-planner docker build blocked twice: 'failed to resolve source metadata for docker.io/library/python:3.12-slim: 429 Too Many Requests'. Not retried further; CI docker job builds it.
 
 ## Final report (stopped 07:25 IST, Nov 11)
 
@@ -61,11 +62,11 @@ Goal: build as many deployable, resume-ready open-source projects as time allows
 | Square Up | roommate-bill-settler | 16 pass | built OK; COPY data fix not re-run locally (Docker Hub 429) | workflow present | yes | no | none |
 | Sow Calendar | garden-planting-calendar | 14 pass | built+ran | workflow present | yes | no | none |
 | Cook for N | recipe-scaler-shopping-list | 12 pass | built+ran | workflow present | yes | no | none |
-| Lift Week | gym-week-planner | 12 pass | built+ran | workflow present | yes | no | none |
+| Lift Week | gym-week-planner | 12 pass | not built locally (Docker Hub 429 twice); Dockerfile identical to verified siblings | workflow present | yes | no | none |
 | Perishable Stock Planner | (none) | - | - | - | no | no | agent hit 5-hour API rate limit mid-build; abandoned |
 
 ### Built
-17 complete, pushed projects (one branch each), each with README, DEPLOY.md, Dockerfile, CI, tests, sample data. `main` untouched.
+21 complete, pushed projects (one branch each), each with README, DEPLOY.md, Dockerfile, CI, tests, sample data. `main` untouched.
 
 ### Deployed
 None. Render / Hugging Face deploys need the owner's account; render.yaml and DEPLOY.md are ready.
