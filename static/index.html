@@ -1,0 +1,33 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Taxi Fare Splitter</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e8e6e1;--card:#f7f6f2;--ink:#1c1c1a;--mute:#6d6b64;--org:#ef5a14;--line:#c9c6bd;--eq:#8d8a82;--di:#3c7fa8;--sh:#ef5a14}
+@media(prefers-color-scheme:dark){:root{--bg:#171715;--card:#22221f;--ink:#f1efe8;--mute:#aaa79d;--org:#ff7a3a;--line:#403f3a;--eq:#a09d93;--di:#6db3dc;--sh:#ff7a3a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Mono",monospace}
+main{max-width:1020px;margin:auto;padding:26px 16px 56px}
+h1{font:800 clamp(2.2rem,8vw,3.8rem)/1 Rubik,sans-serif;margin:0;letter-spacing:-.03em}h1 i{font-style:normal;color:var(--org)}
+.sub{color:var(--mute);max-width:62ch;margin:8px 0 18px}
+.top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:14px}@media(max-width:760px){.top{grid-template-columns:1fr}}
+.box{background:var(--card);border:2px solid var(--ink);padding:12px}.box h2{margin:0 0 8px;font:800 1rem Rubik,sans-serif;text-transform:uppercase;letter-spacing:.06em}
+svg{width:100%;height:auto;display:block}
+.total{font:800 3rem/1 Rubik,sans-serif;color:var(--org)}.k{color:var(--mute);font-size:.8rem}
+.r{display:grid;grid-template-columns:54px 1fr;gap:8px;align-items:center;margin-bottom:12px}.r b{font-family:Rubik;font-weight:800}
+.bar{display:grid;grid-template-columns:1fr 54px;align-items:center;gap:6px;font-size:.78rem;margin:2px 0}.bar i{display:block;height:9px}
+.flag{color:#c8281e;font-weight:500}@media(prefers-color-scheme:dark){.flag{color:#ff8a80}}
+.lg{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 0;font-size:.78rem}.lg span::before{content:"";display:inline-block;width:10px;height:10px;margin-right:5px;background:var(--c)}
+</style></head><body><main>
+<h1>Taxi Fare <i>Splitter</i></h1><p class="sub">Five people share one taxi from the station and get off at different stops. Three ways to split the fare: equally, by distance, or by Shapley value, which charges each person what they add on average.</p>
+<div class="top"><div class="box"><h2>The route</h2><svg id="map" viewBox="0 0 330 270" role="img" aria-label="Map of stops"></svg><div class="total" id="tot"></div><div class="k">total fare, one taxi</div></div>
+<div class="box" id="bars" aria-live="polite"></div></div></main>
+<script>
+const $=i=>document.getElementById(i),f=n=>"$"+n.toFixed(2);
+(async()=>{const d=await (await fetch("/sample")).json();const r=await (await fetch("/split",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)})).json();
+const xs=[d.start[0],...d.riders.map(x=>x.stop[0])],ys=[d.start[1],...d.riders.map(x=>x.stop[1])],X=v=>25+v/Math.max(...xs)*235,Y=v=>235-v/Math.max(...ys)*200;
+let m=`<circle cx="${X(d.start[0])}" cy="${Y(d.start[1])}" r="9" fill="var(--ink)"/><text x="${X(0)+12}" y="${Y(0)+18}" font-size="11" fill="var(--ink)">Station</text>`;
+d.riders.forEach(p=>{m+=`<circle cx="${X(p.stop[0])}" cy="${Y(p.stop[1])}" r="7" fill="var(--org)"/><text x="${X(p.stop[0])+10}" y="${Y(p.stop[1])+4}" font-size="12" fill="var(--ink)" font-weight="500">${p.name}</text>`});
+$("map").innerHTML=m;$("tot").textContent=f(r.total);
+const mx=Math.max(...r.riders.flatMap(p=>[p.equal,p.distance,p.shapley]));
+const row=(v,c,l,al)=>`<div class="bar"><i style="width:${v/mx*100}%;background:var(${c})"></i><span class="${v>al+.005?"flag":""}">${f(v)}</span></div>`;
+$("bars").innerHTML=`<h2>Who pays what</h2>`+r.riders.map(p=>`<div class="r"><b>${p.name}</b><div>${row(p.equal,"--eq","equal",p.alone)}${row(p.distance,"--di","distance",p.alone)}${row(p.shapley,"--sh","shapley",p.alone)}<div class="k">alone: ${f(p.alone)}</div></div></div>`).join("")+
+`<div class="lg"><span style="--c:var(--eq)">Equal</span><span style="--c:var(--di)">By distance</span><span style="--c:var(--sh)">Shapley</span></div><p class="k">Red = pays more than riding alone. Equal split: ${r.over_alone.equal} riders; distance: ${r.over_alone.distance}; Shapley: ${r.over_alone.shapley}.</p>`})();
+</script></body></html>

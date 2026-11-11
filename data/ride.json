@@ -1,0 +1,8 @@
+{"source": "Invented ride: station at (0,0), stops in km on a grid, straight-line distances. MIT.",
+ "rate_per_km": 1.2, "start": [0, 0],
+ "riders": [
+  {"name": "Ana", "stop": [2, 0]},
+  {"name": "Ben", "stop": [3, 1]},
+  {"name": "Chen", "stop": [9, 1]},
+  {"name": "Dara", "stop": [10, 0]},
+  {"name": "Eli", "stop": [4, 7]}]}
