@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tidy Contacts</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;800&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f8e3dd;--card:#fff9f6;--ink:#1d3a2f;--mute:#5f6f66;--pine:#1d5b43;--rose:#c8553d;--line:#e8c9c0}
+@media(prefers-color-scheme:dark){:root{--bg:#1b1412;--card:#271d1a;--ink:#f7e9e4;--mute:#bfa9a1;--pine:#7fd1a6;--rose:#ff8b70;--line:#4a3732}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "DM Sans",sans-serif}
+main{max-width:980px;margin:auto;padding:24px 16px 56px}h1{font:800 clamp(2rem,7vw,3.4rem)/1.02 Sora;margin:0}h1 em{font-style:normal;color:var(--rose)}.sub{color:var(--mute);margin:6px 0 18px}
+.ctl{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-bottom:16px}.ctl label{display:grid;gap:2px;font-size:.85rem;color:var(--mute)}input[type=range]{accent-color:var(--rose);min-height:44px;width:min(320px,80vw)}
+.stats{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:18px}.s{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 16px}.s b{display:block;font:800 1.8rem Sora;color:var(--pine)}.s span{color:var(--mute);font-size:.8rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:14px}
+.cl{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;animation:in .3s both}.cl h3{margin:0 0 8px;font:600 .8rem Sora;text-transform:uppercase;letter-spacing:.08em;color:var(--rose)}
+.m{font-size:.88rem;padding:4px 0;border-bottom:1px dashed var(--line);display:flex;justify-content:space-between;gap:8px}.m span:last-child{color:var(--mute);text-align:right;overflow-wrap:anywhere}
+.mg{margin-top:8px;background:var(--pine);color:#fff;padding:8px 10px;border-radius:10px;font-weight:600;font-size:.9rem}@media(prefers-color-scheme:dark){.mg{color:#10201a}}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}:focus-visible{outline:3px solid var(--rose);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head><body><main>
+<h1>Tidy <em>Contacts</em></h1><p class="sub">Typos, nicknames, new numbers: duplicates found and merged. Scored against known answers.</p>
+<div class="ctl"><label><span>Match strictness <b id="tv">0.80</b></span><input type="range" id="t" min="0.6" max="0.95" step="0.05" value="0.8"></label></div>
+<div class="stats" id="st" aria-live="polite"></div><div class="grid" id="g"></div></main>
+<script>
+const $=i=>document.getElementById(i);let data;
+async function go(){if(!data)data=await (await fetch("/sample")).json();$("tv").textContent=(+$("t").value).toFixed(2);
+const d=await (await fetch("/dedupe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contacts:data.contacts,threshold:+$("t").value})})).json();
+const e=d.evaluation;
+$("st").innerHTML=`<div class="s"><b>${d.total}</b><span>contacts</span></div><div class="s"><b>${d.after_merge}</b><span>after merging</span></div><div class="s"><b>${d.clusters.length}</b><span>duplicate groups</span></div>`+(e?`<div class="s"><b>${(e.precision*100).toFixed(0)}%</b><span>precision</span></div><div class="s"><b>${(e.recall*100).toFixed(0)}%</b><span>recall</span></div>`:"");
+$("g").innerHTML=d.clusters.slice(0,12).map((c,i)=>`<div class="cl" style="animation-delay:${i*30}ms"><h3>Same person?</h3>${c.members.map(m=>`<div class="m"><span>${m.name}</span><span>${m.phone||m.email}</span></div>`).join("")}<div class="mg">Merged: ${c.merged.name}</div></div>`).join("")}
+$("t").oninput=go;go();
+</script></body></html>

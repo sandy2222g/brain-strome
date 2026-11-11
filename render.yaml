@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: contact-dedupe
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
