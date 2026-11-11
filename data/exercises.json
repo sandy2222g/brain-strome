@@ -1,0 +1,15 @@
+{"source":"Synthetic exercise list for demo; generic, not medical or coaching advice. MIT.",
+"exercises":[
+{"name":"Squat","muscles":["quads","glutes"],"minutes":12},
+{"name":"Deadlift","muscles":["hamstrings","back","glutes"],"minutes":12},
+{"name":"Bench press","muscles":["chest","triceps"],"minutes":12},
+{"name":"Overhead press","muscles":["shoulders","triceps"],"minutes":10},
+{"name":"Barbell row","muscles":["back","biceps"],"minutes":10},
+{"name":"Pull-up","muscles":["back","biceps"],"minutes":8},
+{"name":"Lunge","muscles":["quads","glutes"],"minutes":10},
+{"name":"Dip","muscles":["chest","triceps"],"minutes":8},
+{"name":"Biceps curl","muscles":["biceps"],"minutes":6},
+{"name":"Plank","muscles":["core"],"minutes":5},
+{"name":"Calf raise","muscles":["calves"],"minutes":5},
+{"name":"Lateral raise","muscles":["shoulders"],"minutes":6}
+]}

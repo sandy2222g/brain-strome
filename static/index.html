@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lift Week</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f2ee;--ink:#111;--acid:#c6f432;--mute:#555;--card:#fff}
+@media(prefers-color-scheme:dark){:root{--bg:#0e0e0e;--ink:#f2f2ee;--acid:#c6f432;--mute:#a2a29a;--card:#1a1a1a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Barlow,sans-serif}
+main{max-width:1040px;margin:auto;padding:24px 16px 56px}h1{font:clamp(2.4rem,9vw,4.6rem)/.95 "Archivo Black";text-transform:uppercase;margin:0}h1 mark{background:var(--acid);color:#111;padding:0 8px}
+.sub{color:var(--mute);margin:8px 0 20px}.ctl{display:flex;flex-wrap:wrap;gap:16px;align-items:end;margin-bottom:16px}label{display:grid;gap:4px;font-weight:600;font-size:.85rem;text-transform:uppercase}
+select,input[type=number]{min-height:44px;padding:0 10px;font:inherit;background:var(--card);color:var(--ink);border:2px solid var(--ink)}
+.ex{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}.ex label{flex-direction:row;display:flex;gap:6px;align-items:center;min-height:44px;padding:0 12px;border:2px solid var(--ink);background:var(--card);text-transform:none;font-size:.9rem;cursor:pointer;transition:transform 150ms}.ex label:hover{transform:translateY(-2px)}
+input[type=checkbox]{accent-color:#111;width:16px;height:16px}:focus-visible{outline:3px solid var(--acid);outline-offset:2px}
+.week{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr));gap:10px;animation:in .3s}@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.day{border:2px solid var(--ink);background:var(--card);min-height:170px;padding:10px}.day b{display:block;font:1.3rem "Archivo Black";text-transform:uppercase}.day.on b{background:var(--acid);color:#111;padding:0 6px;display:inline-block}
+.day .t{color:var(--mute);font-size:.8rem;margin-bottom:6px}.day div.e{padding:3px 0;border-bottom:1px solid var(--mute);font-size:.9rem}.rest{color:var(--mute);margin-top:30px}
+.msg{margin-top:14px;font-weight:600}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><main>
+<h1>Lift <mark>Week</mark></h1><p class="sub">Pick lifts, days and time. The planner avoids training the same muscle in back-to-back sessions and counts any clash.</p>
+<div class="ctl"><label>Days<select id="d"><option>2</option><option>3</option><option selected>4</option><option>5</option></select></label><label>Minutes per session<input type="number" id="m" value="45" min="10" max="180"></label></div>
+<div class="ex" id="ex" role="group" aria-label="Exercises"></div>
+<div class="week" id="w" aria-live="polite"></div><p class="msg" id="msg"></p></main>
+<script>
+const $=i=>document.getElementById(i),D=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+async function init(){const l=await (await fetch("/exercises")).json();$("ex").innerHTML=l.map(e=>`<label><input type="checkbox" value="${e.name}" checked>${e.name}</label>`).join("");
+document.querySelectorAll("input").forEach(e=>e.onchange=go);$("d").onchange=go;go()}
+async function go(){const sel=[...document.querySelectorAll(".ex input:checked")].map(e=>e.value);if(!sel.length){$("w").innerHTML="";$("msg").textContent="Pick at least one lift.";return}
+const r=await fetch("/plan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({exercises:sel,days:+$("d").value,minutes_per_day:+$("m").value})});const d=await r.json();if(!r.ok){$("msg").textContent=d.detail;return}
+$("w").innerHTML=D.map(x=>{const v=d.week[x];return v?`<div class="day on"><b>${x}</b><div class="t">${d.minutes[x]} min</div>${v.map(n=>`<div class="e">${n}</div>`).join("")}</div>`:`<div class="day"><b>${x}</b><div class="rest">Rest</div></div>`}).join("");
+$("msg").textContent=d.unplaced.length?`Did not fit: ${d.unplaced.join(", ")}`:`Recovery clashes: ${d.recovery_clashes}`}
+init();
+</script></body></html>
