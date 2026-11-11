@@ -1,0 +1,37 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Box Packer</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f6;--card:#fff;--ink:#0a1f44;--mute:#5a6785;--blue:#0b4fd6;--yel:#ffd21f;--line:#c9d2e3;--over:#d6342c}
+@media(prefers-color-scheme:dark){:root{--bg:#0a1220;--card:#121c31;--ink:#eaf0ff;--mute:#9fb0d3;--blue:#6e9bff;--yel:#ffd21f;--line:#2a3b5e;--over:#ff6b62}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "IBM Plex Mono",monospace}
+header{background:var(--blue);color:#fff;padding:28px 16px}header div{max-width:1100px;margin:auto}
+h1{font:400 clamp(2rem,7vw,3.4rem)/1 "Archivo Black";margin:0;letter-spacing:-.02em}h1 span{background:var(--yel);color:#0a1f44;padding:0 .2em}
+header p{margin:10px 0 0;opacity:.9;max-width:60ch}
+main{max-width:1100px;margin:auto;padding:18px 16px 56px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.tab{background:var(--card);border:2px solid var(--line);border-radius:0;padding:12px;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.tab b{display:block;font:400 2.4rem/1 "Archivo Black"}.tab span{font-size:.78rem;color:var(--mute)}
+.tab[aria-selected=true]{border-color:var(--blue);box-shadow:6px 6px 0 var(--yel)}
+.tab[aria-selected=true] b{color:var(--blue)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.box{background:var(--card);border:2px solid var(--ink);padding:10px}.box h3{margin:0 0 6px;font:400 .9rem "Archivo Black";display:flex;justify-content:space-between}
+.bar{height:8px;background:var(--line);margin:3px 0 7px;position:relative}.bar i{position:absolute;inset:0 auto 0 0;background:var(--blue)}.bar.v i{background:var(--yel)}
+.lab{font-size:.72rem;color:var(--mute);display:flex;justify-content:space-between}
+ul{list-style:none;margin:6px 0 0;padding:0;font-size:.8rem}li{border-top:1px dashed var(--line);padding:2px 0}
+.note{color:var(--mute);font-size:.82rem;margin:0 0 14px}
+@media(max-width:560px){.tab b{font-size:1.8rem}}
+</style></head><body>
+<header><div><h1><span>Box</span> Packer</h1><p>Twenty-two household things, boxes that hold 20 kg and 60 litres. How many boxes do you really need?</p></div></header>
+<main><div class="tabs" role="tablist" id="tabs"></div><p class="note" id="note" aria-live="polite"></p><div class="grid" id="grid"></div></main>
+<script>
+const $=i=>document.getElementById(i);let D,R,cur="optimal";
+const NAMES={next_fit:["In listed order","fill a box, start the next"],first_fit_decreasing:["Biggest first","standard heuristic"],optimal:["Exact search","fewest possible"]};
+function show(){$("tabs").innerHTML=Object.keys(NAMES).map(k=>`<button class="tab" role="tab" aria-selected="${k==cur}" data-k="${k}"><b>${R[k].length}</b>boxes<br><span>${NAMES[k][0]}: ${NAMES[k][1]}</span></button>`).join("");
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{cur=b.dataset.k;show()});
+$("note").textContent=`Lower bound ${R.lower_bound} boxes (total weight or volume). Exact search ${R.proved_optimal?"proved":"did not prove"} ${R.optimal.length} is the minimum.`;
+$("grid").innerHTML=R[cur].map((b,n)=>`<div class="box"><h3>Box ${n+1}<span>${b.items.length} items</span></h3>
+<div class="lab"><span>weight</span><span>${b.kg.toFixed(1)} / ${D.box_kg} kg</span></div><div class="bar"><i style="width:${Math.min(100,b.kg/D.box_kg*100)}%"></i></div>
+<div class="lab"><span>volume</span><span>${b.litres.toFixed(0)} / ${D.box_litres} L</span></div><div class="bar v"><i style="width:${Math.min(100,b.litres/D.box_litres*100)}%"></i></div>
+<ul>${b.items.map(i=>`<li>${i}</li>`).join("")}</ul></div>`).join("")}
+(async()=>{D=await (await fetch("/sample")).json();R=await (await fetch("/pack",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({box_kg:D.box_kg,box_litres:D.box_litres,items:D.items})})).json();show()})();
+</script></body></html>

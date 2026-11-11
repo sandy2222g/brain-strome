@@ -1,0 +1,117 @@
+{
+ "source": "Invented household items; weights and volumes are typical values with random jitter. MIT.",
+ "box_kg": 20,
+ "box_litres": 60,
+ "items": [
+  {
+   "name": "Shoes",
+   "kg": 4.3,
+   "litres": 32.4
+  },
+  {
+   "name": "Winter duvet",
+   "kg": 2.6,
+   "litres": 47.2
+  },
+  {
+   "name": "Coats",
+   "kg": 4.5,
+   "litres": 48.2
+  },
+  {
+   "name": "Dinner plates",
+   "kg": 9.0,
+   "litres": 11.8
+  },
+  {
+   "name": "Paperbacks",
+   "kg": 8.6,
+   "litres": 22.2
+  },
+  {
+   "name": "Pillows",
+   "kg": 2.2,
+   "litres": 39.2
+  },
+  {
+   "name": "Lamp and shades",
+   "kg": 2.9,
+   "litres": 38.0
+  },
+  {
+   "name": "Cookbooks",
+   "kg": 8.2,
+   "litres": 13.7
+  },
+  {
+   "name": "Pots and pans",
+   "kg": 7.3,
+   "litres": 32.6
+  },
+  {
+   "name": "Board games",
+   "kg": 5.9,
+   "litres": 37.3
+  },
+  {
+   "name": "Hardback books",
+   "kg": 12.5,
+   "litres": 19.9
+  },
+  {
+   "name": "Cushions",
+   "kg": 2.1,
+   "litres": 40.8
+  },
+  {
+   "name": "Bedding set",
+   "kg": 3.3,
+   "litres": 30.5
+  },
+  {
+   "name": "Vinyl records",
+   "kg": 13.8,
+   "litres": 15.9
+  },
+  {
+   "name": "Laptop and cables",
+   "kg": 5.7,
+   "litres": 11.1
+  },
+  {
+   "name": "Kettle and toaster",
+   "kg": 3.7,
+   "litres": 20.2
+  },
+  {
+   "name": "Desk files",
+   "kg": 10.3,
+   "litres": 15.4
+  },
+  {
+   "name": "Toolbox",
+   "kg": 13.4,
+   "litres": 13.7
+  },
+  {
+   "name": "Towels",
+   "kg": 4.3,
+   "litres": 23.8
+  },
+  {
+   "name": "Speaker",
+   "kg": 8.0,
+   "litres": 19.0
+  },
+  {
+   "name": "Glasses (wrapped)",
+   "kg": 5.2,
+   "litres": 12.8
+  },
+  {
+   "name": "Photo albums",
+   "kg": 7.3,
+   "litres": 19.8
+  }
+ ]
+}
