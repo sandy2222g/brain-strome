@@ -119,4 +119,4 @@ Python + FastAPI + static UI per project; each project got its own palette, type
 Deploy two to Render, confirm CI green on the newest branches, rebuild perishable-stock-planner, add screenshots to a portfolio page.
 - 06:40 IST: roommate-bill-settler container check caught missing COPY data (sample 500). Fixed in Dockerfile and pushed; local rebuild blocked twice by: 429 Too Many Requests on registry-1.docker.io python:3.12-slim manifest. Not retried further; CI docker job builds it.
 - 06:46 IST: dinner-sync-planner pushed (170 vs 210 min, food waits 142 vs 421 min).
-- 06:55 IST: flat-pack-packer built (14 boxes in listed order, 11 first-fit-decreasing, 10 exact = lower bound).
+- 06:46 IST (container clock): flat-pack-packer built (14 boxes in listed order, 11 first-fit-decreasing, 10 exact = lower bound).
