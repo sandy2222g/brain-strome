@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Club Pick</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4efe6;--ink:#1f2340;--mute:#5c607a;--gold:#e0a419;--indigo:#2b3a8c;--card:#fffdf8;--line:#ddd3bf}
+@media(prefers-color-scheme:dark){:root{--bg:#14172b;--ink:#eceaf7;--mute:#a5a9c9;--gold:#f0b92f;--indigo:#9fb0ff;--card:#1d2140;--line:#343a66}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Public Sans",sans-serif}
+main{max-width:920px;margin:auto;padding:24px 16px 56px}h1{font:700 clamp(2.2rem,7vw,3.6rem)/1 Newsreader;margin:0}h1 i{color:var(--indigo)}.sub{color:var(--mute);margin:6px 0 22px}
+.win{background:var(--indigo);color:#fff;padding:22px;border-radius:4px;border-bottom:8px solid var(--gold);animation:in .3s}@media(prefers-color-scheme:dark){.win{color:#10142a;background:var(--indigo)}}
+.win small{opacity:.8;text-transform:uppercase;letter-spacing:.12em}.win h2{font:700 clamp(1.6rem,5vw,2.4rem) Newsreader;margin:4px 0}.win p{margin:0}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:16px;margin-top:18px}
+.box{background:var(--card);border:1px solid var(--line);padding:16px;border-radius:4px}.box h3{margin:0 0 10px;font:700 1.15rem Newsreader}
+.row{display:grid;grid-template-columns:minmax(0,1.6fr) 3fr 2ch;gap:8px;align-items:center;padding:3px 0;font-size:.9rem}.bar{height:12px;background:var(--line);border-radius:2px}.bar i{display:block;height:100%;background:var(--gold);border-radius:2px;min-width:2px}
+.num{text-align:right}ol{margin:0;padding-left:1.4em}li{padding:2px 0}.mute{color:var(--mute);font-size:.85rem}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head><body><main>
+<h1>Club <i>Pick</i></h1><p class="sub">Nine members rank five books. See what the club actually agrees on.</p>
+<div class="win" id="win" aria-live="polite"></div><div class="cols"><div class="box"><h3>Most first-place votes</h3><div id="pl"></div></div><div class="box"><h3>Borda points</h3><div id="bo"></div></div></div>
+<div class="box" style="margin-top:16px"><h3>Full group ranking (Schulze)</h3><ol id="or"></ol><p class="mute" id="mu"></p></div></main>
+<script>
+const $=i=>document.getElementById(i);
+function bars(o){const m=Math.max(...Object.values(o),1);return Object.entries(o).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="row"><span>${k}</span><span class="bar"><i style="width:${v/m*100}%"></i></span><span class="num">${v}</span></div>`).join("")}
+async function go(){const s=await (await fetch("/sample")).json();
+const d=await (await fetch("/tally",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)})).json();
+const diff=d.winner!==d.plurality_winner;
+$("win").innerHTML=`<small>The club picks</small><h2>${d.winner}</h2><p>${diff?`Beats the plurality leader "${d.plurality_winner}" head to head: most members rank it near the top even if few put it first.`:"Also the plurality leader."}</p>`;
+$("pl").innerHTML=bars(d.plurality);$("bo").innerHTML=bars(d.borda);
+$("or").innerHTML=d.schulze_order.map(b=>`<li>${b}</li>`).join("");
+$("mu").textContent=d.condorcet_winner?`"${d.condorcet_winner}" beats every other book in a head-to-head vote (Condorcet winner).`:"No book beats all others head to head; Schulze resolves the cycle."}
+go();
+</script></body></html>

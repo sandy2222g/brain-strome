@@ -1,0 +1,102 @@
+{
+ "source": "Synthetic ballots; invented members and titles. MIT.",
+ "books": [
+  "The Quiet Orchard",
+  "Salt and Signal",
+  "A Map of Small Rooms",
+  "Night Train to Lisbon Street",
+  "The Last Lighthouse Keeper"
+ ],
+ "ballots": [
+  {
+   "voter": "Ana",
+   "ranking": [
+    "The Quiet Orchard",
+    "A Map of Small Rooms",
+    "Salt and Signal",
+    "The Last Lighthouse Keeper",
+    "Night Train to Lisbon Street"
+   ]
+  },
+  {
+   "voter": "Bo",
+   "ranking": [
+    "The Quiet Orchard",
+    "A Map of Small Rooms",
+    "Salt and Signal",
+    "The Last Lighthouse Keeper",
+    "Night Train to Lisbon Street"
+   ]
+  },
+  {
+   "voter": "Cleo",
+   "ranking": [
+    "The Quiet Orchard",
+    "A Map of Small Rooms",
+    "Salt and Signal",
+    "The Last Lighthouse Keeper",
+    "Night Train to Lisbon Street"
+   ]
+  },
+  {
+   "voter": "Dev",
+   "ranking": [
+    "Salt and Signal",
+    "A Map of Small Rooms",
+    "The Last Lighthouse Keeper",
+    "Night Train to Lisbon Street",
+    "The Quiet Orchard"
+   ]
+  },
+  {
+   "voter": "Esi",
+   "ranking": [
+    "Salt and Signal",
+    "A Map of Small Rooms",
+    "The Last Lighthouse Keeper",
+    "Night Train to Lisbon Street",
+    "The Quiet Orchard"
+   ]
+  },
+  {
+   "voter": "Finn",
+   "ranking": [
+    "The Last Lighthouse Keeper",
+    "A Map of Small Rooms",
+    "Salt and Signal",
+    "Night Train to Lisbon Street",
+    "The Quiet Orchard"
+   ]
+  },
+  {
+   "voter": "Gia",
+   "ranking": [
+    "The Last Lighthouse Keeper",
+    "A Map of Small Rooms",
+    "Salt and Signal",
+    "Night Train to Lisbon Street",
+    "The Quiet Orchard"
+   ]
+  },
+  {
+   "voter": "Hal",
+   "ranking": [
+    "A Map of Small Rooms",
+    "Salt and Signal",
+    "The Last Lighthouse Keeper",
+    "Night Train to Lisbon Street",
+    "The Quiet Orchard"
+   ]
+  },
+  {
+   "voter": "Ivy",
+   "ranking": [
+    "A Map of Small Rooms",
+    "Salt and Signal",
+    "The Last Lighthouse Keeper",
+    "Night Train to Lisbon Street",
+    "The Quiet Orchard"
+   ]
+  }
+ ]
+}
