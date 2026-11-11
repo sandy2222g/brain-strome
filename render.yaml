@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: hall-booking-optimizer
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

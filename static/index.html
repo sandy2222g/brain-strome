@@ -1,0 +1,29 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hall Booking Optimizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--cork:#c79a63;--paper:#fffdf3;--ink:#2b2118;--mute:#6f5e4c;--pin:#c8352b;--ok:#2e7d4f;--no:#d9cdb8}
+@media(prefers-color-scheme:dark){:root{--cork:#3b2b1d;--paper:#2a211a;--ink:#f6ead6;--mute:#c9b79b;--pin:#ff6a5e;--ok:#6fd49a;--no:#4a3d30}}
+*{box-sizing:border-box}body{margin:0;background:var(--cork);background-image:radial-gradient(rgba(0,0,0,.12) 1px,transparent 1.5px);background-size:9px 9px;color:var(--ink);font:16px/1.5 Lora,serif}
+main{max-width:1000px;margin:auto;padding:26px 16px 56px}
+h1{font:700 clamp(2.2rem,8vw,3.8rem)/1 Kalam,cursive;margin:0;transform:rotate(-1.2deg);display:inline-block;background:var(--paper);padding:2px 18px;box-shadow:3px 4px 0 rgba(0,0,0,.25)}
+.sub{max-width:60ch;margin:16px 0 18px;background:var(--paper);padding:8px 14px;box-shadow:3px 4px 0 rgba(0,0,0,.2)}
+.lane{background:var(--paper);box-shadow:3px 5px 0 rgba(0,0,0,.25);padding:10px 14px 14px;margin-bottom:16px;position:relative}
+.lane::before{content:"";position:absolute;top:-6px;left:50%;width:14px;height:14px;border-radius:50%;background:var(--pin);box-shadow:0 2px 0 rgba(0,0,0,.3)}
+.hd{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}.hd h2{font:700 1.3rem Kalam;margin:0}.hd b{font:700 1.8rem Kalam;color:var(--ok)}.hd span{color:var(--mute);font-size:.85rem}
+.tl{position:relative;height:64px;margin-top:6px;border-bottom:2px solid var(--ink)}
+.bk{position:absolute;top:2px;height:28px;border:2px solid var(--ink);font-size:.7rem;line-height:1.1;padding:1px 4px;overflow:hidden;white-space:nowrap}
+.bk.y{background:var(--ok);color:#fff}.bk.n{background:repeating-linear-gradient(45deg,var(--no) 0 5px,transparent 5px 10px);color:var(--mute);border-style:dashed}
+.ax{position:relative;height:16px;font-size:.7rem;color:var(--mute)}.ax span{position:absolute;transform:translateX(-50%)}
+</style></head><body><main>
+<h1>Hall Booking Optimizer</h1><p class="sub">Eleven requests for one Saturday in the village hall. Who gets the room? Solid green = accepted, hatched = turned away.</p>
+<div id="l" aria-live="polite"></div></main>
+<script>
+const $=i=>document.getElementById(i),S=9*60,E=21*60;
+const mn=t=>{const[h,m]=t.split(":");return +h*60+ +m};
+(async()=>{const d=await (await fetch("/sample")).json();const r=await (await fetch("/book",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)})).json();
+const X=m=>(m-S)/(E-S)*100;
+const L=[["first_come","First come, first served"],["earliest_finish","Most bookings (earliest finish)"],["best","Best combination"]];
+$("l").innerHTML=L.map(([k,t])=>{const x=r[k],ok=new Set(x.accepted);
+const rows=[];const bk=d.requests.map(q=>{const a=mn(q.start),b=mn(q.end);let row=0;while(rows[row]!==undefined&&rows[row]>a)row++;rows[row]=b;return `<div class="bk ${ok.has(q.name)?"y":"n"}" style="left:${X(a)}%;width:${X(b)-X(a)}%;top:${row*30+2}px" title="${q.name} $${q.fee}">${q.name}</div>`}).join("");
+return `<div class="lane"><div class="hd"><h2>${t}</h2><span>${x.bookings} bookings, ${x.hours} h</span><b>$${x.revenue}</b></div><div class="tl" style="height:${Math.max(rows.length,1)*30+8}px">${bk}</div><div class="ax">${[9,12,15,18,21].map(h=>`<span style="left:${X(h*60)}%">${h}:00</span>`).join("")}</div></div>`}).join("")})();
+</script></body></html>
