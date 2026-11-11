@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: table-seating-planner
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

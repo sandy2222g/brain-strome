@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Table Seating</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#10162b;--card:#192142;--ink:#f3ead7;--mute:#a7a9c2;--gold:#e2b857;--rose:#ff7a8a;--line:#35406b}
+@media(prefers-color-scheme:light){:root{--bg:#f4eee2;--card:#fffaf0;--ink:#1b2144;--mute:#5d6285;--gold:#a87a14;--rose:#c4344a;--line:#d6cbb2}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Jost,sans-serif}
+main{max-width:1000px;margin:auto;padding:30px 16px 56px;text-align:center}
+h1{font:700 clamp(2.4rem,8vw,4.2rem)/1 "Cormorant Garamond",serif;margin:0;color:var(--gold);font-style:italic}.sub{color:var(--mute);margin:8px auto 18px;max-width:56ch}
+.tog{display:inline-flex;gap:8px;margin-bottom:16px}.tog button{font:500 .95rem Jost;padding:8px 18px;border:1.5px solid var(--gold);background:transparent;color:var(--ink);border-radius:999px;cursor:pointer}.tog button[aria-pressed=true]{background:var(--gold);color:#10162b}
+.stats{display:flex;justify-content:center;gap:28px;margin-bottom:12px;flex-wrap:wrap}.stats b{font:700 2.6rem/1 "Cormorant Garamond",serif;color:var(--gold);display:block}.stats span{font-size:.8rem;color:var(--mute);letter-spacing:.08em;text-transform:uppercase}
+.room{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.tbl{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px}svg{width:100%;height:auto}
+.legend{margin-top:14px;color:var(--mute);font-size:.82rem}
+</style></head><body><main>
+<h1>Table Seating</h1><p class="sub">Sixteen wedding guests, four tables of four, twenty friendships and five feuds. Gold lines join friends who share a table; red would join feuding guests.</p>
+<div class="tog"><button id="bp" aria-pressed="true">Planned seating</button><button id="bo" aria-pressed="false">RSVP order</button></div>
+<div class="stats" id="st" aria-live="polite"></div><div class="room" id="rm"></div>
+<p class="legend">Planner: seeded hill climbing with 25 random restarts. Best found, not proven optimal.</p></main>
+<script>
+const $=i=>document.getElementById(i);let D,R,cur="planned";
+const key=(a,b)=>[a,b].sort().join("|");
+function show(){const x=R[cur];$("bp").setAttribute("aria-pressed",cur=="planned");$("bo").setAttribute("aria-pressed",cur!="planned");
+const L=new Set(D.likes.map(p=>key(...p))),F=new Set(D.feuds.map(p=>key(...p)));
+$("st").innerHTML=`<div><b>${x.likes_together} / ${R.likes_total}</b><span>friend pairs together</span></div><div><b>${x.feuds_together}</b><span>feuds at a table</span></div>`;
+$("rm").innerHTML=x.tables.map((t,n)=>{const c=120,r=48,pts=t.map((g,i)=>{const a=-Math.PI/2+i*2*Math.PI/t.length;return[g,c+r*Math.cos(a),100+r*Math.sin(a),a]});
+let s=`<svg viewBox="0 0 240 200" role="img" aria-label="Table ${n+1}: ${t.join(", ")}"><circle cx="120" cy="100" r="30" fill="none" stroke="var(--line)" stroke-width="2"/><text x="120" y="105" text-anchor="middle" font-size="13" font-family="Cormorant Garamond" font-style="italic" fill="var(--gold)">Table ${n+1}</text>`;
+pts.forEach((a,i)=>pts.slice(i+1).forEach(b=>{const k=key(a[0],b[0]);if(L.has(k))s+=`<line x1="${a[1]}" y1="${a[2]}" x2="${b[1]}" y2="${b[2]}" stroke="var(--gold)" stroke-width="2" opacity=".8"/>`;if(F.has(k))s+=`<line x1="${a[1]}" y1="${a[2]}" x2="${b[1]}" y2="${b[2]}" stroke="var(--rose)" stroke-width="3" stroke-dasharray="4 3"/>`}));
+pts.forEach(p=>{const out=p[3],lx=120+68*Math.cos(out),ly=100+64*Math.sin(out)+(Math.sin(out)>.3?8:4);s+=`<circle cx="${p[1]}" cy="${p[2]}" r="7" fill="var(--gold)"/><text x="${lx}" y="${ly}" text-anchor="${Math.cos(out)>.3?"start":Math.cos(out)<-.3?"end":"middle"}" font-size="12" fill="var(--ink)">${p[0]}</text>`});
+return `<div class="tbl">${s}</svg></div>`}).join("")}
+$("bp").onclick=()=>{cur="planned";show()};$("bo").onclick=()=>{cur="in_order";show()};
+(async()=>{D=await (await fetch("/sample")).json();R=await (await fetch("/seat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(D)})).json();show()})();
+</script></body></html>
