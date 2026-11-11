@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: sms-spam-shield
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

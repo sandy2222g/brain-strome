@@ -1,0 +1,38 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Spam Shield</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e9ecf1;--phone:#fff;--ink:#14171c;--mute:#6a7381;--in:#e7e9ee;--green:#2fb458;--red:#e0433b;--line:#d5d9e0}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1115;--phone:#181b21;--ink:#eef0f4;--mute:#97a0ae;--in:#262a33;--green:#43d070;--red:#ff6a61;--line:#2c313b}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Plus Jakarta Sans",sans-serif}
+main{max-width:980px;margin:auto;padding:24px 16px 56px}h1{font:800 clamp(2rem,7vw,3.2rem)/1.05 inherit;margin:0;letter-spacing:-.02em}h1 b{color:var(--green)}.sub{color:var(--mute);margin:6px 0 20px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:20px;align-items:start}
+.phone{background:var(--phone);border:1px solid var(--line);border-radius:28px;padding:16px;min-height:380px}.msg{display:flex;flex-direction:column;gap:4px;margin:10px 0;animation:in .25s both}
+.bub{align-self:flex-start;max-width:85%;background:var(--in);padding:10px 14px;border-radius:18px 18px 18px 4px;overflow-wrap:anywhere}.msg.spam .bub{background:var(--red);color:#fff}
+.tag{font-size:.75rem;color:var(--mute);padding-left:6px}.tag b{color:var(--red)}.msg.ham .tag b{color:var(--green)}
+textarea{width:100%;min-height:90px;padding:12px;border:1px solid var(--line);border-radius:14px;background:transparent;color:var(--ink);font:inherit;resize:vertical}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px}.row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}button{min-height:44px;padding:0 16px;border-radius:999px;border:0;background:var(--green);color:#10201a;font:700 .9rem inherit;cursor:pointer;transition:transform 150ms}button.alt{background:transparent;border:1px solid var(--line);color:var(--ink)}button:hover{transform:translateY(-2px)}
+label.s{display:grid;gap:2px;font-size:.85rem;color:var(--mute)}input[type=range]{accent-color:var(--green);min-height:44px}
+.why{font-size:.85rem;margin-top:8px}.why span{display:inline-block;margin:2px;padding:2px 10px;border-radius:999px;background:var(--in)}.why .p{background:color-mix(in srgb,var(--red) 25%,transparent)}.why .n{background:color-mix(in srgb,var(--green) 25%,transparent)}
+.metrics{margin-top:16px;font-size:.85rem;color:var(--mute)}.metrics table{border-collapse:collapse;margin-top:6px}.metrics td,.metrics th{padding:3px 10px;text-align:right;border-bottom:1px solid var(--line)}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><main>
+<h1>Spam <b>Shield</b></h1><p class="sub">A Naive Bayes filter written from scratch. Type a message or try the tricky ones.</p>
+<div class="two"><div><textarea id="t" aria-label="Message" placeholder="Type or paste a text message"></textarea>
+<div class="row"><button id="go">Check message</button><button class="alt" id="ex">Try a tricky one</button></div>
+<label class="s"><span>Spam threshold (log-odds) <b id="tv">0</b></span><input type="range" id="th" min="-6" max="6" step="0.5" value="0"></label>
+<div class="why" id="why" aria-live="polite"></div>
+<div class="metrics" id="m"></div></div>
+<div class="phone" id="p" aria-label="Checked messages"></div></div></main>
+<script>
+const $=i=>document.getElementById(i),esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));let ex=[],k=0;
+async function check(text){if(!text.trim())return;$("tv").textContent=$("th").value;
+const d=await (await fetch("/predict",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,threshold:+$("th").value})})).json();
+$("p").insertAdjacentHTML("afterbegin",`<div class="msg ${d.label}"><div class="bub">${esc(text)}</div><div class="tag"><b>${d.label.toUpperCase()}</b> · spam probability ${(d.spam_probability*100).toFixed(0)}%</div></div>`);
+$("why").innerHTML="<b>Why:</b> "+d.reasons.map(r=>`<span class="${r.weight>0?"p":"n"}">${esc(r.feature)} ${r.weight>0?"+":""}${r.weight}</span>`).join("")}
+$("go").onclick=()=>check($("t").value);$("th").oninput=()=>$("tv").textContent=$("th").value;
+$("ex").onclick=()=>{const e=ex[k++%ex.length];$("t").value=e.text;check(e.text)};
+(async()=>{ex=await (await fetch("/examples")).json();ex.sort(()=>0);
+const m=await (await fetch("/metrics")).json(),t=m.template_test;
+$("m").innerHTML=`<b>On templated messages (easy):</b> accuracy ${(t.accuracy*100).toFixed(0)}% on ${t.n}.<br><b>On 25 hand-written tricky messages:</b><table><tr><th>threshold</th><th>accuracy</th><th>precision</th><th>recall</th></tr>`+m.hard_cases.map(h=>`<tr><td>${h.threshold}</td><td>${(h.accuracy*100).toFixed(0)}%</td><td>${(h.precision*100).toFixed(0)}%</td><td>${(h.recall*100).toFixed(0)}%</td></tr>`).join("")+"</table>";
+$("t").value="WINNER! you have won a free gift card, claim now at prize-claim.example";check($("t").value)})();
+</script></body></html>
