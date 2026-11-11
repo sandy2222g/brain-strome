@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: heating-schedule-optimizer
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
