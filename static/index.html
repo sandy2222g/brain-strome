@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shopping Typo Matcher</title>
+<style>
+:root{--bg:#f3f8d9;--ink:#25310f;--accent:#5b8c00;--card:#fff;--bad:#b3261e;--mute:#68754a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Gill Sans","Trebuchet MS",sans-serif}
+main{max-width:720px;margin:0 auto;padding:32px 16px}
+h1{margin:0;font-size:2.2rem;letter-spacing:.02em}p{color:var(--mute)}
+button{background:var(--ink);color:#fff;border:0;border-radius:6px;padding:.6rem 1.3rem;font:inherit;cursor:pointer}
+.list{margin-top:20px;background:var(--card);border-radius:10px;padding:6px 16px}
+.row{display:grid;grid-template-columns:1fr 24px 1fr 90px;gap:8px;padding:9px 0;border-bottom:1px solid #e3ebbd;align-items:center}
+.row:last-child{border:0}.ok{color:var(--accent);font-weight:bold}.no{color:var(--bad)}.d{color:var(--mute);font-size:.85rem;text-align:right}
+.sum{margin-top:14px;font-weight:bold}
+</style></head><body><main>
+<h1>Shopping Typo Matcher</h1>
+<p>Typed list in, catalogue items out. Exact matching misses most typos; edit distance finds them.</p>
+<button id="go">Match the sample list</button><div id="out"></div></main>
+<script>
+const out=document.getElementById("out");
+document.getElementById("go").onclick=async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)})).json();
+  let h='<div class="list">';
+  for(const x of r.rows)h+=`<div class="row"><span>${x.typed}</span><span>&rarr;</span><span class="${x.match?"ok":"no"}">${x.match||"no match (not guessed)"}</span><span class="d">distance ${x.distance}</span></div>`;
+  out.innerHTML=h+`</div><div class="sum">Edit distance matched ${r.fuzzy_found} of ${r.rows.length}; exact matching only ${r.exact_found}.</div>`;
+};
+document.getElementById("go").click();
+</script></body></html>
