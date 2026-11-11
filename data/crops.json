@@ -1,0 +1,13 @@
+{"source":"Synthetic, approximate values written for this demo (typical seed-packet style guidance); not agronomic advice. MIT.",
+"crops":[
+{"name":"Lettuce","sow_weeks_from_frost":-4,"days_to_harvest":50,"frost_tender":false,"succession_weeks":2,"max_heat_c":24,"companions":["Carrot","Radish"],"avoid":[]},
+{"name":"Peas","sow_weeks_from_frost":-6,"days_to_harvest":65,"frost_tender":false,"succession_weeks":3,"max_heat_c":24,"companions":["Carrot","Radish"],"avoid":["Onion"]},
+{"name":"Radish","sow_weeks_from_frost":-5,"days_to_harvest":28,"frost_tender":false,"succession_weeks":2,"max_heat_c":26,"companions":["Lettuce","Peas"],"avoid":[]},
+{"name":"Carrot","sow_weeks_from_frost":-3,"days_to_harvest":75,"frost_tender":false,"succession_weeks":3,"max_heat_c":28,"companions":["Lettuce","Onion","Tomato"],"avoid":[]},
+{"name":"Onion","sow_weeks_from_frost":-4,"days_to_harvest":100,"frost_tender":false,"succession_weeks":0,"max_heat_c":32,"companions":["Carrot"],"avoid":["Peas","Beans"]},
+{"name":"Tomato","sow_weeks_from_frost":1,"days_to_harvest":80,"frost_tender":true,"succession_weeks":0,"max_heat_c":35,"companions":["Carrot","Basil"],"avoid":["Fennel"]},
+{"name":"Basil","sow_weeks_from_frost":1,"days_to_harvest":55,"frost_tender":true,"succession_weeks":4,"max_heat_c":35,"companions":["Tomato"],"avoid":[]},
+{"name":"Beans","sow_weeks_from_frost":1,"days_to_harvest":58,"frost_tender":true,"succession_weeks":3,"max_heat_c":34,"companions":["Carrot"],"avoid":["Onion"]},
+{"name":"Zucchini","sow_weeks_from_frost":1,"days_to_harvest":52,"frost_tender":true,"succession_weeks":0,"max_heat_c":35,"companions":["Beans"],"avoid":[]},
+{"name":"Spinach","sow_weeks_from_frost":-6,"days_to_harvest":45,"frost_tender":false,"succession_weeks":2,"max_heat_c":22,"companions":["Radish","Peas"],"avoid":[]}
+]}

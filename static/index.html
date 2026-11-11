@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sow Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#10231b;--panel:#17332a;--ink:#eaf3e6;--mute:#9db8a6;--sow:#e8c547;--grow:#4f9d6b;--line:#2c4d40}
+@media(prefers-color-scheme:light){:root{--bg:#eef3e8;--panel:#fff;--ink:#16291f;--mute:#53695a;--sow:#c99a00;--grow:#3d8a58;--line:#cfdac8}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Manrope,sans-serif}
+main{max-width:1000px;margin:auto;padding:24px 16px 56px}h1{font:2.4rem/1.1 "DM Serif Display",serif;margin:0}.sub{color:var(--mute);margin:4px 0 20px}
+.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-bottom:20px}label{display:grid;gap:4px;font-size:.8rem;color:var(--mute)}
+input{min-height:44px;background:var(--panel);color:var(--ink);border:1px solid var(--line);padding:0 10px;font:inherit}
+button{min-height:44px;padding:0 20px;background:var(--sow);color:#10231b;border:0;font:700 1rem Manrope;cursor:pointer;transition:transform 150ms}button:hover{transform:translateY(-2px)}button:active{transform:none}
+:focus-visible{outline:3px solid var(--sow);outline-offset:2px}
+.gantt{background:var(--panel);border:1px solid var(--line);padding:12px;overflow-x:auto;animation:in .3s}@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.line{display:grid;grid-template-columns:90px 1fr;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.track{position:relative;height:22px;min-width:520px}.seg{position:absolute;top:3px;height:16px;background:var(--grow);border-left:4px solid var(--sow);border-radius:2px}
+.beds{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:12px;margin-top:20px}.bed{background:var(--panel);border:1px solid var(--line);padding:12px}.bed h3{margin:0 0 6px;font:1.1rem "DM Serif Display"}
+.chip{display:inline-block;margin:2px;padding:2px 10px;background:var(--line);border-radius:20px;font-size:.85rem}.legend{color:var(--mute);font-size:.85rem;margin:8px 0}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><main>
+<h1>Sow Calendar</h1><p class="sub">Last frost in, a season of sowings and bed layout out.</p>
+<div class="bar"><label>Last spring frost<input type="date" id="lf" value="2026-04-20"></label><label>First autumn frost<input type="date" id="ff" value="2026-10-25"></label><label>Beds<input type="number" id="beds" value="2" min="1" max="12"></label><button id="go">Plan my season</button></div>
+<div class="legend">Yellow edge = sowing date. Green bar = days to harvest. All 10 sample crops shown.</div>
+<div class="gantt" id="g" aria-live="polite"></div><div class="beds" id="b"></div></main>
+<script>
+const $=i=>document.getElementById(i),day=86400000;
+async function go(){const crops=await (await fetch("/crops")).json();
+const r=await fetch("/plan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({crops,last_frost:$("lf").value,first_frost:$("ff").value,beds:+$("beds").value})});const d=await r.json();
+if(!r.ok){$("g").textContent=d.detail;return}
+const t0=new Date($("lf").value)-8*7*day,t1=new Date($("ff").value)-0,span=t1-t0;
+$("g").innerHTML=Object.entries(d.plan).map(([n,s])=>`<div class="line"><b>${n}</b><div class="track">${s.map(x=>{const a=(new Date(x.sow)-t0)/span*100,w=(new Date(x.harvest)-new Date(x.sow))/span*100;return `<div class="seg" style="left:${a}%;width:${w}%" title="Sow ${x.sow}, harvest ${x.harvest}"></div>`}).join("")}</div></div>`).join("");
+$("b").innerHTML=d.layout.map((b,i)=>`<div class="bed"><h3>Bed ${i+1}</h3>${b.map(c=>`<span class="chip">${c}</span>`).join("")}</div>`).join("")}
+$("go").onclick=go;go();
+</script></body></html>

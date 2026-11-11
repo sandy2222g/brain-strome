@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: garden-planting-calendar
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
