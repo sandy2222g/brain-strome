@@ -1,0 +1,40 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sudoku Coach</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f3efe4;--ink:#1a1a1a;--pencil:#6e6a60;--red:#c0392b;--line:#1a1a1a;--thin:#b9b3a3;--hl:#ffe9a6;--ok:#2d7a46}
+@media(prefers-color-scheme:dark){:root{--paper:#1b1a17;--ink:#ece8dc;--pencil:#9a9588;--red:#ff6f5e;--line:#ece8dc;--thin:#4a4740;--hl:#5a4a14;--ok:#6fd28f}}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 "IBM Plex Mono",monospace}
+main{max-width:860px;margin:auto;padding:24px 16px 56px}h1{font:400 clamp(2.4rem,9vw,4.4rem)/1 "DM Serif Display";margin:0}.sub{color:var(--pencil);margin:6px 0 18px}
+.wrap{display:grid;grid-template-columns:minmax(0,520px) minmax(0,1fr);gap:24px;align-items:start}@media(max-width:760px){.wrap{grid-template-columns:1fr}}
+#g{display:grid;grid-template-columns:repeat(9,1fr);border:3px solid var(--line);aspect-ratio:1;max-width:520px}
+.c{border:1px solid var(--thin);display:flex;align-items:center;justify-content:center;font:600 clamp(1.1rem,4.5vw,1.9rem) "IBM Plex Mono";cursor:pointer;padding:0;background:transparent;color:var(--red);min-width:0}
+.c.given{color:var(--ink);cursor:default}.c.sel{background:var(--hl)}.c.hint{outline:3px solid var(--ok);outline-offset:-3px;background:var(--hl)}
+.c:nth-child(3n){border-right:2px solid var(--line)}.c:nth-child(9n){border-right:1px solid var(--thin)}.c:nth-child(n+19):nth-child(-n+27),.c:nth-child(n+46):nth-child(-n+54){border-bottom:2px solid var(--line)}
+:focus-visible{outline:3px solid var(--red);outline-offset:-3px}
+.pad{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:12px;max-width:520px}button.b{min-height:44px;border:2px solid var(--ink);background:transparent;color:var(--ink);font:600 1rem "IBM Plex Mono";cursor:pointer;transition:transform 150ms}button.b:hover{transform:translateY(-2px)}button.b:active{transform:none}
+.side button.b{width:100%;margin-bottom:8px;text-align:left;padding:0 12px}.msg{min-height:3.4em;border-left:4px solid var(--red);padding-left:10px;margin-top:10px}.msg.ok{border-color:var(--ok)}.meta{color:var(--pencil);font-size:.85rem;margin-top:10px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body><main>
+<h1>Sudoku Coach</h1><p class="sub">Generated puzzles with one solution, rated by the technique they need, and hints that explain why.</p>
+<div class="wrap"><div><div id="g" role="grid" aria-label="Sudoku grid"></div><div class="pad" id="pad"></div></div>
+<div class="side"><button class="b" id="nw">New puzzle</button><button class="b" id="ht">Hint (explain it)</button><button class="b" id="ck">Check my grid</button><button class="b" id="sv">Show solution</button>
+<div class="msg" id="m" aria-live="polite">Pick a cell, then a digit.</div><div class="meta" id="mt"></div></div></div></main>
+<script>
+const $=i=>document.getElementById(i);let given=[],cur=[],sel=-1,hint=-1,seed=Math.floor(Math.random()*1e6);
+const cells=[];for(let i=0;i<81;i++){const b=document.createElement("button");b.className="c";b.dataset.i=i;b.setAttribute("aria-label","row "+(Math.floor(i/9)+1)+" column "+(i%9+1));b.onclick=()=>{sel=i;draw()};$("g").appendChild(b);cells.push(b)}
+for(let d=1;d<=9;d++){const b=document.createElement("button");b.className="b";b.textContent=d;b.onclick=()=>put(d);$("pad").appendChild(b)}
+const e=document.createElement("button");e.className="b";e.textContent="⌫";e.setAttribute("aria-label","erase");e.onclick=()=>put(0);$("pad").appendChild(e);
+function put(d){if(sel<0||given[sel])return;cur[sel]=d;hint=-1;draw()}
+document.addEventListener("keydown",ev=>{if(ev.key>="1"&&ev.key<="9")put(+ev.key);else if(ev.key==="Backspace"||ev.key==="Delete"||ev.key==="0")put(0);else if(ev.key.startsWith("Arrow")){const d={ArrowLeft:-1,ArrowRight:1,ArrowUp:-9,ArrowDown:9}[ev.key];sel=Math.max(0,Math.min(80,(sel<0?0:sel)+d));draw();ev.preventDefault()}});
+function draw(){cells.forEach((c,i)=>{c.textContent=cur[i]||"";c.classList.toggle("given",!!given[i]);c.classList.toggle("sel",i===sel);c.classList.toggle("hint",i===hint)})}
+function say(t,ok){$("m").textContent=t;$("m").className="msg"+(ok?" ok":"")}
+const gs=()=>cur.map(v=>v||0).join("");
+async function load(){const p=await (await fetch(`/puzzle?seed=${seed}&clues=34`)).json();given=[...p.grid].map(Number);cur=given.slice();sel=-1;hint=-1;$("mt").textContent=`Puzzle #${p.seed} · ${p.clues} clues · rated ${p.difficulty}`;say("Pick a cell, then a digit.");draw()}
+$("nw").onclick=()=>{seed=Math.floor(Math.random()*1e6);load()};
+$("ht").onclick=async()=>{const r=await fetch("/hint",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({grid:gs()})});const d=await r.json();if(!r.ok){say("Something in your grid breaks the rules (a repeated digit).");return}
+if(d.done){say("The grid is full.",true);return}if(!d.hint){say(d.message);return}hint=d.hint.cell;sel=hint;draw();say(`${d.hint.technique}: ${d.hint.reason}. Put ${d.hint.digit} there.`,true)};
+$("ck").onclick=async()=>{const r=await fetch("/check",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({grid:gs()})});const d=await r.json();if(!r.ok){say("A digit repeats in a row, column or box.");return}
+say(d.complete?"Solved! Every digit is right.":d.solvable?"No clashes, and the grid can still be finished.":"No clashes yet, but this grid can no longer be solved: an earlier digit is wrong.",d.solvable)};
+$("sv").onclick=async()=>{const r=await fetch("/solve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({grid:given.join("")})});const d=await r.json();if(d.solution){cur=[...d.solution].map(Number);draw();say("Solution shown.",true)}};
+load();
+</script></body></html>
