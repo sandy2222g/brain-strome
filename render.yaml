@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: movie-night-recommender
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
