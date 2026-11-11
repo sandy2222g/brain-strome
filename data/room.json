@@ -1,0 +1,4 @@
+{
+ "source": "Invented room and tile box. MIT.",
+ "width_m": 3.6, "length_m": 4.2, "tile_cm": 30, "tiles_per_box": 11, "box_price": 38.5, "layout": "diagonal"
+}
