@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: appliance-power-cost
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

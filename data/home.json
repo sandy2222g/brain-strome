@@ -1,0 +1,11 @@
+{"note": "Invented appliances and tariff; not a real utility.", "days": 30,
+ "tariff": {"peak": 0.34, "off_peak": 0.14, "flat": 0.25},
+ "appliances": [
+  {"name": "Fridge", "watts": 120, "hours_per_day": 24, "peak_share": 0.4, "shiftable": false},
+  {"name": "Dishwasher", "watts": 1800, "hours_per_day": 1.0, "peak_share": 0.9, "shiftable": true},
+  {"name": "Washing machine", "watts": 500, "hours_per_day": 1.0, "peak_share": 0.7, "shiftable": true},
+  {"name": "Electric oven", "watts": 2400, "hours_per_day": 0.8, "peak_share": 1.0, "shiftable": false},
+  {"name": "TV and console", "watts": 200, "hours_per_day": 4.0, "peak_share": 1.0, "shiftable": false},
+  {"name": "Laptop", "watts": 60, "hours_per_day": 6.0, "peak_share": 0.5, "shiftable": false},
+  {"name": "EV charger", "watts": 7000, "hours_per_day": 1.5, "peak_share": 0.5, "shiftable": true}
+ ]}

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Appliance Power Cost</title>
+<style>
+:root{--bg:#1b1d1f;--ink:#f1f3ee;--lime:#c6f432;--mute:#8d958a;--bar:#2e3235;--sav:#4cc9f0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 "Helvetica Neue",Arial,sans-serif}
+main{max-width:820px;margin:0 auto;padding:30px 16px}h1{margin:0;font-size:2rem;color:var(--lime);letter-spacing:-1px}p{color:var(--mute)}
+.row{display:grid;grid-template-columns:130px 1fr 96px;gap:12px;align-items:center;margin:9px 0}
+.bar{height:22px;background:var(--bar);border-radius:3px;position:relative}.b{height:100%;background:var(--lime);border-radius:3px;position:relative}
+.s{position:absolute;right:0;top:0;height:100%;background:var(--sav);border-radius:0 3px 3px 0}
+.v{text-align:right;font-variant-numeric:tabular-nums}.key{color:var(--mute);font-size:.85rem;margin:6px 0 14px}
+.tot{margin-top:22px;border-top:1px solid var(--bar);padding-top:14px;font-size:1.1rem}.tot b{color:var(--lime)}
+</style></head><body><main>
+<h1>Where the power bill goes</h1><p>Monthly cost per appliance with peak and off-peak rates.</p>
+<div class="key"><span style="color:var(--lime)">&#9632;</span> cost now &nbsp; <span style="color:var(--sav)">&#9632;</span> saved by running off-peak</div>
+<div id="out"></div><div class="tot" id="tot"></div></main>
+<script>
+(async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/report",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)})).json();
+  const mx=Math.max(...r.rows.map(x=>x.cost));
+  document.getElementById("out").innerHTML=r.rows.map(x=>`<div class="row"><div>${x.name}</div><div class="bar"><div class="b" style="width:${x.cost/mx*100}%"><div class="s" style="width:${x.cost?x.saving/x.cost*100:0}%"></div></div></div><div class="v">${x.cost.toFixed(2)}</div></div>`).join("");
+  document.getElementById("tot").innerHTML=`Total <b>${r.total.toFixed(2)}</b> a month (a single flat rate would say ${r.total_flat.toFixed(2)}). Running the dishwasher, washer and EV charger off-peak saves <b>${r.total_saving.toFixed(2)}</b>.`;
+})();
+</script></body></html>
