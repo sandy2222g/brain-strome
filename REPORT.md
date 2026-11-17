@@ -3,4 +3,4 @@ Decisions: CART from scratch; first run used 400 plants, which gave noisy valida
 
 | project | branch | tests | docker | CI | pushed | deployed | blockers |
 |---|---|---|---|---|---|---|---|
-| Plant Watering Tree | plant-watering-tree | 9 pass | builds, /health ok locally | workflow present | yes | no | deploy needs owner account |
+| Plant Watering Tree | plant-watering-tree | 9 pass | local build blocked (Docker Hub 429 twice); CI docker job is the check | workflow present | yes | no | deploy needs owner account |
