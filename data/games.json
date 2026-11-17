@@ -1,0 +1,8 @@
+[
+ {"name": "Lucky Six (pick 6 of 45)", "n": 45, "k": 6, "price": 2.0,
+  "prizes": {"6": 2000000, "5": 2500, "4": 80, "3": 10}},
+ {"name": "Quick Five (pick 5 of 30)", "n": 30, "k": 5, "price": 1.0,
+  "prizes": {"5": 25000, "4": 120, "3": 8, "2": 1}},
+ {"name": "Daily Pick (pick 4 of 20)", "n": 20, "k": 4, "price": 1.0,
+  "prizes": {"4": 1500, "3": 10, "2": 1}}
+]
