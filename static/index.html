@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cache Policy Lab</title>
+<style>
+:root{--bg:#fff6e5;--ink:#2b1b3d;--a:#7c3aed;--b:#0ea5a4;--c:#f97316;--d:#111}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Trebuchet MS","Segoe UI",sans-serif}
+main{max-width:860px;margin:0 auto;padding:30px 18px}h1{font-size:40px;line-height:1;margin:0;font-weight:900}h1 em{color:var(--a)}.sub{margin:8px 0 20px;max-width:620px}
+.tabs{display:flex;gap:8px;margin-bottom:16px}button{font:inherit;font-weight:700;border:3px solid var(--ink);background:#fff;padding:6px 16px;cursor:pointer;box-shadow:3px 3px 0 var(--ink)}button.on{background:var(--ink);color:#fff}
+.card{background:#fff;border:3px solid var(--ink);padding:16px;box-shadow:6px 6px 0 var(--ink)}svg{width:100%;height:auto;display:block}
+.leg{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-weight:700;font-size:14px}.leg i{display:inline-block;width:14px;height:14px;margin-right:6px;vertical-align:-2px}
+.say{margin-top:14px;font-size:15px}
+</style></head><body><main>
+<h1>Cache <em>policy</em> lab</h1><p class="sub">When the cache is full, which item do you throw out? Four answers, one trace of requests. Higher is better; the black line is the best possible (it knows the future).</p>
+<div class="tabs" id="tabs"></div><div class="card"><svg id="s" viewBox="0 0 700 340"></svg><div class="leg" id="leg"></div><p class="say" id="say"></p></div>
+</main><script>
+const $=i=>document.getElementById(i);let kind='zipf';
+const col={fifo:'#f97316',lru:'#7c3aed',lfu:'#0ea5a4',optimal:'#111'};
+const say={zipf:'A few keys are requested far more than the rest. LFU learns who is popular and beats LRU.',uniform:'Every key is equally likely, so no policy can beat chance. Only knowing the future helps.',scan:'A hot set is repeatedly interrupted by one-off sweeps. LRU lets the sweep flush the hot keys; LFU does not.'};
+async function load(){const j=await (await fetch('/curve?kind='+kind)).json();
+document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.k===kind));
+const X=i=>60+i*(600/(j.sizes.length-1)),Y=v=>300-v*270;let h='';
+for(let g=0;g<=4;g++){h+=`<line x1="60" x2="660" y1="${Y(g/4)}" y2="${Y(g/4)}" stroke="#e8dcc4"/><text x="8" y="${Y(g/4)+5}" font-size="13">${g*25}%</text>`}
+j.sizes.forEach((s,i)=>h+=`<text x="${X(i)-8}" y="325" font-size="13">${s}</text>`);
+h+='<text x="260" y="340" font-size="12">cache size (items)</text>';
+Object.entries(j.curves).forEach(([p,v])=>{h+=`<polyline fill="none" stroke="${col[p]}" stroke-width="${p==='optimal'?2:4}" ${p==='optimal'?'stroke-dasharray="6 4"':''} points="${v.map((y,i)=>X(i)+','+Y(y)).join(' ')}"/>`});
+$('s').innerHTML=h;$('leg').innerHTML=Object.keys(col).map(p=>`<span><i style="background:${col[p]}"></i>${p}</span>`).join('');$('say').textContent=say[kind]}
+$('tabs').innerHTML=['zipf','scan','uniform'].map(k=>`<button data-k="${k}">${k}</button>`).join('');
+$('tabs').onclick=e=>{if(e.target.dataset.k){kind=e.target.dataset.k;load()}};load();
+</script></body></html>

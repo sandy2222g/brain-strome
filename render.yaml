@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: cache-policy-lab
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
