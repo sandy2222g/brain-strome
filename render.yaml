@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: mini-spreadsheet
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
