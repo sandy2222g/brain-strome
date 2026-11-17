@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: cinema-seat-picker
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

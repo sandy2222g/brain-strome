@@ -1,0 +1,10 @@
+{"note": "Invented hall; X = taken, . = free.", "party": 3,
+ "rows": [
+  "..........",
+  "..XX..XX..",
+  "X.........",
+  "...XXXX...",
+  "XX......XX",
+  "..........",
+  "X.X.X.X.X."
+ ]}

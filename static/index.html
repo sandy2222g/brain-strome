@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cinema Seat Picker</title>
+<style>
+:root{--bg:#3a0d14;--ink:#f6e7c1;--gold:#e3b04b;--seat:#8c2230;--taken:#1c0508;--mute:#c9a98e}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#5a1420,var(--bg) 60%);color:var(--ink);font:17px/1.5 "Didot","Bodoni MT",Georgia,serif;min-height:100vh}
+main{max-width:640px;margin:0 auto;padding:30px 16px;text-align:center}h1{margin:0;font-weight:normal;font-size:2.2rem;color:var(--gold);letter-spacing:3px;text-transform:uppercase}p{color:var(--mute)}
+.screen{height:10px;background:var(--gold);border-radius:50%/100%;margin:20px 10% 26px;box-shadow:0 8px 24px #e3b04b66}
+.map{display:inline-grid;gap:6px}.row{display:flex;gap:6px;justify-content:center}
+.s{width:34px;height:30px;border-radius:9px 9px 4px 4px;background:var(--seat)}.s.X{background:var(--taken);opacity:.6}.s.O{background:var(--gold);box-shadow:0 0 12px var(--gold)}
+.cap{margin-top:20px;font-size:.95rem}.cap b{color:var(--gold)}
+</style></head><body><main>
+<h1>Seats for the show</h1><p id="sub"></p><div class="screen"></div>
+<div class="map" id="map"></div><div class="cap" id="cap"></div></main>
+<script>
+const seat=m=>m.map(r=>`<div class="row">${[...r].map(ch=>`<div class="s ${ch==="."?"":ch}"></div>`).join("")}</div>`).join("");
+(async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/pick",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({rows:s.rows,party:s.party})})).json();
+  document.getElementById("sub").textContent=`Party of ${s.party}. Gold seats are the best block together.`;
+  document.getElementById("map").innerHTML=seat(r.map);
+  document.getElementById("cap").innerHTML=`Best: row ${r.best.row+1}, seats ${r.best.start+1}-${r.best.start+r.best.size} (score ${r.best.score}). First free would be row ${r.first_free.row+1}, the front corner (score ${r.first_free.score}).`;
+})();
+</script></body></html>
