@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bill Timing Planner</title>
+<style>
+:root{--bg:#ece8e1;--ink:#1c1c1c;--coral:#e8553d;--ok:#2b7a5b;--mute:#6f6a60;--card:#faf8f4}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Palatino Linotype",Palatino,serif}
+main{max-width:860px;margin:0 auto;padding:30px 16px}h1{margin:0;font-size:2rem}p{color:var(--mute)}
+.card{background:var(--card);padding:16px;border-radius:4px;margin:16px 0;box-shadow:0 1px 0 #cfc9bd}
+h2{font-size:1rem;margin:0 0 8px;text-transform:uppercase;letter-spacing:2px;color:var(--mute)}
+svg{width:100%;height:auto;display:block}.axis{stroke:#bbb}.neg{fill:#e8553d22}
+li{margin:4px 0}.tag{color:var(--ok);font-weight:bold}
+</style></head><body><main>
+<h1>Bill timing planner</h1><p>Does the balance dip below zero before payday?</p>
+<div class="card"><h2>As the bills fall due</h2><svg id="a" viewBox="0 0 800 220"></svg><div id="ta"></div></div>
+<div class="card"><h2>After moving two bills</h2><svg id="b" viewBox="0 0 800 220"></svg><ul id="tb"></ul></div></main>
+<script>
+function draw(id,bal,col){
+  const W=800,H=220,p=28,lo=Math.min(0,...bal),hi=Math.max(...bal),x=i=>p+i*(W-2*p)/(bal.length-1),y=v=>H-p-(v-lo)*(H-2*p)/(hi-lo);
+  const pts=bal.map((v,i)=>`${x(i)},${y(v)}`).join(" ");
+  document.getElementById(id).innerHTML=`<rect class="neg" x="${p}" y="${y(0)}" width="${W-2*p}" height="${Math.max(0,H-p-y(0))}"/><line class="axis" x1="${p}" x2="${W-p}" y1="${y(0)}" y2="${y(0)}"/><polyline fill="none" stroke="${col}" stroke-width="3" points="${pts}"/><text x="${p}" y="14" font-size="12" fill="#6f6a60">${Math.round(hi)}</text><text x="${p}" y="${H-6}" font-size="12" fill="#6f6a60">${Math.round(lo)}</text>`;
+}
+(async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/check",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)})).json();
+  draw("a",r.balances,"#e8553d");draw("b",r.fix.balances,"#2b7a5b");
+  const d=r.shortfalls.map(x=>x.day);
+  document.getElementById("ta").textContent=`Overdrawn on ${d.length} days (first on day ${d[0]}), lowest ${Math.min(...r.shortfalls.map(x=>x.balance))}.`;
+  document.getElementById("tb").innerHTML=Object.entries(r.fix.moves).map(([k,v])=>`<li>Move <b>${k.replace("@"," due day ")}</b> to day ${v}</li>`).join("")+`<li class="tag">${r.fix.shortfalls.length?"Still overdrawn":"No overdrawn days"}</li>`;
+})();
+</script></body></html>

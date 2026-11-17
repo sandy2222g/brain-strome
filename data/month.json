@@ -1,0 +1,9 @@
+{"note": "Invented month of money; no real accounts.", "start": "2026-12-01", "days": 31, "opening_balance": 150.0,
+ "income": [{"name": "Pay", "day": 5, "amount": 900.0}, {"name": "Pay", "day": 19, "amount": 900.0}],
+ "bills": [
+  {"name": "Rent", "day": 1, "amount": 700.0}, {"name": "Phone", "day": 3, "amount": 35.0},
+  {"name": "Internet", "day": 8, "amount": 45.0}, {"name": "Insurance", "day": 12, "amount": 120.0},
+  {"name": "Gym", "day": 14, "amount": 30.0}, {"name": "Streaming", "day": 20, "amount": 15.0},
+  {"name": "Groceries", "day": 7, "amount": 90.0}, {"name": "Groceries", "day": 14, "amount": 90.0},
+  {"name": "Groceries", "day": 21, "amount": 90.0}, {"name": "Groceries", "day": 28, "amount": 90.0}
+ ]}
