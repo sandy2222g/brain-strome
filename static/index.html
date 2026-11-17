@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Birthday Countdown</title>
+<style>
+:root{--bg:#0f1f1a;--ink:#f4efe6;--pink:#ff6f91;--card:#193229;--mute:#8fb3a3}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Trebuchet MS",Verdana,sans-serif}
+main{max-width:860px;margin:0 auto;padding:30px 16px}
+h1{margin:0;font-size:2rem;color:var(--pink)}p{color:var(--mute)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-top:18px}
+.tile{background:var(--card);border-radius:18px;padding:16px}.tile.today{background:var(--pink);color:#2a0d16}
+.big{font-size:2.6rem;font-weight:bold;line-height:1}.nm{font-size:1.15rem;margin-top:8px}.sm{font-size:.85rem;color:var(--mute)}.today .sm{color:#4a1a28}
+</style></head><body><main>
+<h1>Birthday countdown</h1><p id="sub"></p><div class="grid" id="out"></div></main>
+<script>
+(async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/upcoming",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)})).json();
+  document.getElementById("sub").textContent=`Today is ${s.today}. Soonest first (a January-to-December list would start with ${r.calendar_order[0]}).`;
+  document.getElementById("out").innerHTML=r.rows.map(x=>`<div class="tile ${x.days===0?"today":""}"><div class="big">${x.days===0?"Today":x.days}</div><div class="sm">${x.days===0?"":"days"}</div><div class="nm">${x.name}</div><div class="sm">turns ${x.turning} · ${x.date}</div></div>`).join("");
+})();
+</script></body></html>
