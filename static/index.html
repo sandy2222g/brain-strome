@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Next Bus Finder</title>
+<style>
+:root{--bg:#080808;--amber:#ffb000;--dim:#7a5600;--ink:#ffe3a3}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--amber);font:18px/1.5 "Courier New",monospace}
+main{max-width:700px;margin:0 auto;padding:28px 16px}h1{margin:0 0 4px;letter-spacing:4px;text-transform:uppercase;font-size:1.4rem}
+.sub{color:var(--dim);margin-bottom:18px}
+.row{display:grid;grid-template-columns:1fr auto;gap:8px;border-bottom:1px dashed var(--dim);padding:12px 0}
+.row .n{font-size:1.25rem;color:var(--ink)}.t{text-align:right;white-space:nowrap}.t i{font-style:normal;color:var(--dim)}
+.tag{display:inline-block;border:1px solid var(--amber);padding:0 6px;font-size:.8rem;margin-left:8px}
+</style></head><body><main>
+<h1>Departures</h1><div class="sub" id="sub"></div><div id="out"></div></main>
+<script>
+(async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/board",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({routes:s.routes,now:s.now,walk_min:s.walk_min})})).json();
+  document.getElementById("sub").textContent=`now ${s.now} · ${s.walk_min} min walk to the stop`;
+  document.getElementById("out").innerHTML=r.rows.map(x=>`<div class="row"><div class="n">${x.route}${x.is_last?'<span class="tag">LAST BUS</span>':""}</div><div class="t">${x.next.map(d=>`${d.time}${d.tomorrow?"*":""} <i>${d.in_min}m</i>`).join(" &nbsp; ")}</div></div>`).join("")+'<div class="sub" style="margin-top:14px">* tomorrow</div>';
+})();
+</script></body></html>

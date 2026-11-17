@@ -1,0 +1,6 @@
+{"note": "Invented routes and times.", "now": "22:40", "walk_min": 6,
+ "routes": [
+  {"name": "12 Harbour", "service": "weekday", "first": "05:30", "last": "23:30", "headway_min": 20},
+  {"name": "7 University", "service": "weekday", "first": "06:00", "last": "22:45", "headway_min": 15},
+  {"name": "N3 Night", "service": "weekday", "first": "23:15", "last": "04:15", "headway_min": 60}
+ ]}
