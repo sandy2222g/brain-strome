@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: tictactoe-minimax
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

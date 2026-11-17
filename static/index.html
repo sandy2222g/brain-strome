@@ -1,0 +1,26 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unbeatable Tic-Tac-Toe</title>
+<style>
+:root{--bg:#10151f;--ink:#f1f5f9;--x:#ffcf4a;--o:#4ad6c4;--dim:#8a97ab;--card:#1a2233}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Rockwell","Georgia",serif;display:flex;justify-content:center}
+main{width:100%;max-width:560px;padding:28px 18px;text-align:center}h1{margin:0;font-size:34px;letter-spacing:1px}.sub{color:var(--dim);margin:4px 0 20px}
+#b{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:360px;margin:0 auto}
+#b button{aspect-ratio:1;background:var(--card);border:0;border-radius:14px;font:900 64px/1 "Rockwell",serif;cursor:pointer;color:var(--ink)}
+#b button:hover:not(:disabled){background:#243049}#b button.X{color:var(--x)}#b button.O{color:var(--o)}
+#msg{margin:18px 0 6px;font-size:20px;min-height:30px}button.reset{font:inherit;background:var(--x);color:#1a1400;border:0;border-radius:20px;padding:6px 22px;font-weight:700;cursor:pointer}
+.facts{margin-top:26px;background:var(--card);border-radius:14px;padding:14px;font-size:14px;color:var(--dim)}.facts b{color:var(--ink)}
+</style></head><body><main>
+<h1>Unbeatable tic-tac-toe</h1><p class="sub">You are X. The computer searches every possible game, so the best you can do is draw.</p>
+<div id="b"></div><div id="msg"></div><button class="reset" id="r">new game</button>
+<div class="facts" id="f"></div>
+</main><script>
+const $=i=>document.getElementById(i);let board,over;
+function draw(){$('b').innerHTML=[...board].map((c,i)=>`<button data-i="${i}" class="${c}" ${c!=='.'||over?'disabled':''}>${c==='.'?'':c}</button>`).join('')}
+function reset(){board='.........';over=false;$('msg').textContent='Your move.';draw()}
+$('r').onclick=reset;
+$('b').onclick=async e=>{const i=e.target.dataset.i;if(i===undefined||over)return;board=board.slice(0,i)+'X'+board.slice(+i+1);draw();
+const j=await (await fetch('/move?board='+board)).json();board=j.board;over=j.done;draw();
+$('msg').textContent=over?(j.winner==='O'?'The computer wins.':j.winner==='X'?'You win!':'A draw, as expected.'):'Your move.'};
+fetch('/stats').then(r=>r.json()).then(s=>{$('f').innerHTML=`Plain minimax looks at <b>${s.plain.toLocaleString()}</b> positions to prove the empty board is a draw. Alpha-beta pruning gets the same answer from <b>${s.pruned.toLocaleString()}</b>.`});
+reset();
+</script></body></html>
