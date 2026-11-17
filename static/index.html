@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quick Event Parser</title>
+<style>
+:root{--bg:#fff;--ink:#000;--red:#e8001c;--mute:#777;--rule:#000}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.35 "Helvetica Neue",Helvetica,Arial,sans-serif}
+main{max-width:900px;margin:0 auto;padding:28px 18px}h1{margin:0;font-size:3rem;line-height:1;letter-spacing:-2px;font-weight:900}h1 span{color:var(--red)}p{color:var(--mute)}
+.ev{display:grid;grid-template-columns:90px 1fr 130px;gap:14px;border-top:3px solid var(--rule);padding:14px 0;align-items:center}
+.d{font-size:2.6rem;font-weight:900;line-height:1;color:var(--red)}.d small{display:block;font-size:.75rem;color:var(--ink);letter-spacing:1px;text-transform:uppercase;font-weight:700}
+.t{font-weight:700;font-size:1.15rem}.src{color:var(--mute);font-size:.85rem}.time{text-align:right;font-weight:900;font-size:1.4rem}.time small{display:block;font-size:.75rem;color:var(--mute);font-weight:400}
+.warn{color:var(--red)}
+@media(max-width:560px){.ev{grid-template-columns:70px 1fr}.time{grid-column:2;text-align:left}}
+</style></head><body><main>
+<h1>Say it.<br><span>Schedule it.</span></h1><p id="sub"></p><div id="out"></div></main>
+<script>
+const M=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+(async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/parse",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sentences:s.sentences,today:s.today})})).json();
+  document.getElementById("sub").textContent=`Today is ${s.today}. Seven sentences, parsed with plain rules.`;
+  document.getElementById("out").innerHTML=r.events.map(e=>{const d=e.date?new Date(e.date+"T00:00"):null;
+   return `<div class="ev"><div class="d">${d?d.getDate():"?"}<small>${d?M[d.getMonth()]+" · "+e.weekday.slice(0,3):"no date"}</small></div><div><div class="t">${e.title}</div><div class="src">“${e.text}”</div></div><div class="time ${e.time?"":"warn"}">${e.time||"no time"}<small>${e.duration_min?e.duration_min+" min":""}</small></div></div>`}).join("");
+})();
+</script></body></html>

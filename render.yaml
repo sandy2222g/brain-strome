@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: quick-event-parser
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
