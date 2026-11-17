@@ -1,0 +1,8 @@
+{"note": "Invented players and 1-10 skill ratings.",
+ "players": [
+  {"name": "Aiden", "skill": 9}, {"name": "Bea", "skill": 8}, {"name": "Cal", "skill": 8}, {"name": "Dana", "skill": 7},
+  {"name": "Eli", "skill": 6}, {"name": "Faye", "skill": 5}, {"name": "Gus", "skill": 4}, {"name": "Hope", "skill": 3},
+  {"name": "Ivan", "skill": 3}, {"name": "Jo", "skill": 2}
+ ],
+ "keep_apart": [["Aiden", "Bea"]],
+ "keep_together": [["Gus", "Hope"]]}

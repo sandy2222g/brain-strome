@@ -1,0 +1,1 @@
+"""Fair two-team split."""

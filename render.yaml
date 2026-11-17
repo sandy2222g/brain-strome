@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: fair-teams-picker
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
