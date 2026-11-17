@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: receipt-line-reader
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

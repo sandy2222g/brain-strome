@@ -1,0 +1,346 @@
+[
+ {
+  "id": 1,
+  "text": "CORNER CAFE\n2026-03-11 12:41\nTomato soup               5.95\nClub sandwich             3.25\nMineral water             2.50\nBlueberry muffin          3.25\nGreen salad              12.95\nSUBTOTAL                 27.90\nTAX 8%                    2.23\nTIP                       2.79\nTOTAL                    32.92\nTHANK YOU\n",
+  "items": [
+   {
+    "name": "Tomato soup",
+    "qty": 1,
+    "total_cents": 595
+   },
+   {
+    "name": "Club sandwich",
+    "qty": 1,
+    "total_cents": 325
+   },
+   {
+    "name": "Mineral water",
+    "qty": 1,
+    "total_cents": 250
+   },
+   {
+    "name": "Blueberry muffin",
+    "qty": 1,
+    "total_cents": 325
+   },
+   {
+    "name": "Green salad",
+    "qty": 1,
+    "total_cents": 1295
+   }
+  ],
+  "totals": {
+   "subtotal": 2790,
+   "tax": 223,
+   "tip": 279,
+   "total": 3292
+  },
+  "issues": []
+ },
+ {
+  "id": 2,
+  "text": "CORNER CAFE\n2026-03-12 12:42\nChicken wrap             11.50\nFlat white                5.95\nIced tea                  5.95\nChicken wrap              5.95\nPasta bake                3.25\nSUBTOTAL                 32.60\nTAX 8%                    2.61\nTOTAL                    35.21\nTHANK YOU\n",
+  "items": [
+   {
+    "name": "Chicken wrap",
+    "qty": 1,
+    "total_cents": 1150
+   },
+   {
+    "name": "Flat white",
+    "qty": 1,
+    "total_cents": 595
+   },
+   {
+    "name": "Iced tea",
+    "qty": 1,
+    "total_cents": 595
+   },
+   {
+    "name": "Chicken wrap",
+    "qty": 1,
+    "total_cents": 595
+   },
+   {
+    "name": "Pasta bake",
+    "qty": 1,
+    "total_cents": 325
+   }
+  ],
+  "totals": {
+   "subtotal": 3260,
+   "tax": 261,
+   "tip": 0,
+   "total": 3521
+  },
+  "issues": []
+ },
+ {
+  "id": 3,
+  "text": "CORNER CAFE\n2026-03-13 12:43\nBlueberry muffin          5.95\nGreen salad              12,95\nFlat white               11.50\n2 x Orange juice ...... $15.00\nIced tea          3@5.95  17.85\nBlueberry muffin         ll.5O\nOrange juice              2,50\nSUBTOTAL                 77.25\nTAX 8%                    6.18\nTIP                       7.72\nTOTAL                    91.15\nTHANK YOU\n",
+  "items": [
+   {
+    "name": "Blueberry muffin",
+    "qty": 1,
+    "total_cents": 595
+   },
+   {
+    "name": "Green salad",
+    "qty": 1,
+    "total_cents": 1295
+   },
+   {
+    "name": "Flat white",
+    "qty": 1,
+    "total_cents": 1150
+   },
+   {
+    "name": "Orange juice",
+    "qty": 2,
+    "total_cents": 1500
+   },
+   {
+    "name": "Iced tea",
+    "qty": 3,
+    "total_cents": 1785
+   },
+   {
+    "name": "Blueberry muffin",
+    "qty": 1,
+    "total_cents": 1150
+   },
+   {
+    "name": "Orange juice",
+    "qty": 1,
+    "total_cents": 250
+   }
+  ],
+  "totals": {
+   "subtotal": 7725,
+   "tax": 618,
+   "tip": 772,
+   "total": 9115
+  },
+  "issues": []
+ },
+ {
+  "id": 4,
+  "text": "CORNER CAFE\n2026-03-14 12:44\nChicken wrap              7,50\nChicken wrap              2.50\n2 x Garlic bread ...... $5.00\nGreen salad       1@11.50  11.50\nSUBTOTAL                 28.00\nTAX 8%                    2.12\nTOTAL                    28.62\nTHANK YOU\n",
+  "items": [
+   {
+    "name": "Chicken wrap",
+    "qty": 1,
+    "total_cents": 750
+   },
+   {
+    "name": "Chicken wrap",
+    "qty": 1,
+    "total_cents": 250
+   },
+   {
+    "name": "Garlic bread",
+    "qty": 2,
+    "total_cents": 500
+   },
+   {
+    "name": "Green salad",
+    "qty": 1,
+    "total_cents": 1150
+   }
+  ],
+  "totals": {
+   "subtotal": 2800,
+   "tax": 212,
+   "tip": 0,
+   "total": 2862
+  },
+  "issues": [
+   "items_sum_mismatch",
+   "total_mismatch"
+  ]
+ },
+ {
+  "id": 5,
+  "text": "CORNER CAFE\n2026-03-15 12:45\nGarlic bread              7.50\n1 x Green salad ...... $7.50\nPasta bake        3@2.50  7.50\nFlat white                5.95\nMineral water             3,25\nClub sandwich            12.95\n3 x Pasta bake ...... $17.85\nSUBTOTAL                 62.50\nTAX 8%                    5.00\nTIP                       6.25\nTOTAL                    73.75\nTHANK YOU\n",
+  "items": [
+   {
+    "name": "Garlic bread",
+    "qty": 1,
+    "total_cents": 750
+   },
+   {
+    "name": "Green salad",
+    "qty": 1,
+    "total_cents": 750
+   },
+   {
+    "name": "Pasta bake",
+    "qty": 3,
+    "total_cents": 750
+   },
+   {
+    "name": "Flat white",
+    "qty": 1,
+    "total_cents": 595
+   },
+   {
+    "name": "Mineral water",
+    "qty": 1,
+    "total_cents": 325
+   },
+   {
+    "name": "Club sandwich",
+    "qty": 1,
+    "total_cents": 1295
+   },
+   {
+    "name": "Pasta bake",
+    "qty": 3,
+    "total_cents": 1785
+   }
+  ],
+  "totals": {
+   "subtotal": 6250,
+   "tax": 500,
+   "tip": 625,
+   "total": 7375
+  },
+  "issues": []
+ },
+ {
+  "id": 6,
+  "text": "CORNER CAFE\n2026-03-16 12:46\n2 x Orange juice ...... $15.00\nChicken wrap      1@3.25  3.25\nPasta bake                2.5O\nBrownie                  11,50\nTomato soup              11.50\n2 x Tomato soup ...... $23.00\nBrownie           1@7.50  7.50\nSUBTOTAL                 74.25\nTAX 8%                    5.94\nTOTAL                    80.19\nTHANK YOU\n",
+  "items": [
+   {
+    "name": "Orange juice",
+    "qty": 2,
+    "total_cents": 1500
+   },
+   {
+    "name": "Chicken wrap",
+    "qty": 1,
+    "total_cents": 325
+   },
+   {
+    "name": "Pasta bake",
+    "qty": 1,
+    "total_cents": 250
+   },
+   {
+    "name": "Brownie",
+    "qty": 1,
+    "total_cents": 1150
+   },
+   {
+    "name": "Tomato soup",
+    "qty": 1,
+    "total_cents": 1150
+   },
+   {
+    "name": "Tomato soup",
+    "qty": 2,
+    "total_cents": 2300
+   },
+   {
+    "name": "Brownie",
+    "qty": 1,
+    "total_cents": 750
+   }
+  ],
+  "totals": {
+   "subtotal": 7425,
+   "tax": 594,
+   "tip": 0,
+   "total": 8019
+  },
+  "issues": []
+ },
+ {
+  "id": 7,
+  "text": "CORNER CAFE\n2026-03-17 12:47\nClub sandwich     3@4.80  14.40\nOrange juice              7.5O\nGarlic bread              2,50\nBrownie                  11.50\n2 x Brownie ...... $6.50\nGreen salad       2@2.50  5.00\nSUBTOTAL                 47.40\nTAX 8%                    3.79\nTIP                       4.74\nTOTAL                    60.93\nTHANK YOU\n",
+  "items": [
+   {
+    "name": "Club sandwich",
+    "qty": 3,
+    "total_cents": 1440
+   },
+   {
+    "name": "Orange juice",
+    "qty": 1,
+    "total_cents": 750
+   },
+   {
+    "name": "Garlic bread",
+    "qty": 1,
+    "total_cents": 250
+   },
+   {
+    "name": "Brownie",
+    "qty": 1,
+    "total_cents": 1150
+   },
+   {
+    "name": "Brownie",
+    "qty": 2,
+    "total_cents": 650
+   },
+   {
+    "name": "Green salad",
+    "qty": 2,
+    "total_cents": 500
+   }
+  ],
+  "totals": {
+   "subtotal": 4740,
+   "tax": 379,
+   "tip": 474,
+   "total": 6093
+  },
+  "issues": [
+   "total_mismatch"
+  ]
+ },
+ {
+  "id": 8,
+  "text": "CORNER CAFE\n2026-03-18 12:48\nGreen salad               4.8O\nFlat white                5,95\nOrange juice              5.95\n3 x Orange juice ...... $38.85\nChicken wrap      3@3.25  9.75\nChicken wrap              2.5O\nSUBTOTAL                 67.80\nTAX 8%                    5.42\nTOTAL                    73.22\nTHANK YOU\n",
+  "items": [
+   {
+    "name": "Green salad",
+    "qty": 1,
+    "total_cents": 480
+   },
+   {
+    "name": "Flat white",
+    "qty": 1,
+    "total_cents": 595
+   },
+   {
+    "name": "Orange juice",
+    "qty": 1,
+    "total_cents": 595
+   },
+   {
+    "name": "Orange juice",
+    "qty": 3,
+    "total_cents": 3885
+   },
+   {
+    "name": "Chicken wrap",
+    "qty": 3,
+    "total_cents": 975
+   },
+   {
+    "name": "Chicken wrap",
+    "qty": 1,
+    "total_cents": 250
+   }
+  ],
+  "totals": {
+   "subtotal": 6780,
+   "tax": 542,
+   "tip": 0,
+   "total": 7322
+  },
+  "issues": []
+ }
+]
