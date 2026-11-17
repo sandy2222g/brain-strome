@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cafe Demand Forecaster</title>
+<style>
+:root{--bg:#fff1f3;--ink:#4a2c2a;--pink:#e8688a;--choc:#6b3e26;--cream:#fffaf4;--sage:#7aa58a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Nunito","Trebuchet MS",sans-serif;padding:28px}
+main{max-width:1040px;margin:auto}h1{font-size:32px;margin:0;color:var(--choc)}h1 span{color:var(--pink)}p.s{margin:2px 0 18px;opacity:.75}
+.card{background:var(--cream);border-radius:22px;padding:18px 22px;box-shadow:0 4px 0 #e8688a33;margin-bottom:16px}
+svg{width:100%;height:260px}.leg{display:flex;gap:18px;font-size:13px;flex-wrap:wrap}.leg i{display:inline-block;width:14px;height:4px;margin-right:6px;vertical-align:middle;border-radius:2px}
+.days{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}.day{background:#fff;border-radius:16px;padding:10px 12px;text-align:center;border:2px solid #f6d3dc}
+.day b{display:block;font-size:30px;color:var(--pink);line-height:1.1}.day small{opacity:.7}.wk{font-weight:800;letter-spacing:1px;text-transform:uppercase;font-size:12px;color:var(--choc)}
+h2{margin:0 0 8px;font-size:15px;text-transform:uppercase;letter-spacing:1.5px;color:var(--choc)}.m{font-size:14px}.m b{color:var(--pink)}
+</style></head><body><main>
+<h1>Cafe <span>Demand</span> Forecaster</h1><p class="s">How many croissants to bake tomorrow? Holt-Winters forecasting with a 90% safety margin.</p>
+<div class="card"><h2>Last 6 weeks + 2-week test</h2><svg id="ch" viewBox="0 0 900 260"></svg>
+<div class="leg"><span><i style="background:#999"></i>history</span><span><i style="background:var(--choc)"></i>actual (hidden from model)</span><span><i style="background:var(--pink)"></i>Holt-Winters forecast</span><span><i style="background:var(--sage)"></i>same-weekday-last-week</span></div>
+<p class="m" id="m"></p></div>
+<div class="card"><h2>Bake plan for the next 7 days</h2><div class="days" id="days"></div></div></main>
+<script>
+const $=i=>document.getElementById(i);
+async function main(){
+const e=await (await fetch('/evaluation')).json();
+const hist=e.history.slice(-28),n=hist.length+e.actual.length;const all=[...hist,...e.actual,...e.forecast,...e.naive];const lo=Math.min(...all)-5,hi=Math.max(...all)+5;
+const x=i=>40+i/(n-1)*840,y=v=>240-(v-lo)/(hi-lo)*220;
+const line=(arr,off,col,w)=>`<polyline fill="none" stroke="${col}" stroke-width="${w}" stroke-linejoin="round" points="${arr.map((v,i)=>x(i+off)+','+y(v)).join(' ')}"/>`;
+const cut=x(hist.length-.5);
+$('ch').innerHTML=`<rect x="${cut}" y="10" width="${880-cut}" height="230" fill="#e8688a" opacity=".07"/>`+line(hist,0,'#999',2)+line([hist[hist.length-1],...e.actual],hist.length-1,'#6b3e26',2.5)+line([hist[hist.length-1],...e.naive],hist.length-1,'#7aa58a',2)+line([hist[hist.length-1],...e.forecast],hist.length-1,'#e8688a',3);
+$('m').innerHTML=`Average miss on the 14 hidden days: Holt-Winters <b>${e.mae_holdw}</b> items vs <b>${e.mae_naive}</b> for "same as last week".`;
+const s=await (await fetch('/sample')).json();
+const p=await (await fetch('/plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({last_day:s.last_day,sold:s.sold,days:7})})).json();
+$('days').innerHTML=p.days.map(d=>`<div class="day"><div class="wk">${d.weekday}</div><b>${d.bake}</b><small>bake · forecast ${d.forecast}</small></div>`).join('')}
+main();
+</script></body></html>

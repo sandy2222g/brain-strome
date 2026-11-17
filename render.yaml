@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: cafe-demand-forecaster
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
