@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Elo Rating League</title>
+<style>
+:root{--bg:#f4f1e8;--navy:#14213d;--ball:#d7e84a;--ink:#1c2233;--mut:#6c7385;--line:#d9d4c4}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Avenir Next","Segoe UI",sans-serif;padding:0}
+header{background:var(--navy);color:#fff;padding:28px 20px 22px}header div{max-width:1000px;margin:auto}
+h1{margin:0;font:800 34px "Arial Black","Segoe UI",sans-serif;letter-spacing:-1px;text-transform:uppercase}h1 span{color:var(--ball)}header p{margin:4px 0 0;color:#aeb7cc}
+main{max-width:1000px;margin:22px auto;padding:0 20px;display:grid;grid-template-columns:1.7fr 1fr;gap:22px}@media(max-width:800px){main{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:16px 18px;margin-bottom:18px}h2{margin:0 0 10px;font:700 12px "Segoe UI",sans-serif;text-transform:uppercase;letter-spacing:1.6px;color:var(--mut)}
+.r{display:grid;grid-template-columns:26px 68px 1fr 120px 54px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #eee;font-size:14px}.r:last-child{border:0}
+.r .n{color:var(--mut);font-weight:700}.r b{font-weight:700}.bar{height:12px;background:#eee;border-radius:2px;overflow:hidden}.bar i{display:block;height:100%;background:var(--navy)}.r:first-child .bar i{background:var(--ball);outline:1px solid var(--navy)}
+.r .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}svg{width:120px;height:26px}
+select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:4px;width:100%;margin-bottom:8px;background:#fff}
+.pr{text-align:center;margin-top:10px}.pr b{font:800 52px "Arial Black",sans-serif;color:var(--navy);line-height:1}.pr small{display:block;color:var(--mut)}
+.pbar{height:16px;border-radius:8px;background:#e9e6d6;overflow:hidden;margin-top:10px}.pbar i{display:block;height:100%;background:var(--ball);border-right:3px solid var(--navy)}
+.m{font-size:13px;color:var(--mut)}.m b{color:var(--ink)}
+</style></head><body>
+<header><div><h1>Elo <span>Rating</span> League</h1><p>12 club players, 240 matches. Ratings update after every game.</p></div></header>
+<main><div><div class="card"><h2>Leaderboard</h2><div id="lb"></div></div></div>
+<div><div class="card"><h2>Who wins?</h2><select id="a"></select><select id="b"></select><div class="pr" id="pr"></div></div>
+<div class="card m" id="ev"></div></div></main>
+<script>
+const $=i=>document.getElementById(i);
+async function main(){
+const L=(await (await fetch('/leaderboard')).json()).players,lo=Math.min(...L.map(p=>p.rating))-40,hi=Math.max(...L.map(p=>p.rating));
+const spark=h=>{const mn=Math.min(...h),mx=Math.max(...h),n=h.length;return `<svg viewBox="0 0 120 26" preserveAspectRatio="none"><polyline fill="none" stroke="#14213d" stroke-width="1.6" points="${h.map((v,i)=>(i/(n-1)*118+1)+','+(24-(v-mn)/(mx-mn||1)*22)).join(' ')}"/></svg>`};
+$('lb').innerHTML=L.map((p,i)=>`<div class="r"><span class="n">${i+1}</span><b>${p.player}</b><div class="bar"><i style="width:${(p.rating-lo)/(hi-lo)*100}%"></i></div>${spark(p.history)}<span class="v">${Math.round(p.rating)}</span></div>`).join('');
+const opts=L.map(p=>`<option>${p.player}</option>`).join('');$('a').innerHTML=opts;$('b').innerHTML=opts;$('a').value=L[0].player;$('b').value=L[L.length-1].player;
+async function pred(){const r=await fetch(`/predict?a=${$('a').value}&b=${$('b').value}`);if(!r.ok){$('pr').innerHTML='<small>pick two different players</small>';return}
+const j=await r.json(),p=Math.round(j.p_a*100);$('pr').innerHTML=`<b>${p}%</b><small>${j.a} beats ${j.b}</small><div class="pbar"><i style="width:${p}%"></i></div>`}
+$('a').onchange=pred;$('b').onchange=pred;pred();
+const e=await (await fetch('/evaluation')).json();
+$('ev').innerHTML=`<h2>Is Elo better than win rate?</h2>Trained on the first ${e.matches-e.holdout} matches, tested on the last ${e.holdout}.<br>Ranking vs hidden true skill: Elo <b>${e.rank_corr_elo}</b>, win rate <b>${e.rank_corr_winrate}</b> (1 is perfect).<br>Predicting the winner: Elo <b>${Math.round(e.acc_elo*100)}%</b>, win rate <b>${Math.round(e.acc_winrate*100)}%</b>.`}
+main();
+</script></body></html>
