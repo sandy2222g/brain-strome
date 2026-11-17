@@ -1,0 +1,1 @@
+"""Campus FAQ search."""

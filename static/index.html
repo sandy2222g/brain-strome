@@ -1,0 +1,25 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Campus FAQ Search</title>
+<style>
+:root{--bg:#f5f3ff;--ink:#1e1b4b;--a:#4f46e5;--b:#06b6d4;--card:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Segoe UI",system-ui,sans-serif;padding:36px 22px}
+main{max-width:720px;margin:auto}h1{font-size:34px;margin:0;background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+p.s{margin:2px 0 22px;color:#5b5880}.bar{display:flex;gap:8px;background:#fff;border-radius:40px;padding:6px;box-shadow:0 6px 24px #4f46e522}
+input{flex:1;border:0;font:inherit;padding:10px 18px;outline:0;background:none}button{border:0;border-radius:30px;padding:0 24px;background:linear-gradient(90deg,var(--a),var(--b));color:#fff;font-weight:700;cursor:pointer}
+.chips{margin:12px 2px 18px;display:flex;gap:6px;flex-wrap:wrap}.chips span{background:#e0e7ff;border-radius:14px;padding:2px 12px;font-size:13px;cursor:pointer}
+.r{background:var(--card);border-radius:16px;padding:16px 20px;margin-bottom:12px;border-left:5px solid var(--a);box-shadow:0 2px 10px #1e1b4b14}
+.r:nth-child(n+2){border-color:var(--b);opacity:.92}.r h3{margin:0 0 4px;font-size:16px}.r p{margin:0;color:#444}.sc{float:right;font-size:12px;color:#7c79a8}
+.m{margin-top:24px;font-size:13px;color:#5b5880;text-align:center}#err{color:#c0392b}
+</style></head><body><main>
+<h1>Campus FAQ Search</h1><p class="s">Ask in your own words. TF-IDF ranking finds the best answer.</p>
+<div class="bar"><input id="q" value="how do I extend my book loan online" autocomplete="off"><button id="go">Search</button></div>
+<div class="chips" id="ch"></div><div id="out"></div><span id="err"></span><p class="m" id="m"></p></main>
+<script>
+const $=i=>document.getElementById(i);
+['printer for coursework','forgot my email password','shuttle from the north car park','anxious and need counselling','gym weekend hours'].forEach(t=>{const s=document.createElement('span');s.textContent=t;s.onclick=()=>{$('q').value=t;run()};$('ch').appendChild(s)});
+async function run(){$('err').textContent='';const r=await fetch('/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:$('q').value})});
+const j=await r.json();if(!r.ok){$('out').innerHTML='';$('err').textContent=j.detail;return}
+$('out').innerHTML=j.results.length?j.results.map(x=>`<div class="r"><span class="sc">match ${x.score}</span><h3>${x.question}</h3><p>${x.answer}</p></div>`).join(''):'<p>No match found.</p>'}
+fetch('/metrics').then(r=>r.json()).then(m=>{$('m').textContent=`On ${m.queries} test questions: TF-IDF finds the right answer first ${(m.tfidf_top1*100).toFixed(0)}% of the time, plain word overlap ${(m.overlap_top1*100).toFixed(0)}%.`});
+$('go').onclick=run;$('q').onkeydown=e=>{if(e.key==='Enter')run()};run();
+</script></body></html>
