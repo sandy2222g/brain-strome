@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Text Diff Viewer</title>
+<style>
+:root{--bg:#f3efe6;--ink:#2a2622;--mut:#8b8274;--del:#fbd9d3;--deld:#e4806e;--add:#d5ecd0;--addd:#4f9a49;--line:#d9d1c1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Palatino Linotype",Palatino,Georgia,serif}
+main{max-width:1020px;margin:0 auto;padding:34px 20px}
+h1{font:700 34px/1.1 Palatino,Georgia,serif;margin:0}h1 em{color:var(--deld)}.sub{color:var(--mut);margin:4px 0 22px}
+.ed{display:grid;grid-template-columns:1fr 1fr;gap:14px}.ed label{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)}
+textarea{width:100%;height:150px;border:1px solid var(--line);border-radius:4px;padding:10px;font:13px/1.5 Menlo,Consolas,monospace;background:#fffdf8;color:var(--ink);resize:vertical}
+.sum{margin:18px 0 8px;font-size:15px}.sum b.a{color:var(--addd)}.sum b.d{color:var(--deld)}
+.tbl{border:1px solid var(--line);border-radius:4px;background:#fffdf8;font:13px/1.55 Menlo,Consolas,monospace;overflow:hidden}
+.r{display:grid;grid-template-columns:1fr 1fr}.r>div{padding:2px 12px;white-space:pre-wrap;word-break:break-word;min-height:22px;border-bottom:1px solid #f0eadc}.r>div:first-child{border-right:1px solid var(--line)}
+.r .d{background:var(--del)}.r .a{background:var(--add)}.r .z{background:#f7f3ea}
+.r mark.d{background:#f3a99c;border-radius:2px}.r mark.a{background:#9fd397;border-radius:2px}
+@media(max-width:700px){.ed,.r{grid-template-columns:1fr}.r>div:first-child{border-right:0}}
+</style></head><body><main>
+<h1>What <em>changed</em>?</h1><p class="sub">Paste two versions of a text. See the smallest set of edits that turns one into the other.</p>
+<div class="ed"><div><label>Before</label><textarea id="a"></textarea></div><div><label>After</label><textarea id="b"></textarea></div></div>
+<p class="sum" id="sum"></p><div class="tbl" id="t"></div>
+</main><script>
+const $=i=>document.getElementById(i),esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));let tm;
+function side(words,drop){let h='';for(const w of words){if(w.kind=='eq')h+=esc(w.text);else if(w.kind==drop)h+=`<mark class="${drop=='del'?'d':'a'}">${esc(w.text)}</mark>`}return h}
+async function go(){const r=await fetch('/diff',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({a:$('a').value,b:$('b').value})});const j=await r.json();
+if(!r.ok){$('sum').textContent=j.detail;$('t').innerHTML='';return}
+$('sum').innerHTML=j.edits?`<b class="a">+${j.added}</b> lines added, <b class="d">&minus;${j.deleted}</b> lines removed (${j.edits} edits in total, the fewest possible).`:'The two texts are identical.';
+$('t').innerHTML=j.rows.map(x=>{if(x.kind=='eq')return `<div class="r"><div>${esc(x.text)}</div><div>${esc(x.text)}</div></div>`;
+if(x.kind=='del')return `<div class="r"><div class="d">${esc(x.text)}</div><div class="z"></div></div>`;
+if(x.kind=='add')return `<div class="r"><div class="z"></div><div class="a">${esc(x.text)}</div></div>`;
+return `<div class="r"><div class="d">${side(x.words,'del')}</div><div class="a">${side(x.words,'add')}</div></div>`}).join('')}
+[$('a'),$('b')].forEach(e=>e.oninput=()=>{clearTimeout(tm);tm=setTimeout(go,250)});
+fetch('/sample').then(r=>r.json()).then(d=>{$('a').value=d.a.trimEnd();$('b').value=d.b.trimEnd();go()});
+</script></body></html>
