@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: abjudge-solver
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

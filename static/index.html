@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A/B Test Judge</title>
+<style>
+:root{--bg:#fdf3e7;--ink:#26313f;--a:#e8590c;--b:#1c7ed6;--card:#fff;--ok:#2f9e44;--no:#868e96}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Optima","Candara",sans-serif}
+main{max-width:860px;margin:0 auto;padding:30px 18px;display:grid;grid-template-columns:1fr 1fr;gap:18px}header{grid-column:1/-1}
+h1{margin:0;font-size:36px}h1 b{color:var(--a)}h1 i{color:var(--b)}.sub{margin:4px 0 0;max-width:620px}
+.card{background:var(--card);border-radius:12px;padding:18px;border-top:6px solid var(--ink)}h2{margin:0 0 10px;font-size:14px;text-transform:uppercase;letter-spacing:1.5px}
+.grp{display:grid;grid-template-columns:auto 1fr 1fr;gap:6px 10px;align-items:center}input{font:inherit;width:100%;padding:4px 8px;border:2px solid #d8dde3;border-radius:6px}
+.verdict{margin-top:14px;padding:12px;border-radius:8px;color:#fff;font-weight:700}.verdict.ok{background:var(--ok)}.verdict.no{background:var(--no)}
+.small{font-size:14px;margin-top:8px}.bar{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:14px}.bar div{height:16px;background:var(--a);border-radius:3px}
+@media(max-width:720px){main{grid-template-columns:1fr}}
+</style></head><body><main>
+<header><h1>A/B test <b>judge</b>: <i>is it real?</i></h1><p class="sub">Version B converted better. Is that a real improvement or luck? Enter the counts to find out, plan how much traffic you need, and see why checking early misleads.</p></header>
+<section class="card"><h2>Did B win?</h2><div class="grp"><span></span><b>visitors</b><b>conversions</b>
+<b style="color:var(--a)">A</b><input id="na" type="number" value="2000"><input id="ca" type="number" value="200">
+<b style="color:var(--b)">B</b><input id="nb" type="number" value="2000"><input id="cb" type="number" value="250"></div>
+<div class="verdict" id="v"></div><p class="small" id="d"></p></section>
+<section class="card"><h2>How much traffic?</h2><div class="grp"><span></span><b>base rate</b><b>lift to detect</b><span></span><input id="br" type="number" step="0.01" value="0.10"><input id="ml" type="number" step="0.005" value="0.02"></div>
+<p class="small" id="ss"></p>
+<h2 style="margin-top:18px">The peeking trap</h2><p class="small" style="margin-top:0">Two identical versions, checked repeatedly. How often does a "winner" appear?</p><div id="pk"></div></section>
+</main><script>
+const $=i=>document.getElementById(i);
+async function go(){const body=JSON.stringify({conv_a:+$('ca').value,n_a:+$('na').value,conv_b:+$('cb').value,n_b:+$('nb').value});
+const r=await fetch('/analyse',{method:'POST',headers:{'content-type':'application/json'},body});if(!r.ok){$('v').textContent='Check the numbers.';$('v').className='verdict no';return}
+const j=await r.json();$('v').textContent=j.significant?'Yes: B is different from A (p = '+j.p_value+')':'Not proven (p = '+j.p_value+')';$('v').className='verdict '+(j.significant?'ok':'no');
+$('d').textContent=`A converts ${(j.rate_a*100).toFixed(1)}%, B ${(j.rate_b*100).toFixed(1)}%. The true lift is likely between ${(j.ci_low*100).toFixed(1)} and ${(j.ci_high*100).toFixed(1)} percentage points.`}
+async function size(){const j=await (await fetch(`/sample-size?base_rate=${$('br').value}&min_lift=${$('ml').value}`)).json();$('ss').textContent=j.per_variant?`You need about ${j.per_variant.toLocaleString()} visitors per version.`:'Check the numbers.'}
+['na','ca','nb','cb'].forEach(i=>$(i).oninput=go);['br','ml'].forEach(i=>$(i).oninput=size);go();size();
+fetch('/peeking').then(r=>r.json()).then(d=>{$('pk').innerHTML=Object.entries(d.rates).map(([k,v])=>`<div class="bar"><span style="width:90px">${k} look${k>1?'s':''}</span><div style="width:${v*300}px"></div><b>${(v*100).toFixed(0)}%</b></div>`).join('')+'<p class="small">An honest single look is wrong about 5% of the time.</p>'});
+</script></body></html>
