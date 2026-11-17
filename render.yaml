@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: coupon-stack-chooser
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

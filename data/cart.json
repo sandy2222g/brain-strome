@@ -1,0 +1,10 @@
+{"subtotal": 120.0, "shipping": 8.0,
+ "coupons": [
+  {"code": "SAVE20", "kind": "percent", "value": 20, "min_spend": 100, "group": "site", "max_off": 25},
+  {"code": "WELCOME15", "kind": "percent", "value": 15, "min_spend": 0, "group": "new-customer", "max_off": 30},
+  {"code": "FIVEOFF", "kind": "fixed", "value": 5, "min_spend": 30, "group": "app"},
+  {"code": "TENOFF75", "kind": "fixed", "value": 10, "min_spend": 75, "group": "site"},
+  {"code": "FREESHIP", "kind": "shipping", "value": 0, "min_spend": 50, "group": "shipping"},
+  {"code": "BIGSPEND", "kind": "fixed", "value": 25, "min_spend": 200, "group": "app"},
+  {"code": "LOYAL8", "kind": "percent", "value": 8, "min_spend": 0, "group": "loyalty"}
+ ]}

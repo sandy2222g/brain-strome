@@ -1,0 +1,29 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coupon Stack Chooser</title>
+<style>
+:root{--bg:#2b2b2b;--paper:#fbfaf3;--ink:#1a1a1a;--red:#c0392b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#eee;font:14px/1.5 "Courier New",monospace;padding:30px}
+main{max-width:980px;margin:auto}h1{margin:0 0 4px;font-size:26px;letter-spacing:3px}p.s{margin:0 0 20px;opacity:.7}
+.cols{display:grid;grid-template-columns:1.1fr 1fr;gap:24px;align-items:start}@media(max-width:800px){.cols{grid-template-columns:1fr}}
+.pane{background:#383838;border-radius:6px;padding:16px}.pane h2{margin:0 0 10px;font-size:14px;letter-spacing:2px}
+table{width:100%;border-collapse:collapse}td,th{padding:4px 6px;text-align:left;font-size:13px}th{opacity:.6;font-weight:400}tr.on td{color:#8fe388}
+.in{display:flex;gap:10px;margin-bottom:12px}.in label{font-size:11px;opacity:.7;display:block}input{width:90px;background:#222;border:1px solid #666;color:#fff;font:inherit;padding:4px}
+button{background:#f2c94c;border:0;font:inherit;font-weight:700;padding:7px 16px;cursor:pointer;margin-top:8px}
+.receipt{background:var(--paper);color:var(--ink);padding:20px 22px;box-shadow:0 8px 0 #0004;clip-path:polygon(0 0,100% 0,100% calc(100% - 10px),96% 100%,92% calc(100% - 10px),88% 100%,84% calc(100% - 10px),80% 100%,76% calc(100% - 10px),72% 100%,68% calc(100% - 10px),64% 100%,60% calc(100% - 10px),56% 100%,52% calc(100% - 10px),48% 100%,44% calc(100% - 10px),40% 100%,36% calc(100% - 10px),32% 100%,28% calc(100% - 10px),24% 100%,20% calc(100% - 10px),16% 100%,12% calc(100% - 10px),8% 100%,4% calc(100% - 10px),0 100%)}
+.receipt h2{text-align:center;margin:0 0 8px;font-size:16px;letter-spacing:3px}.ln{display:flex;justify-content:space-between}.dash{border-top:2px dashed #999;margin:8px 0}
+.tot{font-size:22px;font-weight:700}.sv{color:var(--red);text-align:center;margin-top:8px}.base{opacity:.65;font-size:12px;margin-top:6px}#err{color:#ff8a80}
+</style></head><body><main>
+<h1>COUPON STACK CHOOSER</h1><p class="s">Which coupons to combine for the lowest total. Groups can't stack; minimum spends apply.</p>
+<div class="cols"><div class="pane"><h2>CART & COUPONS</h2><div class="in"><div><label>Subtotal</label><input id="s" type="number"></div><div><label>Shipping</label><input id="h" type="number"></div></div>
+<table><thead><tr><th>Code</th><th>Kind</th><th>Value</th><th>Min</th><th>Group</th></tr></thead><tbody id="tb"></tbody></table><button id="go">Find best stack</button> <span id="err"></span></div>
+<div class="receipt" id="r"></div></div></main>
+<script>
+let D;const $=i=>document.getElementById(i);const m=x=>'$'+x.toFixed(2);
+async function run(){$('err').textContent='';const r=await fetch('/choose',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subtotal:+$('s').value,shipping:+$('h').value,coupons:D.coupons})});
+const j=await r.json();if(!r.ok){$('err').textContent=j.detail;return}
+[...$('tb').children].forEach((tr,i)=>tr.className=j.best.coupons.includes(D.coupons[i].code)?'on':'');
+$('r').innerHTML=`<h2>RECEIPT</h2><div class="ln"><span>Subtotal</span><span>${m(+$('s').value)}</span></div><div class="ln"><span>Shipping</span><span>${m(+$('h').value)}</span></div><div class="dash"></div>`+
+j.best.discounts.map(d=>`<div class="ln"><span>${d.code}</span><span>-${m(d.off)}</span></div>`).join('')+`<div class="dash"></div><div class="ln tot"><span>TOTAL</span><span>${m(j.best.total)}</span></div><div class="sv">YOU SAVED ${m(j.best.saved)}</div><div class="base">Best single % coupon only: ${m(j.baseline.total)} — ${m(j.extra_saved)} more.</div>`}
+fetch('/sample').then(r=>r.json()).then(d=>{D=d;$('s').value=d.subtotal;$('h').value=d.shipping;$('tb').innerHTML=d.coupons.map(c=>`<tr><td>${c.code}</td><td>${c.kind}</td><td>${c.kind==='percent'?c.value+'%':c.kind==='fixed'?m(c.value):'free'}</td><td>${c.min_spend}</td><td>${c.group}</td></tr>`).join('');run()});
+$('go').onclick=run;
+</script></body></html>
