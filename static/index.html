@@ -1,0 +1,29 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Autocomplete Trie Search</title>
+<style>
+:root{--bg:#10231c;--ink:#e9f5ee;--lime:#b6f23a;--mint:#2fd1a0;--pan:#17352b;--mut:#86a898}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Inter","Helvetica Neue",Arial,sans-serif;padding:40px 20px}
+main{max-width:620px;margin:0 auto}h1{font-size:40px;margin:0;font-weight:800;letter-spacing:-1.5px}h1 span{color:var(--lime)}
+p.s{color:var(--mut);margin:6px 0 26px}
+.box{position:relative}input{width:100%;font:inherit;font-size:22px;padding:16px 20px;border-radius:14px;border:2px solid var(--mint);background:var(--pan);color:var(--ink);outline:none}
+input:focus{border-color:var(--lime)}
+ul{list-style:none;margin:10px 0 0;padding:0;background:var(--pan);border-radius:14px;overflow:hidden}
+li{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid #214a3c}li:last-child{border:0}
+li b{font-weight:600}li em{font-style:normal;font-size:12px;color:var(--bg);background:var(--lime);padding:2px 8px;border-radius:99px;margin-left:10px}
+li small{color:var(--mut)}.mode{font-size:13px;color:var(--mut);margin:10px 4px;min-height:20px}.mode b{color:var(--lime)}
+.m{margin-top:30px;font-size:13px;color:var(--mut)}.m b{color:var(--lime)}
+</style></head><body><main>
+<h1>Type <span>fast.</span><br>Typos <span>fine.</span></h1><p class="s">Autocomplete over 158 world cities, using a trie and edit distance.</p>
+<div class="box"><input id="q" autofocus placeholder="Try  lon  or  Londno  or  Pariss" autocomplete="off"></div>
+<div class="mode" id="mode"></div><ul id="list"></ul>
+<p class="m" id="ev"></p></main>
+<script>
+const $=i=>document.getElementById(i);let tm;
+async function go(){const q=$('q').value;
+if(!q.trim()){$('list').innerHTML='';$('mode').textContent='';return}
+const r=await (await fetch('/suggest?q='+encodeURIComponent(q))).json();
+$('mode').innerHTML=r.mode==='fuzzy'?(r.results.length?'No name starts with that, so showing <b>closest spellings</b>':'Nothing close enough'):'Prefix match';
+$('list').innerHTML=r.results.map(x=>`<li><span><b>${x.name}</b>${x.edits?`<em>${x.edits} edit${x.edits>1?'s':''}</em>`:''}</span><small>popularity ${x.score}</small></li>`).join('')}
+$('q').addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(go,80)});
+fetch('/evaluation').then(r=>r.json()).then(e=>{$('ev').innerHTML=`On ${e.queries} mistyped searches the right city appears in the top 5 <b>${Math.round(e.fuzzy_recall*100)}%</b> of the time, vs <b>${(e.baseline_recall*100).toFixed(1)}%</b> for a prefix-only search.`});
+</script></body></html>
