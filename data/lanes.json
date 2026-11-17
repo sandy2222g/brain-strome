@@ -1,0 +1,10 @@
+{
+  "note": "Invented store layout and speeds; no real shop.",
+  "items": 14,
+  "lanes": [
+    {"name": "Express", "seconds_per_item": 2.0, "overhead": 30, "item_limit": 10, "ahead": [4, 6]},
+    {"name": "Till A", "seconds_per_item": 2.5, "overhead": 40, "item_limit": null, "ahead": [40, 35]},
+    {"name": "Till B", "seconds_per_item": 2.0, "overhead": 35, "item_limit": null, "ahead": [8, 6, 5, 12]},
+    {"name": "Self-service", "seconds_per_item": 4.5, "overhead": 20, "item_limit": 25, "ahead": [9, 4, 7, 10]}
+  ]
+}

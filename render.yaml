@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: checkout-line-chooser
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

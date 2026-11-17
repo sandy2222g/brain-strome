@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Checkout Line Chooser</title>
+<style>
+:root{--bg:#e9e1f5;--ink:#2e1f4a;--card:#fff;--best:#2e1f4a;--mute:#6f5f8f;--warn:#b3412f}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 ui-monospace,Menlo,Consolas,monospace}
+main{max-width:560px;margin:0 auto;padding:28px 16px}
+h1{margin:0 0 4px;font-size:1.5rem;letter-spacing:-.5px}p{color:var(--mute);margin:.3rem 0 1rem}
+label{display:block;margin-bottom:12px}input{font:inherit;width:90px;padding:.35rem;border:2px solid var(--ink);background:var(--card);color:var(--ink)}
+button{background:var(--ink);color:var(--bg);border:0;padding:.55rem 1rem;font:inherit;cursor:pointer;margin-left:8px}
+.lane{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:2px solid var(--ink);padding:12px 14px;margin:10px 0;border-radius:14px}
+.lane.best{background:var(--best);color:var(--bg)}.lane.no{opacity:.55;border-style:dashed}
+.lane b{font-size:1.1rem}.t{font-size:1.3rem}.sub{font-size:.8rem;color:var(--mute)}.best .sub{color:#cdbfe8}
+.note{margin-top:14px;padding:10px 14px;border-left:6px solid var(--warn);background:var(--card)}
+</style></head><body><main>
+<h1>Checkout line chooser</h1>
+<p>The shortest queue is not always the fastest one.</p>
+<label>Items in my basket <input id="n" type="number" min="1" max="500" value="14"><button id="go">Pick a line</button></label>
+<div id="out"></div></main>
+<script>
+const out=document.getElementById("out"),fmt=s=>`${Math.floor(s/60)}m ${String(Math.round(s%60)).padStart(2,"0")}s`;
+let sample;
+async function run(){
+  sample=sample||await (await fetch("/sample")).json();
+  const items=+document.getElementById("n").value;
+  const r=await (await fetch("/pick",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lanes:sample.lanes,items})})).json();
+  if(!r.rows){out.textContent="Check the basket size.";return}
+  out.innerHTML=r.rows.map(x=>`<div class="lane ${x.name===r.best?"best":""} ${x.eligible?"":"no"}"><div><b>${x.name}</b><div class="sub">${x.people_ahead} ahead${x.eligible?"":" · basket too big"}</div></div><div class="t">${x.eligible?fmt(x.seconds):"—"}</div></div>`).join("")
+   +(r.fewest_people!==r.best?`<div class="note">Joining the shortest queue (${r.fewest_people}) would cost you ${fmt(r.extra_seconds_if_fewest_people)} more.</div>`:`<div class="note">Here the shortest queue is also the fastest.</div>`);
+}
+document.getElementById("go").onclick=run;run();
+</script></body></html>
