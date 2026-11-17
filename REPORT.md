@@ -3,4 +3,4 @@ Decisions: from-scratch parser and engine, no eval(). Excel-compatible precedenc
 
 | project | branch | tests | docker | CI | pushed | deployed | blockers |
 |---|---|---|---|---|---|---|---|
-| Mini Spreadsheet | mini-spreadsheet | 11 pass | builds, /health ok locally | workflow present | yes | no | deploy needs owner account |
+| Mini Spreadsheet | mini-spreadsheet | 11 pass | local build blocked (Docker Hub 429 twice); CI docker job is the check | workflow present | yes | no | deploy needs owner account; local Docker blocked by Docker Hub 429 |
