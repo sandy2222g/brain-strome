@@ -1,0 +1,36 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maze Lab</title>
+<style>
+:root{--bg:#1b1a17;--paper:#f3e9d2;--ink:#2a2118;--amber:#f2a93b;--teal:#3fb5a3;--rose:#e0566e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--paper);font:16px/1.5 "Courier New",ui-monospace,monospace}
+main{max-width:980px;margin:0 auto;padding:26px 16px}h1{margin:0;color:var(--amber);font-size:30px;letter-spacing:3px;text-transform:uppercase}
+.sub{margin:4px 0 18px;opacity:.75}.stage{background:var(--paper);padding:10px;border-radius:4px}canvas{width:100%;display:block;image-rendering:pixelated}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 12px}select,button,input{font:inherit;background:transparent;color:var(--paper);border:1px solid var(--amber);padding:3px 10px}
+button{cursor:pointer;color:var(--amber)}button:hover{background:var(--amber);color:var(--ink)}input{width:80px}
+.legend span{display:inline-block;margin-right:14px}.dot{display:inline-block;width:10px;height:10px;margin-right:5px}
+table{width:100%;border-collapse:collapse;margin-top:22px;font-size:14px}th{color:var(--teal);text-transform:uppercase;font-size:12px;letter-spacing:1px}td,th{padding:5px 8px;border-bottom:1px dashed #5a5242;text-align:right}th:first-child,td:first-child{text-align:left}
+.note{opacity:.7;font-size:13px}
+</style></head><body><main>
+<h1>Maze lab</h1><p class="sub">Three ways to carve a maze, three ways to solve it. Same size, very different personalities.</p>
+<div class="bar"><select id="alg"></select><label>seed <input id="seed" type="number" value="1"></label><button id="go">new maze</button><span id="stat"></span></div>
+<div class="bar legend"><span><i class="dot" style="background:#f2a93b"></i>the route from top-left to bottom-right</span></div>
+<div class="stage"><canvas id="c" width="900" height="630"></canvas></div>
+<table id="t"></table>
+<p class="note">Table: averages over 60 mazes of 25x25. "looked at" = cells a solver visited before finding the exit.</p>
+</main><script>
+const $=i=>document.getElementById(i);
+async function load(){const j=await (await fetch(`/maze?width=24&height=16&algorithm=${$('alg').value}&seed=${$('seed').value}`)).json();
+const cv=$('c'),x=cv.getContext('2d'),s=Math.floor(Math.min(900/j.width,630/j.height)),ox=(900-s*j.width)/2,oy=(630-s*j.height)/2;
+x.fillStyle='#f3e9d2';x.fillRect(0,0,900,630);
+const open=new Set(j.passages.map(p=>p.join(',')));
+function fill(cells,col){x.fillStyle=col;cells.forEach(([a,b])=>x.fillRect(ox+a*s+2,oy+b*s+2,s-3,s-3))}
+const route=j.solutions.astar.path;fill(route,'#f2a93b');
+x.strokeStyle='#2a2118';x.lineWidth=2;x.beginPath();
+for(let a=0;a<j.width;a++)for(let b=0;b<j.height;b++){
+ if(!open.has(`${a},${b},${a+1},${b}`))x.moveTo(ox+(a+1)*s,oy+b*s),x.lineTo(ox+(a+1)*s,oy+(b+1)*s);
+ if(!open.has(`${a},${b},${a},${b+1}`))x.moveTo(ox+a*s,oy+(b+1)*s),x.lineTo(ox+(a+1)*s,oy+(b+1)*s);}
+x.moveTo(ox,oy);x.lineTo(ox,oy+j.height*s);x.moveTo(ox,oy);x.lineTo(ox+j.width*s,oy);x.stroke();
+const sol=j.solutions;$('stat').textContent=`route ${sol.bfs.path.length} cells, ${j.dead_ends} dead ends; looked at: BFS ${sol.bfs.expanded}, DFS ${sol.dfs.expanded}, A* ${sol.astar.expanded}`}
+fetch('/compare').then(r=>r.json()).then(d=>{$('alg').innerHTML=d.algorithms.map(a=>`<option>${a}</option>`).join('');$('go').onclick=load;$('alg').onchange=load;load();
+$('t').innerHTML='<tr><th>generator</th><th>route length</th><th>dead ends</th><th>BFS looked at</th><th>DFS</th><th>A*</th></tr>'+d.rows.map(r=>`<tr><td>${r.generator}</td><td>${r.length}</td><td>${r.dead}</td><td>${r.bfs}</td><td>${r.dfs}</td><td>${r.astar}</td></tr>`).join('')});
+</script></body></html>

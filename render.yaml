@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: maze-lab
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
