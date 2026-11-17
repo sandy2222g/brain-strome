@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: storage-cleanup-picker
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

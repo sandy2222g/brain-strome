@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Storage Cleanup Picker</title>
+<style>
+:root{--bg:#fff;--ink:#111;--mute:#777;--o:#ff5a1f;--line:#e3e3e3}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Helvetica,Arial,sans-serif;padding:36px}
+main{max-width:1040px;margin:auto}h1{font-size:56px;line-height:1;margin:0 0 6px;letter-spacing:-2px;font-weight:800}h1 span{color:var(--o)}
+p.s{color:var(--mute);margin:0 0 26px}.ctl{display:flex;gap:12px;align-items:end;margin-bottom:24px;border-top:3px solid var(--ink);padding-top:14px}
+input{font:inherit;font-size:20px;border:0;border-bottom:2px solid var(--ink);width:150px;padding:2px 0;background:none}
+label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--mute);display:block}
+button{background:var(--ink);color:#fff;border:0;padding:10px 20px;font-weight:700;cursor:pointer}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:40px}@media(max-width:800px){.cols{grid-template-columns:1fr}}
+.big{font-size:84px;font-weight:800;line-height:1;letter-spacing:-3px}.big small{font-size:16px;letter-spacing:0;color:var(--mute);font-weight:400}
+.opt .big{color:var(--o)}h2{font-size:12px;text-transform:uppercase;letter-spacing:2px;margin:0 0 4px}
+ul{list-style:none;padding:0;margin:14px 0 0}li{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0}
+li i{font-style:normal;color:var(--mute)}.bar{height:10px;background:var(--line);margin-top:12px}.bar b{display:block;height:100%;background:var(--o)}
+.win{margin-top:22px;font-size:18px;font-weight:700}#err{color:#c00}
+</style></head><body><main>
+<h1>Free the space.<br><span>Keep what matters.</span></h1><p class="s">Delete the least valuable files that still free what you need.</p>
+<div class="ctl"><div><label>Space needed (MB)</label><input id="t" type="number"></div><button id="go">Pick files</button><span id="err"></span></div>
+<div class="cols"><div class="opt"><h2>Optimal</h2><div class="big" id="ov"></div><div class="bar"><b id="ob"></b></div><ul id="ol"></ul></div>
+<div><h2>Delete biggest first</h2><div class="big" id="bv"></div><div class="bar"><b id="bb" style="background:#111"></b></div><ul id="bl"></ul></div></div>
+<p class="win" id="win"></p></main>
+<script>
+const $=i=>document.getElementById(i);let D;
+const list=(o,l,v,b)=>{$(v).innerHTML=`${o.value_lost}<small> value lost · ${o.freed_mb} MB freed</small>`;$(l).innerHTML=o.delete.map(x=>`<li>${x.name}<i>${x.mb} MB · keep ${x.keep}</i></li>`).join('');$(b).style.width=Math.min(100,o.freed_mb/D.total*100)+'%'};
+async function run(){$('err').textContent='';const r=await fetch('/pick',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target_mb:+$('t').value,items:D.items})});
+const j=await r.json();if(!r.ok){$('err').textContent=j.detail;return}
+list(j.optimal,'ol','ov','ob');list(j.biggest_first,'bl','bv','bb');$('win').textContent=`Same job, ${j.value_saved} less value thrown away.`}
+fetch('/sample').then(r=>r.json()).then(d=>{D=d;D.total=d.items.reduce((a,x)=>a+x.mb,0);$('t').value=d.target_mb;run()});$('go').onclick=run;
+</script></body></html>

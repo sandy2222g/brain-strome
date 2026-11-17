@@ -1,0 +1,17 @@
+{"target_mb": 5000,
+ "items": [
+  {"name": "Holiday videos 2023", "mb": 4200, "keep": 9},
+  {"name": "Old game installers", "mb": 3100, "keep": 2},
+  {"name": "Podcast downloads", "mb": 1800, "keep": 3},
+  {"name": "Screenshots folder", "mb": 950, "keep": 2},
+  {"name": "Wedding photos", "mb": 2600, "keep": 10},
+  {"name": "Offline maps", "mb": 1400, "keep": 6},
+  {"name": "Lecture recordings", "mb": 2200, "keep": 5},
+  {"name": "App caches", "mb": 1300, "keep": 1},
+  {"name": "Music library", "mb": 3400, "keep": 7},
+  {"name": "Duplicate photos", "mb": 1700, "keep": 1},
+  {"name": "Old backups", "mb": 2900, "keep": 4},
+  {"name": "Downloaded movies", "mb": 4800, "keep": 5},
+  {"name": "Tax scans", "mb": 300, "keep": 10},
+  {"name": "Meme collection", "mb": 800, "keep": 3}
+ ]}
