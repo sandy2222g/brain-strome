@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: pagerank-lab
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
