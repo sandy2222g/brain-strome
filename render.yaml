@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: town-bridge-finder
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

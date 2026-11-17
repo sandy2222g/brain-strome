@@ -1,0 +1,8 @@
+{"note": "An invented town. Places and roads are made up for this repo.",
+ "places": {"Market": [48, 42], "Library": [40, 55], "School": [28, 50], "Park": [34, 34], "Bakery": [54, 56], "Hospital": [22, 66],
+            "Station": [60, 24], "Mill": [74, 14], "Farm": [88, 28], "Church": [76, 40], "Harbour": [60, 70], "Lighthouse": [72, 84],
+            "Quarry": [94, 48], "Hill": [92, 68], "Castle": [88, 52]},
+ "roads": [["Market", "Library"], ["Library", "School"], ["School", "Park"], ["Park", "Market"], ["Market", "Bakery"],
+           ["Bakery", "Library"], ["School", "Hospital"], ["Hospital", "Library"], ["Park", "Station"], ["Station", "Mill"],
+           ["Mill", "Farm"], ["Farm", "Church"], ["Church", "Station"], ["Market", "Harbour"], ["Harbour", "Lighthouse"],
+           ["Farm", "Quarry"], ["Quarry", "Hill"], ["Church", "Castle"]]}

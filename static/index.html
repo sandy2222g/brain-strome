@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Town Bridge Finder</title>
+<style>
+:root{--paper:#e9e4c8;--ink:#3b3522;--riv:#3f7fa6;--red:#c4402f;--grn:#5d7a3a;--card:#f4f0dc}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 Georgia,"Times New Roman",serif}
+main{max-width:980px;margin:0 auto;padding:28px 18px;display:grid;grid-template-columns:1.5fr 1fr;gap:22px}
+header{grid-column:1/-1}h1{font:italic 700 36px/1 Georgia,serif;margin:0}h1 b{color:var(--red);font-style:normal}.sub{margin:4px 0 0;opacity:.75}
+.map{background:var(--card);border:2px solid var(--ink);border-radius:4px;padding:6px}svg{width:100%;display:block}
+.road{stroke:var(--ink);stroke-width:1.2;cursor:pointer}.road.br{stroke:var(--red);stroke-width:1.8;stroke-dasharray:3 2}.road.closed{stroke:#aaa;stroke-dasharray:1 2;stroke-width:1}
+.hit{stroke:transparent;stroke-width:6;cursor:pointer}
+.pl text{font-size:3.2px;fill:var(--ink);text-anchor:middle}.pl circle{fill:var(--card);stroke:var(--ink);stroke-width:.7}.pl.j circle{fill:#f3c34c}
+.side h2{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin:0 0 6px}.side p{margin:0 0 14px}.box{background:var(--card);border:1px solid var(--ink);padding:12px 14px;margin-bottom:14px}
+.piece{display:inline-block;margin:2px 4px 2px 0;padding:1px 8px;border-radius:10px;font-size:13px;color:#fff}ul{padding-left:18px;margin:4px 0}li{font-size:14px}
+.key span{display:inline-block;width:22px;height:0;border-top:2px dashed var(--red);margin-right:6px;vertical-align:middle}.key i{display:inline-block;width:11px;height:11px;border-radius:50%;background:#f3c34c;border:1px solid var(--ink);margin:0 6px 0 14px;vertical-align:middle}
+@media(max-width:760px){main{grid-template-columns:1fr}}
+</style></head><body><main>
+<header><h1>Which road <b>can't</b> we lose?</h1><p class="sub">Click any road to close it. Dashed red roads are bridges: closing one cuts the town in two.</p></header>
+<div><div class="map"><svg id="m" viewBox="0 0 110 96"></svg></div><p class="key" style="font-size:13px"><span></span>bridge road<i></i>junction whose loss splits the town</p></div>
+<div class="side"><div class="box"><h2>Result</h2><div id="res">Click a road on the map.</div></div>
+<div class="box"><h2>Best new roads to build</h2><ul id="sug"></ul></div></div>
+</main><script>
+const $=i=>document.getElementById(i);let T,closed=null;const cols=['#5d7a3a','#c4402f','#3f7fa6','#a0731f'];
+const isBr=(a,b)=>T.bridges.some(e=>(e[0]==a&&e[1]==b)||(e[0]==b&&e[1]==a));
+function draw(){let s='';T.roads.forEach(([a,b])=>{const [x1,y1]=T.places[a],[x2,y2]=T.places[b];const cl=closed&&((closed[0]==a&&closed[1]==b)||(closed[0]==b&&closed[1]==a));
+s+=`<line class="road${isBr(a,b)?' br':''}${cl?' closed':''}" x1="${x1+5}" y1="${y1}" x2="${x2+5}" y2="${y2}"/><line class="hit" data-a="${a}" data-b="${b}" x1="${x1+5}" y1="${y1}" x2="${x2+5}" y2="${y2}"/>`});
+Object.entries(T.places).forEach(([n,[x,y]])=>{s+=`<g class="pl${T.junctions.includes(n)?' j':''}"><circle cx="${x+5}" cy="${y}" r="1.9"/><text x="${x+5}" y="${y-3}">${n}</text></g>`});$('m').innerHTML=s}
+async function pick(a,b){closed=[a,b];draw();const r=await (await fetch(`/close?a=${a}&b=${b}`)).json();
+$('res').innerHTML=`<p><b>${a} &ndash; ${b}</b> closed. ${r.split?'<b style="color:#c4402f">The town splits into '+r.pieces.length+' pieces:</b>':'Everyone can still reach everyone.'}</p>`+(r.split?r.pieces.map((p,i)=>`<span class="piece" style="background:${cols[i%4]}">${p.length==1?p[0]:p.length+' places'}</span>`).join('')+'<ul>'+r.pieces.map(p=>`<li>${p.join(', ')}</li>`).join('')+'</ul>':'')}
+fetch('/town').then(r=>r.json()).then(t=>{T=t;draw();$('m').onclick=e=>{const l=e.target.closest('.hit');if(l)pick(l.dataset.a,l.dataset.b)};
+$('sug').innerHTML=t.suggestions.map(x=>`<li>${x.road[0]} &ndash; ${x.road[1]}: leaves ${x.bridges_left} bridge${x.bridges_left==1?'':'s'} (fixes ${x.fixed})</li>`).join('')});
+</script></body></html>
