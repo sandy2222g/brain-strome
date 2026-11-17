@@ -4,3 +4,5 @@ Decisions: pure Python (no Pillow). First scoring used 4x4 blocks, which made or
 | project | branch | tests | docker | CI | pushed | deployed | blockers |
 |---|---|---|---|---|---|---|---|
 | Dither Lab | dither-lab | 10 pass | builds, /health ok locally | workflow present | yes | no | deploy needs owner account |
+
+Fix: CI docker job failed because Dockerfile copied an empty, untracked data/ directory (data is generated in code). Removed that COPY line. Found by reading CI results, not by the local build, which had the empty directory on disk.
