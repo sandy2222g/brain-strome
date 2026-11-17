@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: habit-streak-keeper
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

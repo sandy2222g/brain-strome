@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Habit Streak Keeper</title>
+<style>
+:root{--bg:#f6fbf9;--ink:#0b3d3a;--teal:#17a589;--miss:#e3ece9;--mute:#5a7a75}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Avenir Next",Avenir,"Helvetica Neue",sans-serif}
+main{max-width:640px;margin:0 auto;padding:34px 18px}h1{margin:0;font-size:1.8rem;font-weight:600}p{color:var(--mute)}
+.nums{display:flex;gap:28px;margin:18px 0}.nums div b{display:block;font-size:2.8rem;line-height:1;color:var(--teal)}.nums span{font-size:.85rem;color:var(--mute)}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:340px}.c{aspect-ratio:1;border-radius:6px;background:var(--miss)}
+.c.done{background:var(--teal)}.c.future{background:transparent;border:1px dashed var(--miss)}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:340px;font-size:.75rem;color:var(--mute);margin-bottom:4px}
+.note{margin-top:20px;border-top:1px solid var(--miss);padding-top:12px}
+</style></head><body><main>
+<h1 id="h"></h1><p id="sub"></p>
+<div class="nums" id="nums"></div>
+<div class="days"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+<div class="grid" id="grid"></div><div class="note" id="note"></div></main>
+<script>
+(async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/streak",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({done:s.done,today:s.today,grace_days:s.grace_days})})).json();
+  document.getElementById("h").textContent=s.habit;
+  document.getElementById("sub").textContent=`${r.streak.total_checkins} check-ins · ${s.grace_days} missed day allowed`;
+  const n=(v,l)=>`<div><b>${v}</b><span>${l}</span></div>`;
+  document.getElementById("nums").innerHTML=n(r.streak.current,"current streak")+n(r.streak.longest,"longest streak")+n(r.strict.current,"strict current");
+  document.getElementById("grid").innerHTML=r.heatmap.flat().map(c=>`<div class="c ${c}"></div>`).join("");
+  document.getElementById("note").textContent=`With no grace day one slip resets the current streak to ${r.strict.current}; with one grace day it stays ${r.streak.current}.`;
+})();
+</script></body></html>
