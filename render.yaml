@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: potluck-dish-matcher
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

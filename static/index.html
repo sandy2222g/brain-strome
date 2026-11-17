@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Potluck Dish Matcher</title>
+<style>
+:root{--red:#c62828;--ink:#3a1212;--paper:#fffafa;--mute:#8a5a5a}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);font:17px/1.4 "Baskerville","Palatino Linotype",serif;
+background-color:#fff;background-image:linear-gradient(90deg,#c6282826 50%,transparent 50%),linear-gradient(#c6282826 50%,transparent 50%);background-size:48px 48px}
+main{max-width:900px;margin:0 auto;padding:28px 16px}.top{background:var(--paper);padding:14px 20px;border:3px double var(--red);margin-bottom:20px}
+h1{margin:0;font-size:2rem;color:var(--red);font-style:italic}p{margin:4px 0 0;color:var(--mute)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.col{background:var(--paper);border-top:8px solid var(--red);padding:10px 14px;box-shadow:3px 3px 0 #c6282855}.col h3{margin:0 0 6px;font-size:.9rem;text-transform:uppercase;letter-spacing:2px;color:var(--red)}
+.col div{padding:3px 0;border-bottom:1px dotted #d9b3b3}.col .gap{color:var(--red);font-style:italic}
+.cmp{margin-top:20px;background:var(--paper);border-left:8px solid var(--red);padding:10px 16px}
+</style></head><body><main>
+<div class="top"><h1>Who brings what?</h1><p id="sub"></p></div>
+<div class="cols" id="cols"></div><div class="cmp" id="cmp"></div></main>
+<script>
+(async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({needs:s.needs,guests:s.guests})})).json();
+  document.getElementById("sub").textContent=`${s.guests.length} guests, ${r.best.slots} dishes needed.`;
+  document.getElementById("cols").innerHTML=Object.entries(r.best.assignment).map(([c,n])=>`<div class="col"><h3>${c}</h3>${n.map(x=>`<div class="${x?"":"gap"}">${x||"nobody yet"}</div>`).join("")}</div>`).join("");
+  const f=r.first_come;
+  document.getElementById("cmp").textContent=`Matching fills ${r.best.filled} of ${r.best.slots}. Letting each guest take the first dish they can, in order, fills only ${f.filled}: ${f.missing.join(", ")||"none"} left empty while ${f.unassigned_guests.join(", ")||"nobody"} brings nothing.`;
+})();
+</script></body></html>

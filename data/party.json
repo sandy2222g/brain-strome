@@ -1,0 +1,11 @@
+{"note": "Invented guests and dishes.",
+ "needs": {"Main": 2, "Salad": 1, "Dessert": 2, "Drinks": 1, "Bread": 1},
+ "guests": [
+  {"name": "Ana", "can": ["Main", "Dessert", "Salad"]},
+  {"name": "Ben", "can": ["Main"]},
+  {"name": "Chen", "can": ["Dessert", "Bread"]},
+  {"name": "Dara", "can": ["Main", "Salad"]},
+  {"name": "Eve", "can": ["Dessert"]},
+  {"name": "Finn", "can": ["Drinks", "Bread"]},
+  {"name": "Gia", "can": ["Salad", "Drinks"]}
+ ]}
