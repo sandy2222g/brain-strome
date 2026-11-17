@@ -20,7 +20,7 @@ Passwords are analysed in memory only and never stored or logged.
 | password | bits | verdict |
 |---|---|---|
 | letmein | 10 | very weak (common) |
-| Tr0ub4dor&3 | about 29 | weak: a word with predictable tweaks |
+| Tr0ub4dor&3 | 31.1 | weak: a word with predictable tweaks |
 | qzvmtbhs | 37.6 | weak: 8 random lowercase letters = 8 x log2(26) |
 | correct horse battery staple | 61.6 | strong (4 words, not 164 bits as a naive count says) |
 
