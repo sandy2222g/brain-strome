@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sleep Cycle Planner</title>
+<style>
+:root{--bg:#f3e3d0;--ink:#3b2418;--clay:#c2562f;--mute:#8a6a55;--line:#d9b99c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 Georgia,"Times New Roman",serif}
+main{max-width:620px;margin:0 auto;padding:34px 18px}
+h1{font-size:2.3rem;margin:0;font-style:italic;color:var(--clay)}p{color:var(--mute)}
+input{font:inherit;padding:.3rem .5rem;border:0;border-bottom:2px solid var(--ink);background:transparent;width:110px}
+button{font:inherit;background:var(--clay);color:#fff;border:0;border-radius:30px;padding:.4rem 1.2rem;margin-left:10px;cursor:pointer}
+ol{list-style:none;margin:26px 0 0;padding:0 0 0 26px;border-left:3px solid var(--clay)}
+li{position:relative;padding:0 0 22px 18px}li:before{content:"";position:absolute;left:-36px;top:6px;width:14px;height:14px;border-radius:50%;background:var(--clay)}
+li b{font-size:1.7rem}li span{color:var(--mute);margin-left:8px}
+.warn{border-top:1px solid var(--line);padding-top:14px;margin-top:6px;font-size:.95rem}
+</style></head><body><main>
+<h1>When should I go to bed?</h1>
+<p>Count back from your alarm in whole 90-minute cycles.</p>
+<label>Wake-up time <input id="w" value="06:45"></label><button id="go">Plan</button>
+<ol id="out"></ol><div class="warn" id="w8"></div></main>
+<script>
+async function run(){
+  const r=await (await fetch("/plan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({wake:document.getElementById("w").value})})).json();
+  if(!r.options){document.getElementById("out").innerHTML="<li>Use HH:MM, e.g. 06:45</li>";return}
+  document.getElementById("out").innerHTML=r.options.map(o=>`<li><b>${o.in_bed}</b><span>${o.cycles} cycles · ${o.sleep_hours} h asleep</span></li>`).join("");
+  const c=r.eight_hour_check;
+  document.getElementById("w8").textContent=`Plain "8 hours" bedtime (${r.eight_hour_bed}) wakes you ${c.minutes_into_cycle} min into a cycle.`;
+}
+document.getElementById("go").onclick=run;run();
+</script></body></html>
