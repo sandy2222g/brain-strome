@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Elevator Dispatch Simulator</title>
+<style>
+:root{--bg:#f2efe6;--ink:#1d1d1b;--red:#d7391f;--steel:#5d6b73;--line:#1d1d1b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Courier New",ui-monospace,monospace;padding:30px}
+main{max-width:980px;margin:auto}h1{font-size:34px;margin:0;text-transform:uppercase;letter-spacing:-1px;border-bottom:4px solid var(--line);padding-bottom:6px}
+h1 span{color:var(--red)}p.s{margin:8px 0 22px;color:var(--steel)}
+.ctl{display:flex;gap:18px;flex-wrap:wrap;align-items:end;margin-bottom:20px}.ctl label{display:block;font-size:12px;text-transform:uppercase;color:var(--steel)}
+input{font:inherit;width:90px;padding:6px 8px;border:2px solid var(--line);background:#fff}button{font:inherit;font-weight:700;background:var(--red);color:#fff;border:2px solid var(--line);padding:8px 18px;cursor:pointer;text-transform:uppercase}
+table{width:100%;border-collapse:collapse;background:#fff;border:3px solid var(--line)}th,td{padding:10px 12px;text-align:right;border-bottom:1px solid #ccc}
+th{background:var(--line);color:var(--bg);text-transform:uppercase;font-size:12px}th:first-child,td:first-child{text-align:left;font-weight:700}
+td.best{background:#ffe2dc;font-weight:700}.bars{margin-top:22px}.g{margin:14px 0}.g h3{margin:0 0 6px;font-size:13px;text-transform:uppercase;color:var(--steel)}
+.b{display:grid;grid-template-columns:80px 1fr 70px;gap:10px;align-items:center;margin:4px 0}.b i{display:block;height:16px;background:var(--steel)}.b i.w{background:var(--red)}
+.m{font-size:13px;color:var(--steel);margin-top:18px}
+</style></head><body><main>
+<h1>Elevator <span>dispatch</span> sim</h1><p class="s">120 people, one lift, one 12-storey morning rush. Which dispatch rule makes people wait least?</p>
+<div class="ctl"><div><label>Floors</label><input id="f" type="number" value="12" min="2" max="40"></div>
+<div><label>Lift capacity</label><input id="c" type="number" value="8" min="1" max="20"></div><button id="go">Run simulation</button></div>
+<table><thead><tr><th>Policy</th><th>Mean wait</th><th>90th pct wait</th><th>Max wait</th><th>Mean ride</th><th>Finished</th></tr></thead><tbody id="t"></tbody></table>
+<div class="bars" id="bars"></div>
+<p class="m">fcfs = serve the oldest request. nearest = go to the closest call. scan = sweep up and down like a real lift. Times in seconds. Synthetic arrivals; 2 s per floor, 5 s doors.</p></main>
+<script>
+const $=i=>document.getElementById(i);
+async function run(){
+const r=(await (await fetch('/compare',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({floors:+$('f').value,capacity:+$('c').value})})).json()).results;
+const names=Object.keys(r),best=(k)=>Math.min(...names.map(n=>r[n][k]));
+const cols=['mean_wait','p90_wait','max_wait','mean_ride','finish_s'];
+$('t').innerHTML=names.map(n=>`<tr><td>${n}</td>`+cols.map(k=>`<td class="${r[n][k]===best(k)?'best':''}">${r[n][k]}</td>`).join('')+'</tr>').join('');
+const grp=(k,t,cls)=>{const mx=Math.max(...names.map(n=>r[n][k]));return `<div class="g"><h3>${t}</h3>`+names.map(n=>`<div class="b"><span>${n}</span><i class="${cls}" style="width:${r[n][k]/mx*100}%"></i><span>${r[n][k]}s</span></div>`).join('')+'</div>'};
+$('bars').innerHTML=grp('mean_wait','Average wait for a lift','w')+grp('mean_ride','Average time inside the lift','');}
+$('go').onclick=run;run();
+</script></body></html>
