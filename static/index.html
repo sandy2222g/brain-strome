@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Markov Name Maker</title>
+<style>
+:root{--y:#ffd93d;--k:#111;--b:#2b59ff;--p:#ff6ec7;--w:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--y);color:var(--k);font:600 17px/1.4 "Arial Black","Helvetica Neue",Arial,sans-serif}
+main{max-width:940px;margin:0 auto;padding:34px 20px}
+h1{font:900 clamp(40px,8vw,76px)/.95 "Arial Black",Arial,sans-serif;margin:0 0 6px;text-transform:uppercase;letter-spacing:-2px}
+.sub{font-weight:600;margin:0 0 24px;max-width:560px}
+.ctl{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:22px}
+label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+input,select{font:700 18px "Courier New",monospace;border:3px solid var(--k);background:var(--w);padding:8px 12px;box-shadow:4px 4px 0 var(--k);width:150px}
+button{font:900 18px Arial,sans-serif;text-transform:uppercase;border:3px solid var(--k);background:var(--b);color:var(--w);padding:11px 22px;box-shadow:4px 4px 0 var(--k);cursor:pointer}button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--k)}
+.names{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin:12px 0 30px}
+.n{background:var(--w);border:3px solid var(--k);box-shadow:5px 5px 0 var(--k);padding:12px 14px;font:900 22px Arial,sans-serif}.n:nth-child(3n+1){background:var(--p)}.n:nth-child(3n+2){background:#fff}.n:nth-child(3n){background:#9ef0c4}
+h2{font:900 20px Arial,sans-serif;text-transform:uppercase;margin:0 0 10px}
+.bars{background:var(--w);border:3px solid var(--k);box-shadow:5px 5px 0 var(--k);padding:16px}.row{display:grid;grid-template-columns:90px 1fr 70px;gap:10px;align-items:center;margin:6px 0;font:700 15px "Courier New",monospace}
+.bar{height:22px;background:#eee;border:2px solid var(--k)}.bar i{display:block;height:100%;background:var(--b)}.row.best .bar i{background:var(--p)}
+.note{font-weight:600;font-size:14px;margin-top:10px}
+</style></head><body><main>
+<h1>Invent a village.</h1><p class="sub">A tiny language model learned how English place names are spelled, then made up new ones.</p>
+<div class="ctl"><div><label>Starts with</label><input id="pre" maxlength="6" placeholder="any"></div>
+<div><label>Context (letters)</label><select id="ord"></select></div><div><label>How many</label><input id="n" type="number" value="12" min="1" max="50"></div><button id="go">Make names</button></div>
+<div class="names" id="names"></div>
+<h2>Which context length works best?</h2><div class="bars" id="bars"></div><p class="note" id="note"></p>
+</main><script>
+const $=i=>document.getElementById(i);let seed=3,best=2;
+async function go(){const q=new URLSearchParams({n:$('n').value,order:$('ord').value,seed:seed++,prefix:$('pre').value});
+const r=await fetch('/generate?'+q);const j=await r.json();if(!r.ok){$('names').innerHTML='<div class="n">'+j.detail+'</div>';return}
+$('names').innerHTML=j.names.map(n=>`<div class="n">${n}</div>`).join('')}
+fetch('/scores').then(r=>r.json()).then(d=>{best=d.best;const mx=Math.max(...d.scores.map(s=>s.bits));
+$('ord').innerHTML=d.scores.map(s=>`<option value="${s.order}"${s.order==d.best?' selected':''}>${s.order}${s.order==d.best?' (best)':''}</option>`).join('');
+$('bars').innerHTML=d.scores.map(s=>`<div class="row${s.order==d.best?' best':''}"><span>${s.order} letters</span><div class="bar"><i style="width:${s.bits/mx*100}%"></i></div><span>${s.bits}</span></div>`).join('');
+$('note').textContent='Bits of surprise per letter on '+Math.ceil(d.names/5)+' village names the model never saw. Lower is better. Too much context memorises the training names instead of learning their spelling.';go()});
+$('go').onclick=go;
+</script></body></html>

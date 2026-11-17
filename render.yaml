@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: markov-name-maker
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
