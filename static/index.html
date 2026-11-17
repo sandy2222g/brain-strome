@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sorting Race</title>
+<style>
+:root{--bg:#f1fbf7;--ink:#0f3d33;--co:#ff6f59;--mint:#2bb594;--card:#fff;--ln:#cfe9df}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Trebuchet MS","Segoe UI",sans-serif}
+main{max-width:980px;margin:0 auto;padding:28px 18px}h1{font:800 36px/1 "Trebuchet MS",sans-serif;margin:0;letter-spacing:-1px}h1 b{color:var(--co)}.sub{opacity:.7;margin:4px 0 16px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}select,button{font:inherit;border:2px solid var(--ink);background:var(--card);color:var(--ink);padding:6px 12px;border-radius:8px}button{background:var(--ink);color:#fff;cursor:pointer;font-weight:700}
+.lanes{display:grid;gap:8px}.lane{display:grid;grid-template-columns:90px 1fr 120px;gap:10px;align-items:center;background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:6px 12px}.lane b{text-transform:capitalize}.lane canvas{width:100%;height:56px;display:block}.lane span{font-size:13px;text-align:right}.lane.win{border-color:var(--mint);box-shadow:0 0 0 2px var(--mint) inset}
+input[type=range]{width:100%;accent-color:var(--co)}
+table{width:100%;border-collapse:collapse;margin-top:8px;font-size:14px;background:var(--card);border-radius:12px;overflow:hidden}th,td{padding:6px 10px;text-align:right;border-bottom:1px solid var(--ln)}th:first-child,td:first-child{text-align:left}th{background:var(--ink);color:#fff;font-weight:600}td.best{background:#d8f4ea;font-weight:700}td.worst{color:var(--co);font-weight:700}
+h2{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--co);margin:22px 0 4px}
+</style></head><body><main>
+<h1>Sorting <b>race</b></h1><p class="sub">Five algorithms, same list, same clock: one tick is one comparison.</p>
+<div class="bar"><label>List <select id="k"></select></label><button id="go">Race</button><span id="t"></span></div>
+<input id="sl" type="range" min="0" max="1" value="0"><div class="lanes" id="ln"></div>
+<h2>Comparisons for 200 items</h2><div id="tb"></div>
+</main><script>
+const $=i=>document.getElementById(i);let R,timer,tick=0;const colors=['#ff6f59','#ffb347','#2bb594','#4a8fe7','#9b6dd6'];
+function frameAt(l,c){let f=l.frames[0];for(const x of l.frames){if(x[0]<=c)f=x;else break}return f[1]}
+function draw(){const mx=R.max_comparisons;$('t').textContent=tick+' comparisons';$('sl').value=tick;
+Object.entries(R.lanes).forEach(([a,l],i)=>{const cv=$('c_'+a),ctx=cv.getContext('2d'),w=cv.width,h=cv.height;ctx.clearRect(0,0,w,h);const arr=frameAt(l,tick),n=arr.length,bw=w/n;
+arr.forEach((v,j)=>{const bh=(v+1)/n*(h-4);ctx.fillStyle=colors[i];ctx.fillRect(j*bw+1,h-bh,bw-2,bh)});
+const done=tick>=l.comparisons;$('s_'+a).textContent=done?'done: '+l.comparisons:Math.min(tick,l.comparisons)+' so far';$('r_'+a).className='lane'+(done?' win':'')})}
+function play(){clearInterval(timer);tick=0;const mx=R.max_comparisons,step=Math.max(1,Math.round(mx/160));timer=setInterval(()=>{tick=Math.min(mx,tick+step);draw();if(tick>=mx)clearInterval(timer)},40)}
+async function load(){R=await (await fetch('/race?n=30&kind='+$('k').value)).json();$('sl').max=R.max_comparisons;
+$('ln').innerHTML=Object.keys(R.lanes).map(a=>`<div class="lane" id="r_${a}"><b>${a}</b><canvas id="c_${a}" width="600" height="56"></canvas><span id="s_${a}"></span></div>`).join('');tick=0;draw();play()}
+$('go').onclick=load;$('k').onchange=load;$('sl').oninput=e=>{clearInterval(timer);tick=+e.target.value;draw()};
+fetch('/options').then(r=>r.json()).then(o=>{$('k').innerHTML=o.kinds.map(k=>`<option>${k}</option>`).join('');
+$('tb').innerHTML='<table><tr><th>list</th>'+o.algos.map(a=>`<th>${a}</th>`).join('')+'</tr>'+o.kinds.map(k=>{const row=o.table[k],v=o.algos.map(a=>row[a]),mn=Math.min(...v),mxv=Math.max(...v);return `<tr><td>${k}</td>`+o.algos.map(a=>`<td class="${row[a]==mn?'best':row[a]==mxv?'worst':''}">${row[a].toLocaleString()}</td>`).join('')+'</tr>'}).join('')+'</table>';load()});
+</script></body></html>

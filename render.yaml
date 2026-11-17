@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: sorting-race
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
