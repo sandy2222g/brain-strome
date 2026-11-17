@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: plant-watering-tree
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

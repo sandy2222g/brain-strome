@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plant Watering Tree</title>
+<style>
+:root{--bg:#f5ebe0;--clay:#c8553d;--teal:#2a6f6b;--ink:#2d2a26;--card:#fffaf3;--line:#e0cfba}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Gill Sans","Trebuchet MS",sans-serif}
+main{max-width:960px;margin:0 auto;padding:34px 20px;display:grid;grid-template-columns:1fr 1.15fr;gap:24px}
+header{grid-column:1/-1}h1{font:700 38px/1.05 "Gill Sans","Trebuchet MS",sans-serif;margin:0;color:var(--teal)}h1 b{color:var(--clay)}.sub{margin:6px 0 0;opacity:.75}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.sl{margin:0 0 14px}.sl label{display:flex;justify-content:space-between;font-size:14px;text-transform:capitalize}.sl b{color:var(--teal)}
+input[type=range]{width:100%;accent-color:var(--clay)}
+.ans{margin-top:8px;padding:16px;border-radius:12px;text-align:center;font:700 26px "Gill Sans",sans-serif;color:#fff}.ans.water{background:var(--teal)}.ans.skip{background:var(--clay)}
+.why{margin:14px 0 0;padding-left:0;list-style:none;font-size:14px}.why li{padding:4px 0 4px 14px;border-left:3px solid var(--line)}.why li:last-child{border-color:var(--clay);font-weight:700}
+h2{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--clay);margin:0 0 10px}
+pre{margin:0;font:12.5px/1.5 Menlo,Consolas,monospace;white-space:pre-wrap;max-height:310px;overflow:auto;background:#f7efe3;border-radius:10px;padding:12px}
+.bars .row{display:grid;grid-template-columns:62px 1fr 1fr;gap:6px;align-items:center;font-size:12px;margin:3px 0}.bar{height:14px;background:#eadcc8;border-radius:7px;overflow:hidden}.bar i{display:block;height:100%}.t i{background:#c9b79c}.v i{background:var(--teal)}.row.best{font-weight:700}
+.note{font-size:13px;opacity:.75;margin:10px 0 0}
+@media(max-width:760px){main{grid-template-columns:1fr}}
+</style></head><body><main>
+<header><h1>Should I <b>water</b> it?</h1><p class="sub">A decision tree learned from 600 made-up plants. Move the sliders and read the questions it asks.</p></header>
+<section class="card"><div id="sl"></div><div class="ans" id="ans"></div><ul class="why" id="why"></ul></section>
+<section class="card"><h2>The tree as rules</h2><pre id="rules"></pre>
+<h2 style="margin-top:18px">How deep should it be?</h2><div class="bars" id="bars"></div><p class="note" id="note"></p></section>
+</main><script>
+const $=i=>document.getElementById(i);let info,tm,depth=null;const v={};
+function sliders(){$('sl').innerHTML=info.features.map(f=>{const [a,b]=info.ranges[f];v[f]=(a+b)/2;return `<div class="sl"><label>${f.replace(/_/g,' ')}<b id="v_${f}">${v[f]}</b></label><input type="range" min="${a}" max="${b}" step="${f=='soil_moisture'||f=='sunlight_hours'||f=='temperature_c'?0.5:1}" value="${v[f]}" data-f="${f}"></div>`}).join('');
+$('sl').oninput=e=>{const f=e.target.dataset.f;v[f]=+e.target.value;$('v_'+f).textContent=v[f];clearTimeout(tm);tm=setTimeout(go,60)}}
+async function go(){const q=new URLSearchParams({...v,depth});const j=await (await fetch('/predict?'+q)).json();
+$('ans').className='ans '+j.answer;$('ans').textContent=j.answer=='water'?'Water it':'Skip today';$('why').innerHTML=j.why.map(x=>`<li>${x}</li>`).join('');$('rules').textContent=j.rules.join('\n')}
+fetch('/info').then(r=>r.json()).then(d=>{info=d;depth=d.best_depth;sliders();
+$('bars').innerHTML='<div class="row"><span></span><span>training</span><span>validation</span></div>'+d.scores.map(s=>`<div class="row${s.depth==d.best_depth?' best':''}"><span>depth ${s.depth}</span><div class="bar t"><i style="width:${s.train*100}%"></i></div><div class="bar v"><i style="width:${s.validation*100}%"></i></div></div>`).join('');
+$('note').textContent=`Depth ${d.best_depth} chosen on validation data. On 200 unseen plants it is right ${Math.round(d.test_accuracy*100)}% of the time (always guessing the common answer: ${Math.round(d.majority_accuracy*100)}%; a depth-8 tree: ${Math.round(d.deep_test_accuracy*100)}%).`;go()});
+</script></body></html>
