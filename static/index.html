@@ -1,0 +1,36 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flat Rent Estimator</title>
+<style>
+:root{--bg:#e9eef0;--ink:#143642;--teal:#0f8b8d;--sand:#ec9a29;--card:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Avenir Next","Segoe UI",sans-serif;padding:30px}
+main{max-width:980px;margin:auto}h1{font-size:30px;margin:0;font-weight:700}p.s{margin:0 0 20px;opacity:.7}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media(max-width:780px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:14px;padding:20px;box-shadow:0 2px 0 #14364214}
+.row{margin-bottom:14px}.row label{display:flex;justify-content:space-between;font-weight:600}input[type=range]{width:100%;accent-color:var(--teal)}
+.price{font-size:64px;font-weight:800;color:var(--teal);line-height:1}.price small{font-size:18px;color:var(--ink);opacity:.6;font-weight:400}
+h2{margin:0 0 10px;font-size:14px;text-transform:uppercase;letter-spacing:1.5px;opacity:.7}
+.cf{display:grid;grid-template-columns:110px 1fr 70px;gap:8px;align-items:center;margin:6px 0;font-size:13px}.track{height:12px;background:#e6ecee;border-radius:6px;position:relative}
+.track i{position:absolute;top:0;height:100%;border-radius:6px}.m{font-size:13px;opacity:.8;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 0;text-align:left}th{opacity:.6;font-weight:500}
+</style></head><body><main>
+<h1>Flat Rent Estimator</h1><p class="s">A ridge regression, written from scratch, trained on 240 synthetic listings.</p>
+<div class="grid"><div class="card">
+<div class="row"><label>Area <b id="a_v"></b></label><input id="a" type="range" min="25" max="120" value="75"></div>
+<div class="row"><label>Bedrooms <b id="b_v"></b></label><input id="b" type="range" min="0" max="4" value="2"></div>
+<div class="row"><label>Distance to centre <b id="d_v"></b></label><input id="d" type="range" min="0.5" max="15" step="0.5" value="4"></div>
+<div class="row"><label>Building age <b id="g_v"></b></label><input id="g" type="range" min="0" max="60" value="15"></div>
+<h2>Estimated monthly rent</h2><div class="price" id="p">—</div></div>
+<div class="card"><h2>What moves the price (per unit)</h2><div id="cf"></div><h2 style="margin-top:20px">Held-out accuracy</h2><table id="mt"></table><p class="m" id="note"></p></div></div></main>
+<script>
+const $=i=>document.getElementById(i);
+const lab={area_m2:'+1 m²',bedrooms:'+1 bedroom',distance_km:'+1 km away',age_years:'+1 year old'};
+async function run(){const body={area_m2:+$('a').value,bedrooms:+$('b').value,distance_km:+$('d').value,age_years:+$('g').value};
+$('a_v').textContent=body.area_m2+' m²';$('b_v').textContent=body.bedrooms;$('d_v').textContent=body.distance_km+' km';$('g_v').textContent=body.age_years+' yrs';
+const j=await (await fetch('/estimate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})).json();
+$('p').innerHTML=`$${j.rent.toLocaleString()} <small>/ month</small>`;
+const mx=Math.max(...Object.values(j.per_unit).map(Math.abs));
+$('cf').innerHTML=Object.entries(j.per_unit).map(([k,v])=>`<div class="cf"><span>${lab[k]}</span><div class="track"><i style="background:${v>=0?'var(--teal)':'var(--sand)'};${v>=0?'left:50%':'right:50%'};width:${Math.abs(v)/mx*50}%"></i></div><b>${v>=0?'+':'−'}$${Math.abs(v).toFixed(1)}</b></div>`).join('')}
+['a','b','d','g'].forEach(i=>$(i).oninput=run);
+fetch('/metrics').then(r=>r.json()).then(m=>{$('mt').innerHTML=`<tr><th></th><th>RMSE ($)</th><th>R²</th></tr><tr><td>Ridge model</td><td>${m.model.rmse}</td><td>${m.model.r2}</td></tr><tr><td>Always the mean</td><td>${m.baseline.rmse}</td><td>${m.baseline.r2}</td></tr>`;$('note').textContent=`Trained on ${m.train} listings, tested on ${m.test} it never saw. Data is synthetic.`});
+run();
+</script></body></html>
