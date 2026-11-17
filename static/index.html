@@ -1,0 +1,34 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cron Explainer</title>
+<style>
+:root{--ink:#111;--red:#e30613;--grey:#8a8a8a;--line:#111}
+*{box-sizing:border-box}body{margin:0;background:#fafaf7;color:var(--ink);font:16px/1.5 "Helvetica Neue",Helvetica,Arial,sans-serif;padding:0}
+main{max-width:900px;margin:0 auto;padding:46px 24px}.top{border-top:8px solid var(--red);padding-top:14px;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap}
+h1{font:700 44px/1 "Helvetica Neue",Arial,sans-serif;letter-spacing:-2px;margin:0}.top span{color:var(--grey);font-size:13px;letter-spacing:2px;text-transform:uppercase}
+.fields{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin:34px 0 8px;border:2px solid var(--line)}.fields div{border-right:2px solid var(--line)}.fields div:last-child{border:0}
+.fields input{width:100%;border:0;font:700 34px "Courier New",monospace;text-align:center;padding:14px 4px;background:transparent;outline:none}.fields label{display:block;text-align:center;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--grey);padding:4px 0 6px;border-top:2px solid var(--line);background:#fff}
+.fields input:focus{background:#fff2f2}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}.chips button{font:inherit;font-size:13px;border:2px solid var(--line);background:#fff;padding:3px 12px;cursor:pointer}.chips button:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.say{font:700 30px/1.25 "Helvetica Neue",Arial,sans-serif;letter-spacing:-.5px;border-left:8px solid var(--red);padding-left:18px;margin:10px 0 28px;min-height:76px}.say.bad{color:var(--red)}
+h2{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--grey);margin:0 0 8px}
+.runs{list-style:none;padding:0;margin:0;border-top:2px solid var(--line)}.runs li{display:flex;justify-content:space-between;padding:9px 2px;border-bottom:1px solid #ccc;font-variant-numeric:tabular-nums}.runs li b{font-family:"Courier New",monospace}.runs li span{color:var(--grey)}
+.m{margin-top:20px;font-size:13px;color:var(--grey)}
+</style></head><body><main>
+<div class="top"><h1>Cron, in words.</h1><span>explainer</span></div>
+<div class="fields"><div><input id="f0" value="30"><label>minute</label></div><div><input id="f1" value="9"><label>hour</label></div><div><input id="f2" value="*"><label>day of month</label></div><div><input id="f3" value="*"><label>month</label></div><div><input id="f4" value="1-5"><label>weekday</label></div></div>
+<div class="chips" id="ch"></div><div class="say" id="say"></div>
+<h2 id="rh">Next runs</h2><ul class="runs" id="runs"></ul>
+<p class="m" id="m"></p></main>
+<script>
+const $=i=>document.getElementById(i);let tm,start='';
+async function go(){const expr=[0,1,2,3,4].map(i=>$('f'+i).value.trim()||'*').join(' ');
+const r=await fetch('/explain?n=6&start='+encodeURIComponent(start)+'&expr='+encodeURIComponent(expr));const j=await r.json();
+if(!r.ok){$('say').className='say bad';$('say').textContent=j.detail;$('runs').innerHTML='';return}
+$('say').className='say';$('say').textContent=j.meaning+'.';
+$('runs').innerHTML=j.runs.length?j.runs.map(t=>{const [d,h,w]=t.split(' ');return `<li><b>${d} ${h}</b><span>${w}</span></li>`}).join(''):'<li><span>Never runs: that date does not exist.</span></li>'}
+function setExpr(e){const p=e.startsWith('@')?{'@daily':'0 0 * * *','@hourly':'0 * * * *','@weekly':'0 0 * * 0','@monthly':'0 0 1 * *'}[e]:e;p.split(' ').forEach((v,i)=>$('f'+i).value=v);go()}
+fetch('/examples').then(r=>r.json()).then(d=>{start=d.start;$('rh').textContent='Next runs after '+start.replace('T',' ').slice(0,16);
+$('ch').innerHTML=d.examples.map(e=>`<button data-e="${e.expr}">${e.label}</button>`).join('');$('ch').onclick=ev=>{const b=ev.target.closest('button');if(b)setExpr(b.dataset.e)};go()});
+[0,1,2,3,4].forEach(i=>$('f'+i).oninput=()=>{clearTimeout(tm);tm=setTimeout(go,150)});
+$('m').textContent='Fields: minute 0-59, hour 0-23, day 1-31, month 1-12 or JAN-DEC, weekday 0-7 or SUN-SAT. Use * for any, 1,15 for a list, 1-5 for a range, */10 for every 10th. If both day and weekday are set, either one triggers a run.';
+</script></body></html>

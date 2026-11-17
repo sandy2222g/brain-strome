@@ -1,0 +1,10 @@
+[
+ {"expr": "*/15 * * * *", "label": "Every quarter hour"},
+ {"expr": "30 9 * * 1-5", "label": "Weekday stand-up"},
+ {"expr": "0 0 1 * *", "label": "Start of every month"},
+ {"expr": "0 22 * * SUN", "label": "Sunday night backup"},
+ {"expr": "0 8,12,18 * * *", "label": "Three times a day"},
+ {"expr": "0 9 1,15 * *", "label": "Payday reminder"},
+ {"expr": "0 0 29 2 *", "label": "Leap-day job"},
+ {"expr": "@daily", "label": "Macro: daily"}
+]
