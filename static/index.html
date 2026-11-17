@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kitchen Stock Reorder</title>
+<style>
+:root{--tile:#f5f7f2;--herb:#3d7a4a;--clay:#c2593a;--ink:#26332a;--mut:#778379;--line:#dde4d9}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);font:15px/1.5 "Optima","Candara","Segoe UI",sans-serif;padding:30px 20px;background:var(--tile);background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:44px 44px}
+main{max-width:980px;margin:auto}h1{font:700 40px "Georgia",serif;margin:0;color:var(--herb)}h1 em{color:var(--clay)}p.s{margin:2px 0 18px;color:var(--mut)}
+.sv{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap}.sv span{font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:1px}.sv button{font:inherit;border:2px solid var(--herb);background:#fff;color:var(--herb);border-radius:99px;padding:3px 14px;cursor:pointer}.sv button.on{background:var(--herb);color:#fff}
+.tot{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}@media(max-width:700px){.tot{grid-template-columns:1fr}}
+.t{background:#fff;border:2px solid var(--line);border-radius:14px;padding:14px 18px}.t h2{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:var(--mut)}
+.t b{font:700 34px Georgia,serif}.t .a{color:var(--herb)}.t .b{color:var(--clay)}.t small{color:var(--mut);display:block}
+.items{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px}.card{background:#fff;border:2px solid var(--line);border-radius:14px;padding:16px}
+.card h3{margin:0 0 8px;font:700 20px Georgia,serif;text-transform:capitalize;display:flex;justify-content:space-between}.card h3 span{font:13px sans-serif;color:var(--mut)}
+.k{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center;margin-bottom:10px}.k div{background:var(--tile);border-radius:8px;padding:6px 2px}.k b{display:block;font-size:20px;color:var(--herb)}.k small{font-size:11px;color:var(--mut);text-transform:uppercase}
+.cmp{font-size:13px;margin:4px 0}.cmp .bar{display:grid;grid-template-columns:70px 1fr 60px;gap:6px;align-items:center}.cmp i{display:block;height:9px;border-radius:5px}.cmp .s i{background:var(--herb)}.cmp .w i{background:var(--clay)}
+.m{margin-top:16px;font-size:13px;color:var(--mut)}
+</style></head><body><main>
+<h1>Kitchen <em>Stock</em> Reorder</h1><p class="s">When should a small kitchen reorder, and how much? Tested on the last 30 days of invented demand.</p>
+<div class="sv"><span>Service level</span><button data-s="0.90">90%</button><button data-s="0.95" class="on">95%</button><button data-s="0.99">99%</button></div>
+<div class="tot" id="tot"></div><div class="items" id="it"></div>
+<p class="m">Smart = reorder when stock plus orders on the way falls to the reorder point, then top up. Weekly = every Monday, order last week's total. Waste = units that passed their shelf life.</p></main>
+<script>
+const $=i=>document.getElementById(i);
+async function go(s){const e=await (await fetch('/evaluation?service='+s)).json(),t=e.totals;
+$('tot').innerHTML=`<div class="t"><h2>Days a shelf ran empty (30 days x 5 items)</h2><b class="a">${t.smart.short_days}</b> smart <b class="b" style="margin-left:14px">${t.weekly.short_days}</b> weekly</div><div class="t"><h2>Money thrown away</h2><b class="a">$${t.smart.waste_cost}</b> smart <b class="b" style="margin-left:14px">$${t.weekly.waste_cost}</b> weekly</div>`;
+const mx=Math.max(...e.items.map(r=>Math.max(r.smart.avg_stock,r.weekly.avg_stock)));
+$('it').innerHTML=e.items.map(r=>`<div class="card"><h3>${r.name}<span>${r.plan.mean}/day &plusmn;${r.plan.sd}</span></h3>
+<div class="k"><div><b>${Math.round(r.plan.reorder_point)}</b><small>reorder at</small></div><div><b>${Math.round(r.plan.order_up_to)}</b><small>top up to</small></div><div><b>${Math.round(r.plan.safety)}</b><small>safety stock</small></div></div>
+<div class="cmp"><div class="bar s"><span>smart</span><i style="width:${r.smart.avg_stock/mx*100}%"></i><span>${r.smart.avg_stock}</span></div><div class="bar w"><span>weekly</span><i style="width:${r.weekly.avg_stock/mx*100}%"></i><span>${r.weekly.avg_stock}</span></div><div style="color:#778379;margin-top:2px">average units on the shelf</div>
+<div style="margin-top:6px">Empty days: <b>${r.smart.short_days}</b> vs ${r.weekly.short_days} &middot; waste: <b>$${r.smart.waste_cost}</b> vs $${r.weekly.waste_cost}</div></div></div>`).join('')}
+document.querySelector('.sv').onclick=ev=>{const b=ev.target.closest('button');if(!b)return;document.querySelectorAll('.sv button').forEach(x=>x.classList.toggle('on',x===b));go(b.dataset.s)};go(0.95);
+</script></body></html>

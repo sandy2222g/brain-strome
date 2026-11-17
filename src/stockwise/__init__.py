@@ -1,0 +1,1 @@
+"""Kitchen stock reorder planner."""
