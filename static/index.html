@@ -1,0 +1,26 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Waste Bin Sorter</title>
+<style>
+:root{--bg:#eaf6ee;--ink:#17352a;--card:#fff;--rec:#2f80ed;--com:#3a9d5d;--lan:#7d8590;--ewa:#d64545}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Trebuchet MS",Verdana,sans-serif;padding:30px}
+main{max-width:760px;margin:auto}h1{font-size:30px;margin:0}p.s{margin:2px 0 20px;opacity:.7}
+.q{display:flex;gap:10px}input{flex:1;font:inherit;padding:12px 16px;border:2px solid var(--ink);border-radius:30px;background:#fff}
+button{font:inherit;font-weight:700;background:var(--ink);color:#fff;border:0;border-radius:30px;padding:0 24px;cursor:pointer}
+.chips{margin:10px 0 18px;display:flex;gap:6px;flex-wrap:wrap}.chips span{background:#fff;border-radius:14px;padding:2px 12px;font-size:13px;cursor:pointer}
+.card{background:var(--card);border-radius:22px;padding:22px;box-shadow:0 4px 0 #0001}
+.ans{font-size:34px;font-weight:800;text-transform:capitalize;margin-bottom:10px}
+.row{display:grid;grid-template-columns:100px 1fr 50px;align-items:center;gap:10px;margin:6px 0;font-size:14px}.track{background:#eef2ef;border-radius:8px;height:16px}.track i{display:block;height:100%;border-radius:8px}
+.m{margin-top:18px;font-size:13px;opacity:.75}#err{color:var(--ewa)}
+</style></head><body><main>
+<h1>Waste Bin Sorter</h1><p class="s">Type an item. A small naive Bayes model, trained from scratch, picks the bin.</p>
+<div class="q"><input id="i" value="plastic bottle" autocomplete="off"><button id="go">Sort it</button></div>
+<div class="chips" id="ch"></div><div class="card"><div id="out"></div><span id="err"></span><div class="m" id="m"></div></div></main>
+<script>
+const $=i=>document.getElementById(i);const col={recycling:'var(--rec)',compost:'var(--com)',landfill:'var(--lan)','e-waste':'var(--ewa)'};
+['glass jar','banana peel','dirty diaper','old phone charger','pizza box','tea bag'].forEach(t=>{const s=document.createElement('span');s.textContent=t;s.onclick=()=>{$('i').value=t;run()};$('ch').appendChild(s)});
+async function run(){$('err').textContent='';const r=await fetch('/classify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({item:$('i').value})});
+const j=await r.json();if(!r.ok){$('err').textContent=j.detail;return}
+$('out').innerHTML=`<div class="ans" style="color:${col[j.bin]}">${j.bin}</div>`+Object.entries(j.probabilities).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="row"><span>${k}</span><div class="track"><i style="width:${v*100}%;background:${col[k]}"></i></div><span>${Math.round(v*100)}%</span></div>`).join('')+(j.known_words?'':'<p>No word recognised — this is just the prior.</p>')}
+fetch('/metrics').then(r=>r.json()).then(m=>{$('m').textContent=`Held-out accuracy ${(m.naive_bayes*100).toFixed(0)}% on ${m.test} unseen items (always-guess-one-bin baseline: ${(m.majority*100).toFixed(0)}%).`});
+$('go').onclick=run;$('i').onkeydown=e=>{if(e.key==='Enter')run()};run();
+</script></body></html>
