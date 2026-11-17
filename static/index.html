@@ -1,0 +1,26 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Palette Extractor</title>
+<style>
+:root{--bg:#111;--ink:#f4f1ea;--mute:#8d8a82;--acc:#e9ff3b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Helvetica Neue",Arial,sans-serif;padding:0}
+header{padding:28px 40px 0}h1{font-size:64px;line-height:.95;margin:0;font-weight:900;letter-spacing:-3px}h1 em{font-style:normal;color:var(--acc)}
+p.s{color:var(--mute);margin:8px 0 0}.wrap{display:grid;grid-template-columns:1fr 1.2fr;gap:0;margin-top:26px}@media(max-width:850px){.wrap{grid-template-columns:1fr}}
+.left{padding:0 40px}.left img{width:100%;border-radius:4px;display:block}.ctl{display:flex;gap:12px;align-items:center;margin-top:14px;flex-wrap:wrap}
+input[type=range]{accent-color:var(--acc)}button,label.f{background:var(--acc);color:#111;border:0;padding:8px 16px;font-weight:800;cursor:pointer;font-size:14px}label.f input{display:none}
+.right{display:flex;flex-direction:column;min-height:380px}.sw{flex:1;display:flex;align-items:flex-end;padding:12px 16px;font-weight:700;font-size:15px;text-shadow:0 0 6px #0008;color:#fff;min-height:48px}
+.sw small{margin-left:auto;font-weight:400;opacity:.9}.cmp{padding:18px 40px;color:var(--mute);font-size:13px}.cmp b{color:var(--acc)}.strip{display:flex;height:22px;margin-top:6px}.strip i{display:block}
+#err{color:#ff7a7a;padding:0 40px}
+</style></head><body>
+<header><h1>Pull the <em>colours</em><br>out of any picture.</h1><p class="s">k-means++ clustering written from scratch. Nothing is stored.</p></header>
+<div class="wrap"><div class="left"><img id="img" src="/static/sample.png" alt="sample"><div class="ctl"><label class="f">Upload image<input id="f" type="file" accept="image/*"></label><span>colours: <b id="kv">5</b></span><input id="k" type="range" min="2" max="10" value="5"></div></div>
+<div class="right" id="sw"></div></div><div class="cmp" id="cmp"></div><div id="err"></div>
+<script>
+const $=i=>document.getElementById(i);let file=null;
+async function run(){$('err').textContent='';const fd=new FormData();fd.append('k',$('k').value);if(file)fd.append('file',file);
+const r=await fetch('/palette',{method:'POST',body:fd});const j=await r.json();if(!r.ok){$('err').textContent=j.detail;return}
+$('sw').innerHTML=j.palette.map(p=>`<div class="sw" style="background:${p.hex};flex:${Math.max(p.share,.05)}">${p.hex}<small>${(p.share*100).toFixed(1)}%</small></div>`).join('');
+const strip=a=>`<div class="strip">${a.map(p=>`<i style="background:${p.hex};flex:${p.share}"></i>`).join('')}</div>`;
+$('cmp').innerHTML=`Colour error (lower is better): k-means <b>${j.mse_kmeans}</b> vs uniform-bin baseline <b>${j.mse_baseline}</b>.${strip(j.palette)}${strip(j.baseline_palette)}`}
+$('k').oninput=()=>{$('kv').textContent=$('k').value;run()};
+$('f').onchange=e=>{file=e.target.files[0];if(file)$('img').src=URL.createObjectURL(file);run()};run();
+</script></body></html>
