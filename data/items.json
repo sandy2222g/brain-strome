@@ -1,0 +1,54 @@
+{
+ "note": "Invented packing list, weights in grams; limit is per bag.",
+ "bag_limit_g": 11000,
+ "items": [
+  {
+   "name": "Gifts",
+   "g": 3200
+  },
+  {
+   "name": "Umbrella",
+   "g": 500
+  },
+  {
+   "name": "Camera kit",
+   "g": 2700
+  },
+  {
+   "name": "Shoes",
+   "g": 1100
+  },
+  {
+   "name": "Books x4",
+   "g": 2400
+  },
+  {
+   "name": "T-shirts x6",
+   "g": 1300
+  },
+  {
+   "name": "Laptop and charger",
+   "g": 2100
+  },
+  {
+   "name": "Toiletries",
+   "g": 1200
+  },
+  {
+   "name": "Winter coat",
+   "g": 1900
+  },
+  {
+   "name": "Jumpers x3",
+   "g": 1500
+  },
+  {
+   "name": "Jeans x3",
+   "g": 1800
+  },
+  {
+   "name": "Hiking boots",
+   "g": 1600
+  }
+ ]
+}

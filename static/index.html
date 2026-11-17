@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bag Weight Balancer</title>
+<style>
+:root{--sky1:#d9efff;--sky2:#f7fbff;--ink:#0d2b4a;--blue:#1769c9;--mute:#52708f;--red:#d1432f}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(var(--sky1),var(--sky2));color:var(--ink);font:16px/1.45 "Gill Sans","Segoe UI",sans-serif;min-height:100vh}
+main{max-width:860px;margin:0 auto;padding:30px 16px}h1{margin:0;font-size:2rem;letter-spacing:-.5px}p{color:var(--mute)}
+h2{margin:26px 0 10px;font-size:.85rem;text-transform:uppercase;letter-spacing:2px;color:var(--mute)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.bag{background:#fff;border-radius:18px 18px 8px 8px;border:3px solid var(--ink);padding:0;overflow:hidden}
+.bag h3{margin:0;padding:8px 14px;background:var(--ink);color:#fff;display:flex;justify-content:space-between;font-size:1rem}.bag h3.over{background:var(--red)}
+.bag ul{list-style:none;margin:0;padding:8px 14px 12px}.bag li{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px dotted #c7d6e6;font-size:.92rem}
+.gap{margin-top:10px;font-size:1.05rem}.gap b{color:var(--blue)}
+@media(max-width:600px){.pair{grid-template-columns:1fr}}
+</style></head><body><main>
+<h1>Two bags, even weight</h1><p id="sub"></p>
+<h2>Balanced</h2><div class="pair" id="best"></div><div class="gap" id="g1"></div>
+<h2>Packed in alternating order</h2><div class="pair" id="alt"></div><div class="gap" id="g2"></div></main>
+<script>
+const kg=g=>(g/1000).toFixed(1)+" kg";
+function bag(t,items,w,over){return `<div class="bag"><h3 class="${over?"over":""}"><span>${t}</span><span>${kg(w)}${over?" · over":""}</span></h3><ul>${items.map(i=>`<li><span>${i.name}</span><span>${(i.g/1000).toFixed(1)}</span></li>`).join("")}</ul></div>`}
+(async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/balance",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({items:s.items,bag_limit_g:s.bag_limit_g})})).json();
+  document.getElementById("sub").textContent=`${s.items.length} items, limit ${kg(s.bag_limit_g)} per bag.`;
+  const b=r.best,a=r.alternating;
+  document.getElementById("best").innerHTML=bag("Bag A",b.bag_a,b.weight_a,r.best_over_limit.includes("weight_a"))+bag("Bag B",b.bag_b,b.weight_b,r.best_over_limit.includes("weight_b"));
+  document.getElementById("g1").innerHTML=`Difference <b>${b.difference} g</b>.`;
+  document.getElementById("alt").innerHTML=bag("Bag A",a.bag_a,a.weight_a,r.alternating_over_limit.includes("weight_a"))+bag("Bag B",a.bag_b,a.weight_b,r.alternating_over_limit.includes("weight_b"));
+  document.getElementById("g2").innerHTML=`Difference <b>${a.difference} g</b>${r.alternating_over_limit.length?" and one bag is over the limit.":"."}`;
+})();
+</script></body></html>
