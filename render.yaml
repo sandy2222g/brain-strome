@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: photo-album-grouper
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

@@ -1,0 +1,98 @@
+{
+ "note": "Invented timestamps; no real photos.",
+ "gap_hours": 4,
+ "photos": [
+  {
+   "file": "IMG_001.jpg",
+   "taken": "2026-10-03T19:05"
+  },
+  {
+   "file": "IMG_002.jpg",
+   "taken": "2026-10-03T19:40"
+  },
+  {
+   "file": "IMG_003.jpg",
+   "taken": "2026-10-03T20:15"
+  },
+  {
+   "file": "IMG_004.jpg",
+   "taken": "2026-10-03T21:50"
+  },
+  {
+   "file": "IMG_005.jpg",
+   "taken": "2026-10-03T23:20"
+  },
+  {
+   "file": "IMG_006.jpg",
+   "taken": "2026-10-04T00:10"
+  },
+  {
+   "file": "IMG_007.jpg",
+   "taken": "2026-10-04T00:35"
+  },
+  {
+   "file": "IMG_008.jpg",
+   "taken": "2026-10-04T01:05"
+  },
+  {
+   "file": "IMG_009.jpg",
+   "taken": "2026-10-11T08:30"
+  },
+  {
+   "file": "IMG_010.jpg",
+   "taken": "2026-10-11T08:45"
+  },
+  {
+   "file": "IMG_011.jpg",
+   "taken": "2026-10-11T10:10"
+  },
+  {
+   "file": "IMG_012.jpg",
+   "taken": "2026-10-11T11:55"
+  },
+  {
+   "file": "IMG_013.jpg",
+   "taken": "2026-10-11T13:20"
+  },
+  {
+   "file": "IMG_014.jpg",
+   "taken": "2026-10-11T15:40"
+  },
+  {
+   "file": "IMG_015.jpg",
+   "taken": "2026-10-11T16:05"
+  },
+  {
+   "file": "IMG_016.jpg",
+   "taken": "2026-10-14T12:15"
+  },
+  {
+   "file": "IMG_017.jpg",
+   "taken": "2026-10-24T10:00"
+  },
+  {
+   "file": "IMG_018.jpg",
+   "taken": "2026-10-24T10:20"
+  },
+  {
+   "file": "IMG_019.jpg",
+   "taken": "2026-10-24T11:30"
+  },
+  {
+   "file": "IMG_020.jpg",
+   "taken": "2026-10-24T12:45"
+  },
+  {
+   "file": "IMG_021.jpg",
+   "taken": "2026-10-25T09:40"
+  },
+  {
+   "file": "IMG_022.jpg",
+   "taken": "2026-10-25T10:05"
+  },
+  {
+   "file": "IMG_023.jpg",
+   "taken": "2026-10-25T11:15"
+  }
+ ]
+}
