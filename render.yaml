@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: meeting-notes-summarizer
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

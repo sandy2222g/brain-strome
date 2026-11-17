@@ -1,0 +1,41 @@
+{
+ "meetings": [
+  {
+   "title": "Website redesign kickoff",
+   "text": "Good morning everyone and thanks for joining. We are here to kick off the website redesign project. The current website loads slowly and the checkout page loses customers. Priya said the redesign must cut page load time in half before the spring campaign. Marcus will prepare the new design mockups by Friday. The team agreed that the redesign will launch in two phases, with the checkout page first. Someone mentioned the coffee machine is broken again. Lena should audit the current website pages and list the slowest ones by Wednesday. We decided the redesign budget is capped at twelve thousand dollars. Let us meet again next Tuesday to review the mockups.",
+   "key": [
+    2,
+    3,
+    5,
+    8
+   ]
+  },
+  {
+   "title": "Quarterly budget review",
+   "text": "Welcome to the quarterly budget review. Travel spending is over budget by eighteen percent this quarter. Omar explained that most of the extra travel spending came from two last minute conference trips. The group decided to freeze new travel bookings until the budget recovers. Software subscriptions are on target and no changes are needed. Nina will send a summary of travel spending to every team lead by Monday. The printer lease ends in March and nobody has looked at replacements. We agreed that every travel request above five hundred dollars needs director approval. The next budget review is scheduled for July.",
+   "key": [
+    1,
+    3,
+    7
+   ]
+  },
+  {
+   "title": "Sprint retrospective",
+   "text": "Let us start the sprint retrospective with what went well. The team shipped the login feature two days early. Releases were blocked three times this sprint because the test server was down. Everyone agreed that the unstable test server is the biggest problem for the next sprint. Jamal will ask the infrastructure team to replace the test server by next Thursday. Chloe liked the new daily standup format and wants to keep it. We decided to add an automatic test server health check before every release. Someone suggested ordering pizza for the demo day. The retrospective will be repeated at the end of the next sprint.",
+   "key": [
+    2,
+    3,
+    6
+   ]
+  },
+  {
+   "title": "Charity run planning",
+   "text": "Thanks for coming to plan the charity run. The run will take place on the second Saturday of May at the riverside park. Registration for the run will open online three weeks before the event. Ben will contact the park office about the route permit by Friday. We need at least twenty volunteers to cover the water stations and the finish line. Sofia suggested a t-shirt for every runner, which the group liked. The sponsorship goal is five thousand dollars for the children's hospital. Aisha will email local businesses about sponsorship before the end of the month. Parking near the park is limited so we should arrange a shuttle.",
+   "key": [
+    1,
+    4,
+    6
+   ]
+  }
+ ]
+}
