@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Homework Order Planner</title>
+<style>
+:root{--paper:#fffef5;--line:#bcd7ee;--margin:#e8a0a0;--ink:#1f3a93;--mute:#6a7a99;--late:#c0392b}
+*{box-sizing:border-box}body{margin:0;background:#dfe6ee;color:var(--ink);font:20px/32px "Segoe Print","Bradley Hand","Comic Sans MS",cursive}
+main{max-width:640px;margin:24px auto;background:var(--paper);padding:20px 24px 40px 80px;position:relative;box-shadow:0 4px 18px #0003;
+background-image:repeating-linear-gradient(transparent,transparent 31px,var(--line) 31px,var(--line) 32px);background-position:0 20px}
+main:before{content:"";position:absolute;left:60px;top:0;bottom:0;width:2px;background:var(--margin)}
+h1{margin:0 0 4px;font-size:1.7rem;line-height:40px}p{margin:0;color:var(--mute);font-size:.95rem}
+ol{margin:18px 0 0;padding:0;list-style:none}li{display:flex;justify-content:space-between}
+li.late{color:var(--late);text-decoration:line-through}.t{font-size:.9rem;color:var(--mute)}li.late .t{color:var(--late)}
+.sum{margin-top:18px;font-size:.95rem}
+</style></head><body><main>
+<h1>Homework order</h1><p>Most assignments finished on time.</p>
+<ol id="out"></ol><div class="sum" id="sum"></div></main>
+<script>
+(async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/plan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tasks:s.tasks})})).json();
+  document.getElementById("out").innerHTML=r.plan.schedule.map((x,i)=>`<li class="${x.on_time?"":"late"}"><span>${i+1}. ${x.name}</span><span class="t">done at ${x.finish}h · due ${x.due}h</span></li>`).join("");
+  document.getElementById("sum").textContent=`${r.plan.on_time_count} of ${r.plan.schedule.length} on time. Listed order: ${r.listed_on_time}. Shortest first: ${r.shortest_on_time}.`;
+})();
+</script></body></html>

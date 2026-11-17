@@ -1,0 +1,10 @@
+{"note": "Invented assignments. Hours are of focused work; due is hours from now.",
+ "tasks": [
+  {"name": "Essay draft", "hours": 5, "due": 24},
+  {"name": "Maths sheet", "hours": 2, "due": 8},
+  {"name": "Lab report", "hours": 6, "due": 11},
+  {"name": "Reading notes", "hours": 1, "due": 6},
+  {"name": "Group slides", "hours": 4, "due": 16},
+  {"name": "Quiz revision", "hours": 3, "due": 10},
+  {"name": "Poster", "hours": 7, "due": 20}
+ ]}
