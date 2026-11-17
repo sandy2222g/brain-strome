@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: language-guesser
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
