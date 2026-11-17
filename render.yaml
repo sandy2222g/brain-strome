@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: huffman-squeeze
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

@@ -1,0 +1,27 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Huffman Squeeze</title>
+<style>
+:root{--bg:#f4f1ea;--ink:#12261f;--g:#1f7a4d;--o:#e8710a;--card:#fffdf8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Georgia,"Times New Roman",serif}
+main{max-width:760px;margin:0 auto;padding:34px 18px}h1{font-size:44px;margin:0;color:var(--g);font-style:italic}.sub{margin:4px 0 20px;opacity:.75}
+textarea{width:100%;height:110px;font:15px ui-monospace,monospace;padding:10px;border:2px solid var(--ink);background:var(--card)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 18px}button{font:inherit;background:var(--ink);color:#fff;border:0;padding:6px 14px;cursor:pointer}button.alt{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.bars div{margin:10px 0}.lab{display:flex;justify-content:space-between;font-size:14px}.track{background:#e4ded0;height:26px}.fill{height:100%;transition:width .4s}
+.codes{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;margin-top:18px;font:14px ui-monospace,monospace}.codes span{background:var(--card);border:1px solid var(--ink);padding:3px 8px}
+.msg{font-size:15px;margin-top:14px}
+</style></head><body><main>
+<h1>Huffman squeeze</h1><p class="sub">Frequent letters get short codes. See how far that alone can shrink your text, and where zlib does better.</p>
+<textarea id="t"></textarea><div class="bar"><button id="go">squeeze it</button><span id="sb"></span></div>
+<div class="bars" id="bars"></div><p class="msg" id="msg"></p><div class="codes" id="codes"></div>
+</main><script>
+const $=i=>document.getElementById(i);
+async function go(){const r=await fetch('/analyse',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({text:$('t').value})});
+if(!r.ok){$('msg').textContent='Please type some text first.';return}const j=await r.json();
+const rows=[['original',j.original_bytes,'#12261f'],['Huffman (incl. table)',j.huffman_bytes,'#1f7a4d'],['zlib',j.zlib_bytes,'#e8710a']];
+$('bars').innerHTML=rows.map(([n,v,c])=>`<div><div class="lab"><span>${n}</span><b>${v} bytes</b></div><div class="track"><div class="fill" style="width:${Math.min(100,v/Math.max(j.original_bytes,j.huffman_bytes)*100)}%;background:${c}"></div></div></div>`).join('');
+$('msg').textContent=`${j.bits_per_char} bits per character (the theoretical floor for one-letter-at-a-time coding is ${j.entropy}). Plain text uses 8.`;
+$('codes').innerHTML=Object.entries(j.codes).slice(0,24).map(([k,v])=>`<span>${k==' '?'␣':k==='\n'?'↵':k} → ${v}</span>`).join('')}
+fetch('/samples').then(r=>r.json()).then(d=>{$('sb').innerHTML=Object.keys(d.samples).map(k=>`<button class="alt" data-k="${k}">${k}</button>`).join(' ');
+$('t').value=d.samples.song;$('sb').onclick=e=>{if(e.target.dataset.k){$('t').value=d.samples[e.target.dataset.k];go()}};go()});
+$('go').onclick=go;
+</script></body></html>
