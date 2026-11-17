@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: unit-price-checker
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

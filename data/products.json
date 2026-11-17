@@ -1,0 +1,7 @@
+{"note": "Invented shop prices.", "products": [
+ {"name": "Rice 1 kg bag", "price": 2.40, "qty": 1, "unit": "kg"},
+ {"name": "Rice 500 g bag", "price": 1.35, "qty": 500, "unit": "g"},
+ {"name": "Rice 5 kg sack", "price": 13.50, "qty": 5, "unit": "kg"},
+ {"name": "Rice 2 lb pack", "price": 2.10, "qty": 2, "unit": "lb"},
+ {"name": "Rice 12 oz pouch", "price": 1.20, "qty": 12, "unit": "oz"}
+]}
