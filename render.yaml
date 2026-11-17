@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: message-shrinker
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

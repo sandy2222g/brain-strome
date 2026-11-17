@@ -1,0 +1,37 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Message Shrinker</title>
+<style>
+:root{--bg:#0d3b8c;--line:#ffffff22;--ink:#eaf1ff;--y:#ffd84a;--c:#6fe3ff;--mut:#a9c0f0}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);font:15px/1.5 "Lucida Console","Courier New",monospace;padding:28px 18px;background:var(--bg);background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:32px 32px;min-height:100vh}
+main{max-width:980px;margin:auto}h1{font-size:30px;margin:0;letter-spacing:2px;text-transform:uppercase}h1 span{color:var(--y)}p.s{color:var(--mut);margin:4px 0 16px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.tabs button{font:inherit;font-size:12px;background:transparent;color:var(--ink);border:1px solid var(--mut);padding:3px 10px;cursor:pointer}.tabs button.on{background:var(--y);color:#222;border-color:var(--y)}
+textarea{width:100%;height:110px;font:inherit;background:#082a66;color:var(--ink);border:1px solid var(--mut);padding:10px;resize:vertical}
+.box{border:1px solid var(--mut);background:#0a3278dd;padding:14px 16px;margin-top:14px}h2{margin:0 0 8px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--c)}
+.row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}@media(max-width:700px){.row{grid-template-columns:1fr 1fr}}.row div b{display:block;font-size:26px;color:var(--y)}.row small{color:var(--mut)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border:1px solid var(--mut);padding:2px 8px;font-size:13px}.chip b{color:var(--y)}
+.bits{word-break:break-all;font-size:13px;max-height:130px;overflow:auto}.bits span:nth-child(odd){color:var(--c)}.bits span:nth-child(even){color:var(--y)}
+.bar{display:grid;grid-template-columns:120px 1fr 56px;gap:10px;align-items:center;margin:5px 0;font-size:13px}.bar i{display:block;height:14px;background:var(--c)}.bar.h i{background:var(--y)}.bar.z i{background:#ff8f6b}
+.ok{color:#8dffa8}.m{font-size:12px;color:var(--mut);margin-top:12px}
+</style></head><body><main>
+<h1>Message <span>Shrinker</span></h1><p class="s">Huffman coding: common letters get short codes, rare letters get long ones. Type anything.</p>
+<div class="tabs" id="tabs"></div><textarea id="tx" spellcheck="false"></textarea>
+<div class="box"><h2>Size</h2><div class="row" id="st"></div><div id="bars" style="margin-top:10px"></div></div>
+<div class="box"><h2>Code table (shortest first)</h2><div class="chips" id="ch"></div></div>
+<div class="box"><h2>Encoded bits, one colour per letter</h2><div class="bits" id="bt"></div><div class="m" id="rt"></div></div>
+<p class="m" id="ev"></p></main>
+<script>
+const $=i=>document.getElementById(i);let tm,S;const esc=s=>s==' '?'␣':s=='\n'?'↵':s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+async function go(){const text=$('tx').value;if(!text){return}
+const r=await fetch('/shrink',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});const j=await r.json();if(!r.ok){$('rt').textContent=j.detail;return}
+$('st').innerHTML=`<div><b>${j.chars}</b><small>characters</small></div><div><b>${j.avg_code_len}</b><small>bits per letter (best possible ≥ ${j.entropy})</small></div><div><b>${Math.round(j.payload_ratio*100)}%</b><small>of original, message only</small></div><div><b>${Math.round(j.ratio*100)}%</b><small>of original, incl. code table</small></div>`;
+const mx=Math.max(j.raw_bits,j.total_bits,j.zlib_ratio*j.raw_bits);const bar=(l,v,c)=>`<div class="bar ${c}"><span>${l}</span><i style="width:${v/mx*100}%"></i><span>${v}</span></div>`;
+$('bars').innerHTML=bar('original bits',j.raw_bits,'')+bar('huffman total',j.total_bits,'h')+bar('zlib (for scale)',Math.round(j.zlib_ratio*j.raw_bits),'z');
+$('ch').innerHTML=Object.entries(j.table).map(([c,b])=>`<span class="chip"><b>${esc(c)}</b> ${b}</span>`).join('');
+$('bt').innerHTML=[...text].map(c=>`<span>${j.table[c]}</span>`).join('');
+const back=await (await fetch('/expand',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({table:j.table,bits:j.bits})})).json();
+$('rt').innerHTML=back.text===text?'<span class="ok">✓ decoded back to exactly the same text</span>':'✗ mismatch'}
+fetch('/samples').then(r=>r.json()).then(d=>{S=d.samples;$('tabs').innerHTML=S.map((s,i)=>`<button data-i="${i}">${s.name}</button>`).join('');
+const pick=i=>{$('tx').value=S[i].text;[...$('tabs').children].forEach((b,k)=>b.classList.toggle('on',k===i));go()};$('tabs').onclick=e=>{const b=e.target.closest('button');if(b)pick(+b.dataset.i)};pick(1);
+$('ev').innerHTML='Across the 5 samples Huffman beat zlib on '+d.evaluation.filter(e=>e.ratio<e.zlib_ratio).length+' and lost on '+d.evaluation.filter(e=>e.ratio>=e.zlib_ratio).length+': it only exploits letter frequencies, not repeated phrases.'});
+$('tx').oninput=()=>{clearTimeout(tm);tm=setTimeout(go,200)};
+</script></body></html>
