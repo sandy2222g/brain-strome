@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: word-ladder-solver
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

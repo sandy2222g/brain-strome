@@ -1,0 +1,34 @@
+[project]
+name = "word-ladder-solver"
+version = "1.0.0"
+description = "Shortest word ladders (BFS, bidirectional) with a tile UI"
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi>=0.110",
+  "uvicorn>=0.29",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.4"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["wordladder"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ANN"]
+ignore = ["ANN401"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ANN"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "scripts"]

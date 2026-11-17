@@ -1,0 +1,34 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Word Ladder Solver</title>
+<style>
+:root{--board:#1f3a2e;--chalk:#f1ecd9;--tile:#f6e7b4;--tileink:#2b2418;--acc:#f2a541}
+*{box-sizing:border-box}body{margin:0;background:var(--board);color:var(--chalk);font:17px/1.5 Georgia,"Times New Roman",serif;min-height:100vh}
+main{max-width:720px;margin:0 auto;padding:40px 22px}
+h1{font:italic 400 44px/1.05 Georgia,serif;margin:0 0 6px}.sub{opacity:.7;margin:0 0 28px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+input{font:700 26px "Courier New",monospace;text-transform:lowercase;width:150px;padding:8px 12px;border:2px dashed var(--chalk);background:transparent;color:var(--chalk);border-radius:6px;text-align:center}
+.arrow{font-size:28px;opacity:.7}button{font:inherit;background:var(--acc);color:#2a1d05;border:0;border-radius:6px;padding:10px 20px;font-weight:700;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 30px}.chips button{background:transparent;color:var(--chalk);border:1px solid #fff6;font-weight:400;padding:3px 12px;font-size:14px}.chips button:hover{background:#fff2}
+.ladder{display:flex;flex-direction:column;gap:8px;margin:10px 0}.rung{display:flex;gap:6px;align-items:center}
+.t{width:50px;height:54px;background:var(--tile);color:var(--tileink);font:700 28px "Courier New",monospace;display:grid;place-items:center;border-radius:5px;box-shadow:0 3px 0 #0006;text-transform:uppercase}
+.t.ch{background:var(--acc)}.rung i{margin-left:10px;opacity:.5;font-size:14px}
+.msg{min-height:30px;font-size:19px;margin:6px 0 14px}.bad{color:#ff9d8f}
+.stats{display:flex;gap:30px;margin-top:22px;border-top:1px dashed #fff5;padding-top:14px;font-size:15px}.stats b{font:700 26px "Courier New",monospace;color:var(--acc);display:block}
+</style></head><body><main>
+<h1>Word ladders</h1><p class="sub">Change one letter at a time to turn one word into another, in the fewest steps.</p>
+<div class="row"><input id="a" value="cold" maxlength="4"><span class="arrow">&rarr;</span><input id="z" value="warm" maxlength="4"><button id="go">Solve</button></div>
+<div class="chips" id="ch"></div><div class="msg" id="msg"></div><div class="ladder" id="lad"></div><div class="stats" id="st"></div>
+</main><script>
+const $=i=>document.getElementById(i);
+async function go(){const a=$('a').value.trim(),z=$('z').value.trim();
+const r=await fetch('/ladder?a='+encodeURIComponent(a)+'&z='+encodeURIComponent(z));const j=await r.json();
+$('lad').innerHTML='';$('st').innerHTML='';
+if(!r.ok){$('msg').className='msg bad';$('msg').textContent=j.detail;return}
+if(!j.found){$('msg').className='msg bad';$('msg').textContent='No ladder exists between these words in the list.';return}
+$('msg').className='msg';$('msg').textContent=j.steps+' step'+(j.steps==1?'':'s')+' from '+a+' to '+z+'.';
+$('lad').innerHTML=j.path.map((w,i)=>{const p=j.path[i-1];return '<div class="rung">'+[...w].map((c,k)=>`<div class="t${p&&p[k]!=c?' ch':''}">${c}</div>`).join('')+'</div>'}).join('');
+$('st').innerHTML=`<div><b>${j.explored}</b>words checked, searching from both ends</div><div><b>${j.plain_explored}</b>words checked, one end only</div>`}
+$('go').onclick=go;[$('a'),$('z')].forEach(e=>e.onkeydown=ev=>{if(ev.key=='Enter')go()});
+fetch('/examples').then(r=>r.json()).then(d=>{$('ch').innerHTML=d.examples.map(e=>`<button data-a="${e.from}" data-z="${e.to}">${e.from} &rarr; ${e.to}</button>`).join('');
+$('ch').onclick=ev=>{const b=ev.target.closest('button');if(b){$('a').value=b.dataset.a;$('z').value=b.dataset.z;go()}};go()});
+</script></body></html>
