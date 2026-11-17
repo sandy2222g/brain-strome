@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: bloom-spellcheck
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bloom Spellcheck</title>
+<style>
+:root{--bg:#10151f;--card:#182030;--ink:#e6edf7;--mut:#8a98b0;--cy:#4cd7d0;--pk:#ff6b9d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "SF Mono","Fira Code",Consolas,monospace}
+main{max-width:980px;margin:0 auto;padding:36px 22px;display:grid;grid-template-columns:1.2fr 1fr;gap:22px}
+h1{grid-column:1/-1;font-size:28px;margin:0}h1 span{color:var(--cy)}.sub{grid-column:1/-1;color:var(--mut);margin:-14px 0 4px;font-size:14px}
+.card{background:var(--card);border:1px solid #2a3550;border-radius:10px;padding:18px}
+textarea{width:100%;height:140px;background:#0c111a;color:var(--ink);border:1px solid #2a3550;border-radius:6px;padding:10px;font:inherit;resize:vertical}
+.out{margin-top:14px;min-height:120px}.w{display:inline-block;margin:0 6px 8px 0;padding:2px 8px;border-radius:4px;background:#ff6b9d22;border:1px solid var(--pk);color:var(--pk)}
+.s{color:var(--cy);font-size:14px;margin:0 0 10px 6px}.ok{color:var(--cy)}
+label{display:block;color:var(--mut);font-size:13px;margin:0 0 6px}input[type=range]{width:100%;accent-color:var(--cy)}
+.bar{height:18px;background:#0c111a;border-radius:4px;overflow:hidden;margin:6px 0 14px}.bar i{display:block;height:100%;background:var(--cy)}.bar.set i{background:var(--pk)}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px}dt{color:var(--mut)}dd{margin:0;text-align:right}
+@media(max-width:760px){main{grid-template-columns:1fr}}
+</style></head><body><main>
+<h1>bloom<span>/</span>spellcheck</h1><p class="sub">A dictionary stored as bits. Tiny, fast, and occasionally wrong in a way you can tune.</p>
+<section class="card"><label>Text to check</label><textarea id="t"></textarea><div class="out" id="out"></div></section>
+<section class="card"><label>Allowed false-positive rate: <b id="pv">1%</b></label><input id="p" type="range" min="0" max="3" step="1" value="2">
+<label style="margin-top:14px">Dictionary as a Bloom filter</label><div class="bar"><i id="b1"></i></div>
+<label>Dictionary as a plain Python set</label><div class="bar set"><i style="width:100%"></i></div>
+<dl id="dl"></dl></section>
+</main><script>
+const $=i=>document.getElementById(i),PS=[0.2,0.05,0.01,0.001];let tm;
+async function go(){const p=PS[$('p').value];$('pv').textContent=(p*100)+'%';
+const r=await fetch('/check?p='+p+'&text='+encodeURIComponent($('t').value));const j=await r.json();if(!r.ok){$('out').textContent=j.detail;return}
+$('out').innerHTML=j.unknown.length?j.unknown.map(u=>`<span class="w">${u.word}</span><span class="s">${u.suggestions.length?'did you mean '+u.suggestions.join(', ')+'?':'no suggestion'}</span><br>`).join(''):'<span class="ok">No unknown words.</span>';
+const f=j.filter;$('b1').style.width=Math.max(1,f.bytes/f.set_bytes*100)+'%';
+$('dl').innerHTML=`<dt>words</dt><dd>${f.words}</dd><dt>bits</dt><dd>${f.bits}</dd><dt>hash functions</dt><dd>${f.hashes}</dd><dt>filter size</dt><dd>${f.bytes} bytes</dd><dt>set size</dt><dd>${f.set_bytes} bytes</dd><dt>false positives, theory</dt><dd>${(f.expected_fp*100).toFixed(2)}%</dd><dt>false positives, measured</dt><dd>${(f.measured_fp*100).toFixed(2)}%</dd>`}
+$('p').oninput=go;$('t').oninput=()=>{clearTimeout(tm);tm=setTimeout(go,200)};
+fetch('/sample').then(r=>r.json()).then(d=>{$('t').value=d.text;go()});
+</script></body></html>
