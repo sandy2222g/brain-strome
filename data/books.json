@@ -1,0 +1,95 @@
+{
+ "shelf_width": 30,
+ "books": [
+  {
+   "title": "Book 1",
+   "thickness": 4,
+   "height": 18
+  },
+  {
+   "title": "Book 2",
+   "thickness": 2,
+   "height": 34
+  },
+  {
+   "title": "Book 3",
+   "thickness": 4,
+   "height": 18
+  },
+  {
+   "title": "Book 4",
+   "thickness": 2,
+   "height": 26
+  },
+  {
+   "title": "Book 5",
+   "thickness": 8,
+   "height": 20
+  },
+  {
+   "title": "Book 6",
+   "thickness": 3,
+   "height": 22
+  },
+  {
+   "title": "Book 7",
+   "thickness": 8,
+   "height": 30
+  },
+  {
+   "title": "Book 8",
+   "thickness": 5,
+   "height": 22
+  },
+  {
+   "title": "Book 9",
+   "thickness": 6,
+   "height": 22
+  },
+  {
+   "title": "Book 10",
+   "thickness": 6,
+   "height": 18
+  },
+  {
+   "title": "Book 11",
+   "thickness": 6,
+   "height": 24
+  },
+  {
+   "title": "Book 12",
+   "thickness": 5,
+   "height": 24
+  },
+  {
+   "title": "Book 13",
+   "thickness": 4,
+   "height": 34
+  },
+  {
+   "title": "Book 14",
+   "thickness": 5,
+   "height": 20
+  },
+  {
+   "title": "Book 15",
+   "thickness": 5,
+   "height": 20
+  },
+  {
+   "title": "Book 16",
+   "thickness": 2,
+   "height": 26
+  },
+  {
+   "title": "Book 17",
+   "thickness": 5,
+   "height": 30
+  },
+  {
+   "title": "Book 18",
+   "thickness": 3,
+   "height": 26
+  }
+ ]
+}

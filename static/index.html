@@ -1,0 +1,29 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bookshelf Filler</title>
+<style>
+:root{--bg:#1f2a24;--ink:#f1e8d4;--wood:#6b4423;--wood2:#8a5a2f;--gold:#d9a441}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Palatino Linotype",Palatino,serif;padding:26px}
+main{max-width:1050px;margin:auto}h1{font-size:34px;margin:0;color:var(--gold);font-weight:400;letter-spacing:2px}
+p.s{margin:2px 0 18px;opacity:.75}.top{display:flex;gap:16px;align-items:end;flex-wrap:wrap;margin-bottom:16px}
+label{font-size:12px;opacity:.7;display:block}input{width:90px;padding:6px;border-radius:4px;border:1px solid var(--gold);background:#16201b;color:var(--ink)}
+button{background:var(--gold);border:0;border-radius:4px;padding:8px 16px;font-weight:700;cursor:pointer;color:#2a1c08}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:26px}@media(max-width:800px){.cols{grid-template-columns:1fr}}
+h2{font-weight:400;font-size:18px;border-bottom:1px solid var(--gold);padding-bottom:3px}h2 b{float:right;color:var(--gold)}
+.case{background:#2c1d0e;padding:6px 10px 0;border:6px solid var(--wood);border-radius:3px}
+.shelf{display:flex;align-items:flex-end;gap:2px;border-bottom:8px solid var(--wood2);padding-top:6px}
+.bk{border-radius:2px 2px 0 0;font-size:9px;writing-mode:vertical-rl;text-align:center;overflow:hidden;color:#fff9;display:flex;align-items:center;justify-content:center}
+#err{color:#ff9d8a}.sv{color:var(--gold);font-size:20px}
+</style></head><body><main>
+<h1>Bookshelf Filler</h1><p class="s">Keep your series in order — fit them on the shelves with the least total height.</p>
+<div class="top"><div><label>Shelf width</label><input id="w" type="number"></div><button id="go">Arrange</button><span class="sv" id="sv"></span><span id="err"></span></div>
+<div class="cols"><div><h2>Optimal <b id="ot"></b></h2><div class="case" id="o"></div></div><div><h2>Fill-until-full <b id="gt"></b></h2><div class="case" id="g"></div></div></div></main>
+<script>
+let D;const $=i=>document.getElementById(i);const K=3.4;
+const pal=['#8c2f39','#2f5d8c','#3b7d4f','#b5651d','#6a4c93','#2a9d8f','#c44569'];
+const draw=(r,id,hi)=>{const byT={};D.books.forEach((b,i)=>byT[b.title]=[b,i]);
+$(id).innerHTML=r.shelves.map(s=>`<div class="shelf" style="min-height:${s.height*K}px">${s.books.map(t=>{const[b,i]=byT[t];return`<div class="bk" title="${t}" style="width:${b.thickness*K*1.6}px;height:${b.height*K}px;background:${pal[i%pal.length]}">${b.thickness>=4?t.replace('Book ',''):''}</div>`}).join('')}</div>`).join('')};
+async function run(){$('err').textContent='';const r=await fetch('/fill',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({shelf_width:+$('w').value,books:D.books})});
+const j=await r.json();if(!r.ok){$('err').textContent=j.detail;return}
+draw(j.optimal,'o');draw(j.greedy,'g');$('ot').textContent=j.optimal.total_height+' cm · '+j.optimal.count+' shelves';$('gt').textContent=j.greedy.total_height+' cm · '+j.greedy.count+' shelves';$('sv').textContent='saves '+j.height_saved+' cm of shelf height'}
+fetch('/sample').then(r=>r.json()).then(d=>{D=d;$('w').value=d.shelf_width;run()});$('go').onclick=run;
+</script></body></html>
