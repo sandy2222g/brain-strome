@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: chase-win-estimator
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
