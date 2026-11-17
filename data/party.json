@@ -1,0 +1,8 @@
+{"slices_each": 3, "meat_pct": 60, "people": {"meat": 8, "vegetarian": 5, "vegan": 3},
+ "menu": [
+  {"name": "Pepperoni", "price": 11.5, "slices": 8, "diet": "meat"},
+  {"name": "Margherita", "price": 9.0, "slices": 8, "diet": "vegetarian"},
+  {"name": "Veggie Supreme", "price": 12.0, "slices": 8, "diet": "vegan"},
+  {"name": "BBQ Chicken", "price": 13.5, "slices": 8, "diet": "meat"},
+  {"name": "Four Cheese", "price": 10.5, "slices": 8, "diet": "vegetarian"}
+ ]}

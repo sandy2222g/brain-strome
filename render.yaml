@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: pizza-order-planner
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

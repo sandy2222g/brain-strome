@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pizza Order Planner</title>
+<style>
+:root{--bg:#fff4e0;--ink:#3a1a10;--red:#c8312b;--cheese:#f4b52e;--green:#2e7d4f;--card:#fffaf0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg) repeating-linear-gradient(45deg,#ffeccb 0 14px,#fff4e0 14px 28px);color:var(--ink);font:15px/1.5 "Trebuchet MS",sans-serif;padding:24px}
+main{max-width:980px;margin:auto}header{background:var(--red);color:#fff;padding:18px 24px;border-radius:14px;transform:rotate(-.6deg);box-shadow:5px 5px 0 var(--cheese)}
+h1{margin:0;font-size:30px;letter-spacing:1px;text-transform:uppercase}header p{margin:2px 0 0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}@media(max-width:760px){.row{grid-template-columns:1fr}}
+.box{background:var(--card);border:3px solid var(--ink);border-radius:14px;padding:16px}
+h2{margin:0 0 8px;font-size:17px;text-transform:uppercase}
+.f{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.f label{font-size:12px}.f input{width:70px;display:block;padding:5px;border:2px solid var(--ink);border-radius:6px}
+button{background:var(--green);color:#fff;border:0;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer}
+table{width:100%;border-collapse:collapse}td{padding:5px 0;border-bottom:1px dotted #b99}.tot{font-size:26px;font-weight:800}
+.bad{color:var(--red);font-weight:700}.ok{color:var(--green);font-weight:700}#err{color:var(--red)}
+.tag{font-size:11px;background:var(--cheese);padding:1px 7px;border-radius:9px;margin-left:5px}
+</style></head><body><main>
+<header><h1>Pizza Order Planner</h1><p>Cheapest order that feeds meat eaters, vegetarians and vegans.</p></header>
+<div class="row"><div class="box"><h2>The party</h2><div class="f" id="f"></div><div id="menu"></div><button id="go">Plan the order</button> <span id="err"></span></div>
+<div class="box"><h2>Smart order</h2><div id="p"></div><h2 style="margin-top:18px">Cheapest-slice order (naive)</h2><div id="n"></div></div></div></main>
+<script>
+let D;const $=i=>document.getElementById(i);
+const show=(o,id,naive)=>{$(id).innerHTML=`<table>${o.lines.map(l=>`<tr><td>${l.count} × ${l.name}</td><td align=right>$${l.cost.toFixed(2)}</td></tr>`).join('')}</table><div class="tot">$${o.total.toFixed(2)}</div>`+(naive?(o.unfed_guests?`<div class="bad">${o.unfed_guests} guests have nothing they can eat</div>`:'<div class="ok">everyone fed</div>'):`<div class="ok">everyone fed · ${o.spare_slices} spare slices</div>`)};
+async function run(){$('err').textContent='';const people={meat:+$('m').value,vegetarian:+$('v').value,vegan:+$('g').value};
+const r=await fetch('/plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slices_each:+$('s').value,meat_pct:+$('x').value,people,menu:D.menu})});
+const j=await r.json();if(!r.ok){$('err').textContent=j.detail;return}show(j.planned,'p',false);show(j.naive,'n',true)}
+fetch('/sample').then(r=>r.json()).then(d=>{D=d;
+$('f').innerHTML=`<label>Meat<input id=m type=number value=${d.people.meat}></label><label>Veg<input id=v type=number value=${d.people.vegetarian}></label><label>Vegan<input id=g type=number value=${d.people.vegan}></label><label>Slices each<input id=s type=number value=${d.slices_each}></label><label>Meat %<input id=x type=number value=${d.meat_pct}></label>`;
+$('menu').innerHTML='<table>'+d.menu.map(m=>`<tr><td>${m.name}<span class=tag>${m.diet}</span></td><td align=right>$${m.price.toFixed(2)}</td></tr>`).join('')+'</table><br>';run()});
+$('go').onclick=run;
+</script></body></html>
