@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: debt-payoff-strategist
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

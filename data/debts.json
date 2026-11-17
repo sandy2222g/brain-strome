@@ -1,0 +1,7 @@
+{"note": "Invented debts and budget, amounts in currency units.", "budget": 600.0,
+ "debts": [
+  {"name": "Store card", "balance": 1200.0, "apr": 26.0, "minimum": 40.0},
+  {"name": "Credit card", "balance": 4800.0, "apr": 21.0, "minimum": 120.0},
+  {"name": "Car loan", "balance": 7500.0, "apr": 7.0, "minimum": 210.0},
+  {"name": "Phone plan balance", "balance": 450.0, "apr": 0.0, "minimum": 30.0}
+ ]}

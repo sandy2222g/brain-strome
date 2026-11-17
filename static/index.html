@@ -1,0 +1,38 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Debt Payoff Strategist</title>
+<style>
+:root{--bg:#0f0b1f;--card:#1a1433;--ink:#ece8ff;--mute:#9f98c8;--a:#a78bfa;--b:#34d399;--c:#f472b6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,sans-serif;padding:28px}
+main{max-width:1000px;margin:auto}h1{margin:0 0 4px;font-size:28px;letter-spacing:-.5px}p.s{color:var(--mute);margin:0 0 20px}
+.grid{display:grid;grid-template-columns:1fr 1.4fr;gap:18px}@media(max-width:800px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:14px;padding:18px}
+label{display:block;color:var(--mute);font-size:12px;margin-top:8px}
+input{width:100%;background:#120d28;border:1px solid #2e2557;color:var(--ink);border-radius:8px;padding:6px 8px}
+table{width:100%;border-collapse:collapse}td,th{padding:5px 4px;text-align:left;font-size:13px}th{color:var(--mute);font-weight:500}
+button{margin-top:12px;background:var(--a);color:#150f33;border:0;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer}
+.kpi{display:flex;gap:12px;margin-bottom:12px}.kpi div{flex:1;background:#120d28;border-radius:10px;padding:10px}
+.kpi b{display:block;font-size:20px}.kpi span{color:var(--mute);font-size:12px}
+.save{color:var(--b)}svg{width:100%;height:220px}#err{color:var(--c)}
+</style></head><body><main>
+<h1>Debt Payoff Strategist</h1><p class="s">Avalanche vs snowball vs minimums only, with the same monthly budget.</p>
+<div class="grid"><div class="card"><label>Monthly budget</label><input id="bud" type="number">
+<table id="tb"><thead><tr><th>Debt</th><th>Balance</th><th>APR %</th><th>Min</th></tr></thead><tbody></tbody></table>
+<button id="go">Compare plans</button><p id="err"></p></div>
+<div class="card"><div class="kpi" id="kpi"></div><svg id="ch" viewBox="0 0 600 220"></svg><div id="ord"></div></div></div></main>
+<script>
+let debts=[];const $=i=>document.getElementById(i);
+function draw(r){const cols={avalanche:'#a78bfa',snowball:'#34d399',minimum_only:'#f472b6'};
+const maxM=Math.max(...Object.values(r.plans).map(p=>p.months)),maxB=r.plans.avalanche.balances[0];
+let h='';for(const[k,p]of Object.entries(r.plans)){const pts=p.balances.map((b,i)=>`${(i/maxM*580+10).toFixed(1)},${(205-b/maxB*190).toFixed(1)}`).join(' ');
+h+=`<polyline fill="none" stroke="${cols[k]}" stroke-width="2.5" points="${pts}"/>`}
+$('ch').innerHTML=h;
+$('kpi').innerHTML=Object.entries(r.plans).map(([k,p])=>`<div><span style="color:${cols[k]}">${k.replace('_',' ')}</span><b>${p.months} mo</b><span>interest ${p.interest.toFixed(2)}</span></div>`).join('');
+$('ord').innerHTML=`<p class="save">Avalanche saves ${r.interest_saved_vs_snowball.toFixed(2)} over snowball and ${r.interest_saved_vs_minimum.toFixed(2)} over minimums only.</p>`+
+Object.entries(r.plans).map(([k,p])=>`<p><b>${k.replace('_',' ')}</b>: ${p.paid_off_order.join(' → ')}</p>`).join('')}
+async function run(){$('err').textContent='';const rows=[...document.querySelectorAll('#tb tbody tr')].map((tr,i)=>{const v=[...tr.querySelectorAll('input')].map(x=>+x.value);return{name:debts[i].name,balance:v[0],apr:v[1],minimum:v[2]}});
+const res=await fetch('/compare',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({budget:+$('bud').value,debts:rows})});
+const j=await res.json();if(!res.ok){$('err').textContent=j.detail||'error';return}draw(j)}
+fetch('/sample').then(r=>r.json()).then(d=>{debts=d.debts;$('bud').value=d.budget;
+$('tb').querySelector('tbody').innerHTML=debts.map(x=>`<tr><td>${x.name}</td><td><input type="number" value="${x.balance}"></td><td><input type="number" value="${x.apr}"></td><td><input type="number" value="${x.minimum}"></td></tr>`).join('');run()});
+$('go').onclick=run;
+</script></body></html>
