@@ -1,0 +1,38 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cellular Automata Lab</title>
+<style>
+:root{--bg:#fbfdff;--bl:#2d5bd1;--ink:#16213d;--gr:#d8e2f7;--card:#fff;--pk:#e8497a}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);font:16px/1.5 "Futura","Century Gothic","Trebuchet MS",sans-serif;background:var(--bg) linear-gradient(var(--gr) 1px,transparent 1px) 0 0/24px 24px,linear-gradient(90deg,var(--gr) 1px,transparent 1px) 0 0/24px 24px}
+main{max-width:1000px;margin:0 auto;padding:28px 18px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+header{grid-column:1/-1}h1{font-weight:700;font-size:34px;margin:0;color:var(--bl);letter-spacing:-.5px}.sub{margin:4px 0 0;opacity:.7}
+.card{background:var(--card);border:2px solid var(--bl);padding:14px;box-shadow:5px 5px 0 var(--gr)}h2{margin:0 0 8px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--pk)}
+canvas{width:100%;display:block;image-rendering:pixelated;background:#fff;border:1px solid var(--gr)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px;font-size:14px}input[type=range]{flex:1;min-width:120px;accent-color:var(--bl)}
+select,button{font:inherit;border:2px solid var(--bl);background:#fff;color:var(--bl);padding:3px 10px;cursor:pointer;font-weight:700}button.on{background:var(--bl);color:#fff}
+.note{font-size:13px;margin:8px 0 0;opacity:.8}table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:3px 8px;border-bottom:1px solid var(--gr);text-align:right}th:first-child,td:first-child{text-align:left}
+@media(max-width:760px){main{grid-template-columns:1fr}}
+</style></head><body><main>
+<header><h1>Cellular automata lab</h1><p class="sub">Tiny rules, big surprises. Left: a one-line universe with 256 possible laws. Right: Conway's Game of Life.</p></header>
+<section class="card"><h2>Elementary rule <span id="rn"></span></h2><div class="row"><input id="r" type="range" min="0" max="255" value="30"><span id="stat"></span></div>
+<canvas id="a" width="161" height="80"></canvas><div class="row" style="margin-top:8px" id="tops"></div>
+<table id="tt"></table></section>
+<section class="card"><h2>Game of Life</h2><div class="row"><select id="p"></select><button id="pl">pause</button><span id="gi"></span></div>
+<canvas id="b" width="260" height="260"></canvas><p class="note" id="info"></p></section>
+</main><script>
+const $=i=>document.getElementById(i);let timer,frames,g=0,off=[0,0];
+async function rule(){const r=$('r').value;$('rn').textContent=r;const j=await (await fetch(`/rule?rule=${r}&steps=80&width=161`)).json();
+const c=$('a').getContext('2d'),w=161;c.clearRect(0,0,w,80);c.fillStyle='#2d5bd1';j.rows.forEach((row,y)=>{for(let x=0;x<w;x++)if(row[x]=='1')c.fillRect(x,y,1,1)});
+$('stat').textContent=`density ${j.density}, compressibility ${j.complexity}`}
+function draw(){const c=$('b').getContext('2d');c.clearRect(0,0,260,260);const cells=frames[g];if(!cells.length)return;
+const cs=8,cx=Math.round(cells.reduce((a,p)=>a+p[0],0)/cells.length),cy=Math.round(cells.reduce((a,p)=>a+p[1],0)/cells.length);c.fillStyle='#e8497a';
+cells.forEach(([x,y])=>c.fillRect(130+(x-cx)*cs-4,130+(y-cy)*cs-4,cs-1,cs-1));$('gi').textContent='generation '+g+', '+cells.length+' cells'}
+async function life(){clearInterval(timer);const p=$('p').value;const j=await (await fetch(`/life?pattern=${p}&gens=120`)).json();frames=j.frames;g=0;const i=j.info;
+$('info').textContent=i.kind==='no repeat'?'Never repeats within the first 60 generations: it keeps growing and changing (this one settles only after 1,103 generations, at 116 cells).':`${i.kind}: repeats its shape every ${i.period} generation${i.period>1?'s':''}${i.kind==='spaceship'?' and travels ('+i.move.join(', ')+') cells each time':''}.`;
+draw();timer=setInterval(()=>{if(!$('pl').classList.contains('on')){g=(g+1)%frames.length;draw()}},150)}
+$('pl').onclick=()=>$('pl').classList.toggle('on');$('p').onchange=life;$('r').oninput=rule;
+fetch('/patterns').then(r=>r.json()).then(d=>{$('p').innerHTML=d.patterns.map(p=>`<option${p.pattern==='glider'?' selected':''}>${p.pattern}</option>`).join('');life()});
+fetch('/rules/top').then(r=>r.json()).then(d=>{$('tops').innerHTML='Richest rules: '+d.top.slice(0,6).map(t=>`<button data-r="${t.rule}">${t.rule}</button>`).join(' ');
+$('tops').onclick=e=>{if(e.target.dataset.r){$('r').value=e.target.dataset.r;rule()}};
+$('tt').innerHTML='<tr><th>rule</th><th>density</th><th>compressibility</th></tr>'+d.top.slice(0,5).map(t=>`<tr><td>${t.rule}</td><td>${t.density}</td><td>${t.complexity}</td></tr>`).join('')+d.bottom.slice(0,2).map(t=>`<tr><td>${t.rule} (dullest)</td><td>${t.density}</td><td>${t.complexity}</td></tr>`).join('')});
+rule();
+</script></body></html>

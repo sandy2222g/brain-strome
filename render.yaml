@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: cellular-automata-lab
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
