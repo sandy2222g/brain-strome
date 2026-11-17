@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: dither-lab
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
