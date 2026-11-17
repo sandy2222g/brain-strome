@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Terrain Trail Pathfinder</title>
+<style>
+:root{--bg:#e9e2cf;--ink:#2f2a1e;--olive:#5b6b2e;--rust:#c4561d;--mut:#7d7358;--card:#f6f1e2}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Gill Sans","Trebuchet MS",sans-serif;padding:26px 18px}
+main{max-width:1060px;margin:auto}h1{font:700 36px "Rockwell","Georgia",serif;margin:0;color:var(--olive)}h1 span{color:var(--rust)}p.s{margin:2px 0 14px;color:var(--mut)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}.bar button{font:inherit;border:2px solid var(--olive);background:var(--card);color:var(--olive);padding:4px 14px;cursor:pointer;border-radius:4px}.bar button.on{background:var(--olive);color:#fff}.bar span{margin:0 4px 0 12px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--mut)}
+.g{display:grid;grid-template-columns:2.1fr 1fr;gap:18px}@media(max-width:860px){.g{grid-template-columns:1fr}}
+.card{background:var(--card);border:2px solid #d4cab0;border-radius:8px;padding:14px}svg{width:100%;height:auto;display:block;border:2px solid #2f2a1e}
+.k{margin:0 0 12px}.k b{font:700 32px "Rockwell",serif;display:block;color:var(--rust);line-height:1.1}.k small{color:var(--mut)}
+.leg{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin-top:10px;color:var(--mut)}.leg i{display:inline-block;width:14px;height:14px;vertical-align:middle;margin-right:4px;border:1px solid #0003}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:4px 6px;text-align:right;border-bottom:1px solid #ddd3b8}td:first-child,th:first-child{text-align:left}th{font-size:11px;text-transform:uppercase;color:var(--mut)}tr.on td{font-weight:700;background:#efe6c8}
+</style></head><body><main>
+<h1>Terrain <span>Trail</span> Pathfinder</h1><p class="s">Three ways to cross the same map. Roads cost 1, sand 3, hills 5; walls and water block the way.</p>
+<div class="bar" id="bar"><span>Map</span><span id="sp" style="margin-left:18px">Algorithm</span></div>
+<div class="g"><div class="card"><svg id="sv"></svg><div class="leg"><span><i style="background:#d9d3bd"></i>road</span><span><i style="background:#e8c36a"></i>sand</span><span><i style="background:#a98d5f"></i>hill</span><span><i style="background:#4a90b8"></i>water</span><span><i style="background:#3a3a3a"></i>wall</span><span><i style="background:#c4561d55"></i>cells examined</span><span><i style="background:#c4561d"></i>route</span></div></div>
+<div><div class="card"><div class="k"><b id="c1"></b><small>effort to reach the goal</small></div><div class="k"><b id="c2"></b><small>cells examined on the way</small></div><div class="k" style="margin:0"><b id="c3"></b><small>steps taken</small></div></div>
+<div class="card" style="margin-top:14px"><table id="tb"></table></div></div></div></main>
+<script>
+const $=i=>document.getElementById(i);let D,mi=0,alg='astar';const N={bfs:'BFS (fewest steps)',dijkstra:'Dijkstra (cheapest)',astar:'A* (cheapest, guided)'};
+const COL={'.':'#d9d3bd','S':'#7fb069','G':'#e4572e','s':'#e8c36a','^':'#a98d5f','~':'#4a90b8','#':'#3a3a3a'};
+async function draw(){const m=D.maps[mi],rows=m.text.trim().split('\n'),h=rows.length,w=rows[0].length,k=20;
+const r=await (await fetch('/solve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:m.text,algorithm:alg})})).json();
+let s=`<svg viewBox="0 0 ${w*k} ${h*k}">`;
+rows.forEach((row,y)=>[...row].forEach((c,x)=>s+=`<rect x="${x*k}" y="${y*k}" width="${k}" height="${k}" fill="${COL[c]}" stroke="#0001"/>`));
+r.explored.forEach(([y,x])=>s+=`<rect x="${x*k}" y="${y*k}" width="${k}" height="${k}" fill="#c4561d" opacity=".28"/>`);
+if(r.found)s+=`<polyline fill="none" stroke="#c4561d" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" points="${r.path.map(([y,x])=>(x*k+k/2)+','+(y*k+k/2)).join(' ')}"/>`;
+$('sv').outerHTML=s.replace('<svg ','<svg id="sv" ')+'</svg>';
+$('c1').textContent=r.found?r.cost:'no route';$('c2').textContent=r.expanded;$('c3').textContent=r.steps;
+const ev=D.evaluation[mi];$('tb').innerHTML='<tr><th>'+m.name+'</th><th>effort</th><th>examined</th></tr>'+['bfs','dijkstra','astar'].map(a=>`<tr class="${a===alg?'on':''}"><td>${N[a].split(' ')[0]}</td><td>${ev[a].cost}</td><td>${ev[a].expanded}</td></tr>`).join('');
+document.querySelectorAll('[data-m]').forEach(b=>b.classList.toggle('on',+b.dataset.m===mi));document.querySelectorAll('[data-a]').forEach(b=>b.classList.toggle('on',b.dataset.a===alg))}
+fetch('/maps').then(r=>r.json()).then(d=>{D=d;const bar=$('bar');
+D.maps.forEach((m,i)=>{const b=document.createElement('button');b.textContent=m.name;b.dataset.m=i;b.onclick=()=>{mi=i;draw()};bar.insertBefore(b,$('sp'))});
+Object.keys(N).forEach(a=>{const b=document.createElement('button');b.textContent=N[a];b.dataset.a=a;b.onclick=()=>{alg=a;draw()};bar.appendChild(b)});draw()});
+</script></body></html>

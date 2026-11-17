@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: terrain-trail-pathfinder
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
