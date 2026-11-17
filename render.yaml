@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: morning-routine-planner
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

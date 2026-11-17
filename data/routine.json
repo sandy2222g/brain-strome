@@ -1,0 +1,73 @@
+{
+ "note": "Invented routine; minutes. hands_free tasks (kettle, toaster) run on their own.",
+ "leave": "08:15",
+ "tasks": [
+  {
+   "name": "Boil kettle",
+   "min": 4,
+   "after": [],
+   "hands_free": true
+  },
+  {
+   "name": "Make coffee",
+   "min": 3,
+   "after": [
+    "Boil kettle"
+   ],
+   "hands_free": false
+  },
+  {
+   "name": "Shower",
+   "min": 10,
+   "after": [],
+   "hands_free": false
+  },
+  {
+   "name": "Get dressed",
+   "min": 8,
+   "after": [
+    "Shower"
+   ],
+   "hands_free": false
+  },
+  {
+   "name": "Toast bread",
+   "min": 5,
+   "after": [],
+   "hands_free": true
+  },
+  {
+   "name": "Eat breakfast",
+   "min": 12,
+   "after": [
+    "Toast bread",
+    "Make coffee"
+   ],
+   "hands_free": false
+  },
+  {
+   "name": "Pack bag",
+   "min": 5,
+   "after": [],
+   "hands_free": false
+  },
+  {
+   "name": "Brush teeth",
+   "min": 3,
+   "after": [
+    "Eat breakfast"
+   ],
+   "hands_free": false
+  },
+  {
+   "name": "Shoes and coat",
+   "min": 3,
+   "after": [
+    "Get dressed",
+    "Brush teeth",
+    "Pack bag"
+   ],
+   "hands_free": false
+  }
+ ]
+}
