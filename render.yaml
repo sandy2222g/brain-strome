@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: countdown-solver
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

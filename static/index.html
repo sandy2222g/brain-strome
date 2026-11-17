@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Countdown Solver</title>
+<style>
+:root{--bg:#0a1f5c;--tile:#143a9e;--gold:#ffd23f;--ink:#fff;--glow:#7fb0ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#1c46c4,var(--bg) 70%);color:var(--ink);min-height:100vh;font:17px/1.5 "Arial Rounded MT Bold","Verdana",sans-serif;text-align:center}
+main{max-width:720px;margin:0 auto;padding:30px 16px}h1{margin:0;color:var(--gold);font-size:34px;letter-spacing:3px;text-transform:uppercase;text-shadow:0 0 14px #ffd23f66}.sub{color:var(--glow);margin:4px 0 22px}
+.tiles{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.tile{background:var(--tile);border:3px solid var(--glow);border-radius:10px;min-width:74px;padding:10px 8px;font-size:30px;font-weight:900;color:var(--gold)}
+.target{display:inline-block;margin:20px 0 6px;background:#000;border:4px solid var(--gold);border-radius:8px;padding:6px 28px;font:900 56px/1.1 "Courier New",monospace;color:#ff5a36;letter-spacing:6px}
+button{font:inherit;background:var(--gold);color:#241a00;border:0;border-radius:24px;padding:8px 24px;cursor:pointer;font-weight:900;margin:4px}
+.answer{margin-top:20px;background:#0006;border-radius:12px;padding:16px;min-height:90px}.expr{font:700 22px "Courier New",monospace;color:#fff;word-break:break-word}.meta{color:var(--glow);font-size:14px;margin-top:6px}
+</style></head><body><main>
+<h1>Countdown solver</h1><p class="sub">Six numbers, one target. The solver tries every way of combining them.</p>
+<div class="tiles" id="t"></div><div class="target" id="g">---</div><div><button id="n">new puzzle</button><button id="s">solve it</button></div>
+<div class="answer"><div class="expr" id="e">Press "solve it".</div><div class="meta" id="m"></div></div>
+</main><script>
+const $=i=>document.getElementById(i);let seed=3,pz;
+async function fresh(){pz=await (await fetch('/puzzle?seed='+seed++)).json();$('t').innerHTML=pz.numbers.map(n=>`<div class="tile">${n}</div>`).join('');$('g').textContent=pz.target;$('e').textContent='Press "solve it".';$('m').textContent=''}
+$('n').onclick=fresh;
+$('s').onclick=async()=>{const j=await (await fetch(`/solve?numbers=${pz.numbers.join(',')}&target=${pz.target}`)).json();
+$('e').textContent=(j.exact?'':'Closest: '+j.value+'  ')+j.expression.replace(/^\((.*)\)$/,'$1')+' = '+j.value;$('m').textContent=j.exact?`Exact. Checked ${j.states.toLocaleString()} number sets.`:`Off by ${j.distance}. Checked ${j.states.toLocaleString()} number sets.`};
+fresh().then(()=>$('s').click());
+</script></body></html>
