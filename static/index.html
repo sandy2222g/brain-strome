@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Weekly Menu Planner</title>
+<style>
+:root{--bg:#fbfaf5;--ink:#1d3b2a;--green:#2f6b45;--leaf:#dcebd9;--red:#d9482b;--mute:#6a7d70}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Gill Sans","Trebuchet MS",sans-serif}
+main{max-width:980px;margin:0 auto;padding:30px 16px}h1{margin:0;font-size:2rem;color:var(--green)}p{color:var(--mute)}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:18px}
+.day{background:var(--leaf);border-radius:10px;overflow:hidden;min-height:150px}.day h3{margin:0;background:var(--green);color:#fff;padding:6px 10px;font-size:.9rem;letter-spacing:1px}
+.day div{padding:10px}.dn{font-weight:bold}.m{font-size:.8rem;color:var(--mute);margin-top:4px}
+.bad{margin-top:22px;border-left:5px solid var(--red);background:#fff;padding:10px 14px}.bad ul{margin:6px 0 0;padding-left:18px;font-size:.9rem}
+@media(max-width:700px){.week{grid-template-columns:repeat(2,1fr)}}
+</style></head><body><main>
+<h1>Weekly menu planner</h1><p>Seven dinners: no repeated dish, no same protein two days running, quick meals on weeknights.</p>
+<div class="week" id="week"></div><div class="bad" id="bad"></div></main>
+<script>
+(async()=>{
+  const s=await (await fetch("/sample")).json();
+  const r=await (await fetch("/plan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)})).json();
+  document.getElementById("week").innerHTML=r.plan.map(x=>`<div class="day"><h3>${x.day}</h3><div><div class="dn">${x.name}</div><div class="m">${x.protein} · ${x.minutes} min</div></div></div>`).join("");
+  document.getElementById("bad").innerHTML=`Taking the first seven dishes in list order breaks ${r.list_order_violations.length} rules:<ul>${r.list_order_violations.slice(0,4).map(v=>`<li>${v}</li>`).join("")}</ul>`;
+})();
+</script></body></html>

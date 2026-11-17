@@ -1,0 +1,14 @@
+{"note": "Invented dish list.", "weeknight_max_min": 30,
+ "days": ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+ "dishes": [
+  {"name": "Chicken curry", "protein": "chicken", "minutes": 45},
+  {"name": "Chicken stir-fry", "protein": "chicken", "minutes": 20},
+  {"name": "Lentil dal", "protein": "lentil", "minutes": 30},
+  {"name": "Beef chilli", "protein": "beef", "minutes": 60},
+  {"name": "Fish tacos", "protein": "fish", "minutes": 25},
+  {"name": "Veggie pasta", "protein": "veg", "minutes": 20},
+  {"name": "Egg fried rice", "protein": "egg", "minutes": 15},
+  {"name": "Roast chicken", "protein": "chicken", "minutes": 90},
+  {"name": "Chickpea stew", "protein": "chickpea", "minutes": 35},
+  {"name": "Salmon bake", "protein": "fish", "minutes": 30}
+ ]}

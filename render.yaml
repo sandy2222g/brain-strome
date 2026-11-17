@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: weekly-menu-planner
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
