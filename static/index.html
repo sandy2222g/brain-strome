@@ -1,0 +1,34 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Weather Outfit Picker</title>
+<style>
+:root{--bg:#0f1f2e;--ink:#e8f1f8;--sky:#4fb3ff;--sun:#ffc94d;--card:#18304a;--mut:#8fa9c0}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#0f1f2e,#1d3b5c);min-height:100vh;color:var(--ink);font:16px/1.5 "Segoe UI",system-ui,sans-serif;padding:28px}
+main{max-width:760px;margin:auto}h1{font-size:30px;margin:0 0 4px;letter-spacing:-.5px}h1 b{color:var(--sun)}p.s{margin:0 0 22px;color:var(--mut)}
+.card{background:var(--card);border-radius:18px;padding:22px;margin-bottom:18px;border:1px solid #2a4a6c}
+.row{display:grid;grid-template-columns:110px 1fr 70px;gap:12px;align-items:center;margin:10px 0}
+label{color:var(--mut);font-size:14px}input[type=range]{width:100%;accent-color:var(--sky)}.v{text-align:right;font-weight:700}
+.res{text-align:center}.em{font-size:72px;line-height:1.1}.name{font-size:28px;font-weight:800;color:var(--sun);text-transform:capitalize}
+.bars{margin-top:14px;text-align:left}.bar{display:grid;grid-template-columns:90px 1fr 48px;gap:10px;align-items:center;font-size:13px;margin:5px 0;color:var(--mut)}
+.bar i{display:block;height:10px;border-radius:5px;background:var(--sky);transition:width .25s}.m{font-size:13px;color:var(--mut)}.m b{color:var(--sun)}
+</style></head><body><main>
+<h1>What should I <b>wear</b>?</h1><p class="s">Slide the weather. A tiny logistic-regression model trained on 240 invented days answers.</p>
+<div class="card">
+<div class="row"><label>Temperature</label><input id="t" type="range" min="-5" max="35" step="0.5" value="12"><span class="v" id="tv"></span></div>
+<div class="row"><label>Wind</label><input id="w" type="range" min="0" max="45" step="1" value="10"><span class="v" id="wv"></span></div>
+<div class="row"><label>Rain</label><input id="r" type="range" min="0" max="12" step="0.5" value="0"><span class="v" id="rv"></span></div>
+</div>
+<div class="card res"><div class="em" id="em"></div><div class="name" id="nm"></div><div class="m" id="cf"></div><div class="bars" id="bars"></div></div>
+<p class="m" id="ev"></p></main>
+<script>
+const $=i=>document.getElementById(i);
+const EM={light:'👕',jumper:'🧥',coat:'🧣',raincoat:'☔'};
+async function go(){
+const t=+$('t').value,w=+$('w').value,r=+$('r').value;
+$('tv').textContent=t+' °C';$('wv').textContent=w+' km/h';$('rv').textContent=r+' mm';
+const j=await (await fetch('/recommend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({temp_c:t,wind_kph:w,rain_mm:r})})).json();
+$('em').textContent=EM[j.outfit];$('nm').textContent=j.outfit==='light'?'T-shirt weather':j.outfit;
+$('cf').textContent='confidence '+Math.round(j.confidence*100)+'%';
+$('bars').innerHTML=Object.entries(j.probabilities).map(([k,v])=>`<div class="bar"><span>${k}</span><i style="width:${v*100}%"></i><span>${Math.round(v*100)}%</span></div>`).join('')}
+['t','w','r'].forEach(i=>$(i).addEventListener('input',go));go();
+fetch('/evaluation').then(r=>r.json()).then(e=>{$('ev').innerHTML=`Held-out accuracy <b>${Math.round(e.accuracy*100)}%</b> on ${e.test} unseen days vs <b>${Math.round(e.baseline*100)}%</b> for always guessing "${e.majority_class}".`});
+</script></body></html>

@@ -1,0 +1,1 @@
+"""Weather outfit picker."""
