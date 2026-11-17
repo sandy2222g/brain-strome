@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Typing Speed Coach</title>
+<style>
+:root{--bg:#f7f3ff;--ink:#241b3a;--vio:#6a3df0;--ok:#2a9d6f;--bad:#e5384f;--card:#fff;--mut:#7a6f94}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Georgia","Times New Roman",serif;padding:30px 20px}
+main{max-width:900px;margin:auto}h1{font:800 38px/1.1 "Trebuchet MS",sans-serif;margin:0}h1 span{color:var(--vio)}p.s{color:var(--mut);margin:6px 0 24px}
+.grid{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:16px;padding:20px;box-shadow:0 8px 24px #6a3df01a;margin-bottom:18px}
+h2{font:700 13px "Trebuchet MS",sans-serif;text-transform:uppercase;letter-spacing:1.5px;color:var(--vio);margin:0 0 12px}
+.txt{font:18px/1.9 "Courier New",monospace;word-break:break-word}.txt .ok{color:var(--ink)}.txt .sub{background:#ffd9de;color:var(--bad);border-radius:3px}
+.txt .miss{background:#ffeaa7;border-bottom:3px solid #e1a100}.txt .extra{background:#ffd9de;text-decoration:line-through;color:var(--bad)}
+.stats{display:flex;gap:26px;margin-top:12px}.stats b{display:block;font:800 30px "Trebuchet MS",sans-serif;color:var(--vio)}.stats small{color:var(--mut)}
+.keys{display:flex;gap:10px;flex-wrap:wrap}.key{width:64px;text-align:center;background:#f0eaff;border-radius:10px;padding:8px 0}.key b{font:800 26px "Courier New",monospace;display:block}.key small{color:var(--bad);font-weight:700}
+.drill span{display:inline-block;background:var(--vio);color:#fff;border-radius:99px;padding:3px 14px;margin:4px 6px 4px 0;font:15px "Courier New",monospace}
+svg{width:100%;height:100px}.m{font-size:14px;color:var(--mut)}.m b{color:var(--vio)}
+</style></head><body><main>
+<h1>Typing <span>Speed</span> Coach</h1><p class="s">Align what you typed with what you meant to type, find your weak keys, get a drill.</p>
+<div class="grid"><div class="card"><h2>Latest session</h2><div class="txt" id="txt"></div><div class="stats" id="st"></div></div>
+<div class="card"><h2>Weakest keys</h2><div class="keys" id="keys"></div><p class="m" id="cf"></p></div></div>
+<div class="card"><h2>Drill: words packed with your weak letters</h2><div class="drill" id="dr"></div></div>
+<div class="card"><h2>Net WPM over 5 sessions</h2><svg id="sv" viewBox="0 0 400 100"></svg><p class="m" id="ev"></p></div>
+</main><script>
+const $=i=>document.getElementById(i);
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+async function main(){
+const s=(await (await fetch('/sample')).json()).sessions,last=s[s.length-2];
+const a=await (await fetch('/analyse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target:last.target,typed:last.typed,seconds:last.seconds})})).json();
+$('txt').innerHTML=a.ops.map(([k,e,g])=>k==='match'?`<span class="ok">${esc(e)}</span>`:k==='sub'?`<span class="sub" title="expected ${e}">${esc(g)}</span>`:k==='miss'?`<span class="miss" title="skipped">${e===' '?'␣':esc(e)}</span>`:`<span class="extra">${esc(g)}</span>`).join('');
+$('st').innerHTML=`<div><b>${a.net_wpm}</b><small>net WPM</small></div><div><b>${Math.round(a.accuracy*100)}%</b><small>accuracy</small></div><div><b>${a.errors}</b><small>errors</small></div>`;
+const co=await (await fetch('/coach')).json();
+$('keys').innerHTML=co.weak_keys.map(k=>`<div class="key"><b>${esc(k.key)}</b><small>${Math.round(k.miss_rate*100)}%</small></div>`).join('');
+$('cf').textContent='Share of each letter you hit wrong or skipped, over all sessions.';
+$('dr').innerHTML=co.drill.map(w=>`<span>${w}</span>`).join('');
+const v=co.net_wpm,mx=Math.max(...v)+5,pts=v.map((y,i)=>[20+i*90,90-y/mx*80]);
+$('sv').innerHTML=`<polyline fill="none" stroke="#6a3df0" stroke-width="3" points="${pts.map(p=>p.join(',')).join(' ')}"/>`+pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="#6a3df0"/><text x="${p[0]}" y="${p[1]-9}" font-size="11" text-anchor="middle" fill="#241b3a">${v[i]}</text>`).join('');
+const e=await (await fetch('/evaluation')).json();
+$('ev').innerHTML=`Error counting: this aligner is off by <b>${e.aligned_gap}</b> errors per session vs <b>${e.naive_gap}</b> for letter-by-letter comparison, which breaks after one skipped letter.`}
+main();
+</script></body></html>

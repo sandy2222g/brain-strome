@@ -1,0 +1,37 @@
+[
+ {
+  "id": 1,
+  "target": "the quick brown fox jumps over the lazy dog while the quiet river runs past old stone bridges",
+  "typed": "the qquick hrown fox jumps odwr th lazy dog whilee the quiwt ruverr runs past old stone bridges",
+  "seconds": 39.9,
+  "true_errors": 9
+ },
+ {
+  "id": 2,
+  "target": "please remember to bring your reading glasses and a warm jacket because the evening feels rather cold",
+  "typed": "please remeember to brong your eading glasses and a warm jacket because the evening feels rather cold",
+  "seconds": 37.9,
+  "true_errors": 3
+ },
+ {
+  "id": 3,
+  "target": "every morning she waters the herbs on the window sill before reading the newspaper over her coffee",
+  "typed": "every morning she waters the herbs on the window sill before reaing the newspapet oveg her coffer",
+  "seconds": 32.7,
+  "true_errors": 4
+ },
+ {
+  "id": 4,
+  "target": "a small group of volunteers repaired the wooden fence and painted the gate a bright cheerful yellow",
+  "typed": "a small group of volunteers repaigd the wooden fence and aintsd the gate s bfight cheerful yelloww",
+  "seconds": 29.7,
+  "true_errors": 7
+ },
+ {
+  "id": 5,
+  "target": "quick questions about the quarterly report can be sent to the team before the meeting on thursday",
+  "typed": "quick questions about ths quartegly report can be sent to the team befors tue mfetting on thursday",
+  "seconds": 26.5,
+  "true_errors": 6
+ }
+]
