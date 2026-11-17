@@ -1,0 +1,29 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>k-means Lab</title>
+<style>
+:root{--bg:linear-gradient(135deg,#f6e9ff,#ffe9ef 60%,#fff4d9);--ink:#2d1b4e;--pk:#e0457b;--pu:#7a3fd1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);min-height:100vh;font:16px/1.5 "Nunito","Trebuchet MS",sans-serif}
+main{max-width:980px;margin:0 auto;padding:30px 18px;display:grid;grid-template-columns:3fr 2fr;gap:20px}header{grid-column:1/-1}
+h1{margin:0;font-size:38px;font-weight:900}h1 b{color:var(--pk)}.sub{margin:4px 0 0;max-width:640px}
+.card{background:#fffc;border-radius:22px;padding:18px;box-shadow:0 8px 0 #2d1b4e14,0 0 0 2px #2d1b4e}h2{margin:0 0 8px;font-size:15px;text-transform:uppercase;letter-spacing:1px;color:var(--pu)}
+svg{width:100%;height:auto;display:block}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+select,button,input{font:inherit;border:2px solid var(--ink);border-radius:20px;padding:3px 12px;background:#fff;color:var(--ink)}button{background:var(--pk);color:#fff;font-weight:800;cursor:pointer}
+.stat{font-size:14px}.tbl{width:100%;font-size:14px;border-collapse:collapse}.tbl td,.tbl th{padding:4px 6px;border-bottom:1px solid #2d1b4e22;text-align:right}.tbl th:first-child,.tbl td:first-child{text-align:left}
+.note{font-size:13px;opacity:.8;margin-top:8px}@media(max-width:760px){main{grid-template-columns:1fr}}
+</style></head><body><main>
+<header><h1>k-means <b>lab</b></h1><p class="sub">Group 240 shoppers (visits vs spend) into clusters. Try different starting points and see why the first guess matters.</p></header>
+<section class="card"><h2>Clusters</h2><div class="row"><label>k <select id="k"></select></label><label>start <select id="init"><option value="pp">k-means++</option><option value="random">random</option></select></label><label>seed <input id="seed" type="number" value="0" style="width:70px"></label><button id="go">run</button></div>
+<svg id="s" viewBox="0 0 400 300"></svg><div class="stat" id="stat"></div></section>
+<section class="card"><h2>How many clusters?</h2><svg id="e" viewBox="0 0 300 180"></svg><p class="note">Total spread (inertia) drops sharply until the true 4 clusters, then flattens: the elbow.</p>
+<h2 style="margin-top:14px">Start matters</h2><table class="tbl" id="t"></table></section>
+</main><script>
+const $=i=>document.getElementById(i),pal=['#e0457b','#7a3fd1','#16a085','#f39c12','#2980b9','#8e5a2b','#555','#c0392b','#27ae60','#d35400'];
+$('k').innerHTML=[1,2,3,4,5,6,7,8].map(k=>`<option ${k==4?'selected':''}>${k}</option>`).join('');
+async function run(){const j=await (await fetch(`/cluster?k=${$('k').value}&init=${$('init').value}&seed=${$('seed').value}`)).json();
+const X=v=>14+v*29,Y=v=>290-v*22;let h='';j.points.forEach((p,i)=>h+=`<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="3.5" fill="${pal[j.labels[i]]}" opacity=".75"/>`);
+j.centres.forEach((c,i)=>h+=`<circle cx="${X(c[0])}" cy="${Y(c[1])}" r="9" fill="#fff" stroke="${pal[i]}" stroke-width="4"/>`);$('s').innerHTML=h;
+$('stat').textContent=`inertia ${j.inertia}, converged in ${j.iterations} rounds`}
+$('go').onclick=run;fetch('/summary').then(r=>r.json()).then(d=>{const mx=Math.max(...d.elbow),X=i=>25+i*38,Y=v=>160-v/mx*140;
+$('e').innerHTML=`<polyline fill="none" stroke="#7a3fd1" stroke-width="3" points="${d.elbow.map((v,i)=>X(i)+','+Y(v)).join(' ')}"/>`+d.elbow.map((v,i)=>`<circle cx="${X(i)}" cy="${Y(v)}" r="${i==3?7:4}" fill="${i==3?'#e0457b':'#7a3fd1'}"/><text x="${X(i)-3}" y="176" font-size="11">${i+1}</text>`).join('');
+$('t').innerHTML='<tr><th>start</th><th>avg inertia</th><th>bad runs</th></tr>'+Object.entries(d.inits).map(([k,v])=>`<tr><td>${k==='pp'?'k-means++':'random'}</td><td>${v.mean_inertia}</td><td>${v.bad_runs_pct}%</td></tr>`).join('')});run();
+</script></body></html>

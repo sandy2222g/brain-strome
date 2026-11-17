@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: kmeans-init-lab
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
