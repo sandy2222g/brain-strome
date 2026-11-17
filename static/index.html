@@ -1,0 +1,40 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gradient Descent Lab</title>
+<style>
+:root{--bg:#120d05;--am:#ffb000;--dim:#8a6200;--red:#ff5e3a;--ln:#3a2a08}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--am);font:15px/1.5 "Courier New",monospace}
+main{max-width:980px;margin:0 auto;padding:28px 18px}h1{font-size:26px;margin:0;letter-spacing:3px;text-transform:uppercase}h1:before{content:"> "}.sub{color:var(--dim);margin:2px 0 18px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}.box{border:1px solid var(--dim);padding:12px;background:#171007}
+.ctl{display:grid;grid-template-columns:auto 1fr auto;gap:8px 12px;align-items:center;margin-bottom:14px}input[type=range]{accent-color:var(--am);width:100%}
+button{font:inherit;color:var(--am);background:transparent;border:1px solid var(--am);padding:2px 12px;cursor:pointer}button.on{background:var(--am);color:var(--bg)}
+svg{width:100%;height:220px;display:block}.t{font-size:12px;color:var(--dim);margin:0 0 4px;text-transform:uppercase;letter-spacing:2px}
+.msg{min-height:44px;margin:10px 0 0}.bad{color:var(--red)}
+table{width:100%;border-collapse:collapse;margin-top:16px;font-size:13px}th,td{border-bottom:1px solid var(--ln);padding:4px 8px;text-align:right}th:first-child,td:first-child{text-align:left}th{color:var(--dim);font-weight:400}.x{color:var(--red)}
+@media(max-width:720px){.row{grid-template-columns:1fr}}
+</style></head><body><main>
+<h1>Gradient descent lab</h1><p class="sub">Fit a fare-per-kilometre line by taking small downhill steps. Break it with the sliders.</p>
+<div class="box"><div class="ctl"><span>learning rate</span><input id="lr" type="range" min="-4" max="0.3" step="0.05" value="-1"><b id="lrv"></b>
+<span>steps</span><input id="st" type="range" min="20" max="600" step="10" value="300"><b id="stv"></b>
+<span>feature scaling</span><span><button id="s0">off</button> <button id="s1">on</button></span><span></span></div>
+<div class="msg" id="msg"></div></div>
+<div class="row" style="margin-top:16px"><div class="box"><p class="t">data and fitted line</p><svg id="sc" viewBox="0 0 400 220"></svg></div>
+<div class="box"><p class="t">loss per step (log scale)</p><svg id="ls" viewBox="0 0 400 220"></svg></div></div>
+<div class="box" style="margin-top:16px"><p class="t">steps to get within 1% of the best fit (400 allowed)</p><div id="tb"></div></div>
+</main><script>
+const $=i=>document.getElementById(i);let D,scale=true;
+const lr=()=>Math.pow(10,+$('lr').value);
+function line(pts,sx,sy,c){return `<polyline fill="none" stroke="${c}" stroke-width="2" points="${pts.map(p=>sx(p[0]).toFixed(1)+','+sy(p[1]).toFixed(1)).join(' ')}"/>`}
+async function go(){$('lrv').textContent=lr().toPrecision(2);$('stv').textContent=$('st').value;$('s0').className=scale?'':'on';$('s1').className=scale?'on':'';
+const r=await (await fetch(`/descend?lr=${lr()}&steps=${$('st').value}&scale=${scale}`)).json();
+const sx=x=>20+x/15.5*370,sy=y=>205-y/16*190;let s=D.x.map((x,i)=>`<circle cx="${sx(x)}" cy="${sy(D.y[i])}" r="2.5" fill="#8a6200"/>`).join('');
+s+=line([[0,D.best.b],[15.5,D.best.b+D.best.w*15.5]],sx,sy,'#8a6200').replace('stroke-width="2"','stroke-dasharray="5 4" stroke-width="2"');
+if(!r.diverged)s+=line([[0,r.b],[15.5,r.b+r.w*15.5]],sx,sy,'#ffb000');$('sc').innerHTML=s;
+let l='';if(r.losses.length){const L=r.losses.map(v=>Math.log10(v)),mn=Math.log10(r.best_loss)-0.1,mx=Math.max(...L),px=i=>20+i/Math.max(1,r.losses.length-1)*370,py=v=>205-(v-mn)/(mx-mn+1e-9)*190;
+l+=`<line x1="20" x2="390" y1="${py(Math.log10(r.best_loss))}" y2="${py(Math.log10(r.best_loss))}" stroke="#8a6200" stroke-dasharray="5 4"/>`+line(L.map((v,i)=>[i,v]),px,py,r.diverged?'#ff5e3a':'#ffb000')}
+if(r.diverged)l+=`<text x="200" y="110" fill="#ff5e3a" font-size="18" text-anchor="middle">DIVERGED</text>`;$('ls').innerHTML=l;
+$('msg').innerHTML=r.diverged?'<span class="bad">The steps overshoot and grow: the loss explodes. Lower the learning rate or turn scaling on.</span>':`Fitted fare = ${r.w.toFixed(3)} per km + ${r.b.toFixed(2)}. Best possible: ${D.best.w} per km + ${D.best.b}. ${r.steps_to_1pct==null?'Not within 1% of the best loss yet.':'Within 1% of the best loss after '+r.steps_to_1pct+' steps.'}`}
+fetch('/data').then(r=>r.json()).then(async d=>{D=d;const e=await (await fetch('/experiment')).json();
+const by=k=>e.rows.filter(r=>r.scaled==k);const cell=r=>r.diverged?'<span class="x">diverged</span>':(r.steps_to_1pct??'not yet');
+$('tb').innerHTML='<table><tr><th>learning rate</th>'+D.lrs.map(v=>`<th>${v}</th>`).join('')+'</tr><tr><td>raw kilometres</td>'+by(false).map(r=>`<td>${cell(r)}</td>`).join('')+'</tr><tr><td>scaled</td>'+by(true).map(r=>`<td>${cell(r)}</td>`).join('')+'</tr></table>';go()});
+$('lr').oninput=$('st').oninput=go;$('s0').onclick=()=>{scale=false;go()};$('s1').onclick=()=>{scale=true;go()};
+</script></body></html>
