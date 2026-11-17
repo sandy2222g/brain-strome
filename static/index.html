@@ -1,0 +1,34 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moon Phase Calendar</title>
+<style>
+:root{--bg:#e9e6f5;--ink:#241b4b;--card:#f8f6ff;--ac:#6c4cf0;--mut:#7a739e;--moon:#f6efc7}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Avenir Next","Segoe UI",sans-serif}
+main{max-width:860px;margin:0 auto;padding:30px 18px}
+.top{display:flex;justify-content:space-between;align-items:end;flex-wrap:wrap;gap:10px}h1{font:300 40px/1 "Avenir Next","Segoe UI",sans-serif;margin:0;letter-spacing:-1px}h1 b{font-weight:800;color:var(--ac)}
+.nav{display:flex;gap:8px;align-items:center}.nav button{font:inherit;border:0;background:var(--ink);color:#fff;border-radius:50%;width:38px;height:38px;cursor:pointer;font-size:18px}.nav span{min-width:150px;text-align:center;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:22px 0}.dow{text-align:center;font-size:12px;letter-spacing:2px;color:var(--mut);text-transform:uppercase}
+.d{background:var(--card);border-radius:14px;padding:6px 4px 8px;text-align:center;min-height:92px;position:relative}.d .n{font-size:12px;color:var(--mut);text-align:left;padding-left:6px}.d svg{display:block;margin:2px auto}.d small{font-size:10px;color:var(--mut);display:block;line-height:1.1}
+.d.full{outline:3px solid var(--ac)}.d.empty{background:transparent}
+.acc{background:var(--ink);color:#e9e6f5;border-radius:16px;padding:18px 22px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;text-align:center}.acc b{display:block;font-size:26px;color:var(--moon)}.acc span{font-size:13px;opacity:.8}
+.note{font-size:13px;color:var(--mut);margin-top:10px}
+@media(max-width:620px){.d{min-height:70px}.d small{display:none}.acc{grid-template-columns:1fr}}
+</style></head><body><main>
+<div class="top"><h1>Moon <b>phases</b></h1><div class="nav"><button id="p">&lsaquo;</button><span id="ym"></span><button id="n">&rsaquo;</button></div></div>
+<div class="grid" id="g"></div>
+<div class="acc" id="acc"></div><p class="note" id="note"></p>
+</main><script>
+const $=i=>document.getElementById(i);let Y=2024,M=1;
+function moon(f,waxing,r=17){const R=r,c=r+2,rx=Math.abs(1-2*f)*R,lit=waxing?1:0;
+let path='';if(f<0.02)path='';else if(f>0.98)path=`M${c},${c-R} a${R},${R} 0 1,1 0,${2*R} a${R},${R} 0 1,1 0,${-2*R}`;
+else{const s1=waxing?1:0,gibbous=f>0.5;path=`M${c},${c-R} A${R},${R} 0 0,${s1} ${c},${c+R} A${rx},${R} 0 0,${gibbous?s1:1-s1} ${c},${c-R}`}
+return `<svg width="${2*r+4}" height="${2*r+4}"><circle cx="${c}" cy="${c}" r="${R}" fill="#3b3070"/><path d="${path}" fill="#f6efc7"/></svg>`}
+async function load(){const j=await (await fetch(`/month?year=${Y}&month=${M}`)).json();
+$('ym').textContent=new Date(Y,M-1,1).toLocaleString('en',{month:'long',year:'numeric'});
+const full=j.full_moons.map(s=>+s.slice(8,10));
+let h=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(x=>`<div class="dow">${x}</div>`).join('')+'<div class="d empty"></div>'.repeat(j.first_weekday);
+j.days.forEach(d=>{const waxing=d.age<14.77;h+=`<div class="d${full.includes(d.day)?' full':''}"><div class="n">${d.day}</div>${moon(d.illumination,waxing)}<small>${Math.round(d.illumination*100)}%</small></div>`});$('g').innerHTML=h}
+$('p').onclick=()=>{M--;if(M<1){M=12;Y--}load()};$('n').onclick=()=>{M++;if(M>12){M=1;Y++}load()};
+fetch('/accuracy').then(r=>r.json()).then(a=>{$('acc').innerHTML=`<div><b>${a.mean_only.mean_hours} h</b><span>average error, mean month only</span></div><div><b>${a.corrected.mean_hours} h</b><span>average error, with orbital corrections</span></div><div><b>${a.count}</b><span>published 2024 full moons used as the test</span></div>`;
+$('note').textContent='Outlined days contain a full moon. Errors are measured in hours between the computed and the published time of each 2024 full moon.'});
+load();
+</script></body></html>

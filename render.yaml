@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: moon-phase-calendar
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
