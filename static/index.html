@@ -1,0 +1,29 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Final Grade Needed</title>
+<style>
+:root{--paper:#fffdf0;--line:#bcd7ee;--margin:#e4575f;--ink:#23304d;--pen:#1e4fbf}
+*{box-sizing:border-box}body{margin:0;background:#d9d4c3;padding:26px;font:17px/28px "Segoe Print","Bradley Hand","Comic Sans MS",cursive;color:var(--ink)}
+main{max-width:900px;margin:auto;background:var(--paper) repeating-linear-gradient(transparent 0 27px,var(--line) 27px 28px);border-left:4px double var(--margin);padding:20px 26px 30px 70px;box-shadow:0 6px 20px #0004;position:relative}
+h1{font-size:34px;line-height:44px;margin:0;color:var(--pen)}p.s{margin:0 0 14px}
+table{width:100%;border-collapse:collapse}td,th{height:28px;padding:0 6px;text-align:left}th{font-weight:400;color:#6a7aa8;font-size:14px}
+input{font:inherit;color:var(--pen);background:transparent;border:0;border-bottom:1px dashed var(--pen);width:100%}
+.w{width:60px}button{font:inherit;background:var(--pen);color:#fff;border:0;border-radius:4px;padding:2px 16px;cursor:pointer;margin-top:8px}
+.res{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap}.g{border:2px solid var(--ink);border-radius:6px;padding:0 14px;background:#fffdf0e0;min-width:150px}
+.g b{font-size:30px;display:block;line-height:40px}.possible b{color:var(--pen)}.secured b{color:#2b8a3e}.impossible b{color:var(--margin);text-decoration:line-through}
+.note{color:#6a7aa8;font-size:14px;margin-top:8px;line-height:20px}#err{color:var(--margin)}
+</style></head><body><main>
+<h1>Final Grade Needed</h1><p class="s">What do I have to score on the exam to land each grade?</p>
+<table><thead><tr><th>Category</th><th>Weight %</th><th>Drop lowest</th><th>Scores (comma separated)</th></tr></thead><tbody id="tb"></tbody></table>
+<button id="go">Work it out</button> <span id="err"></span>
+<p id="stand"></p><div class="res" id="res"></div><p class="note" id="note"></p></main>
+<script>
+let D;const $=i=>document.getElementById(i);
+function rows(){return[...document.querySelectorAll('#tb tr')].map(tr=>{const v=tr.querySelectorAll('input');return{name:v[0].value,weight:+v[1].value,drop_lowest:+v[2].value,scores:v[3].value.split(',').map(x=>x.trim()).filter(Boolean).map(Number)}})}
+async function run(){$('err').textContent='';const r=await fetch('/analyse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bands:D.bands,categories:rows()})});
+const j=await r.json();if(!r.ok){$('err').textContent=j.detail;return}
+$('stand').textContent=`Standing on finished work: ${j.standing}% (${j.weight_done}% of the grade graded)`;
+$('res').innerHTML=Object.entries(j.needed).map(([b,x])=>`<div class="g ${x.status}">Grade ${b}<b>${x.needed===null?'—':x.needed+'%'}</b>${x.status}</div>`).join('');
+$('note').textContent=`A plain average of every score would say ${j.naive_mean}% — it ignores the weights and the dropped scores.`}
+fetch('/sample').then(r=>r.json()).then(d=>{D=d;$('tb').innerHTML=d.categories.map(c=>`<tr><td><input value="${c.name}"></td><td><input class="w" type="number" value="${c.weight}"></td><td><input class="w" type="number" value="${c.drop_lowest}"></td><td><input value="${c.scores.join(', ')}"></td></tr>`).join('');run()});
+$('go').onclick=run;
+</script></body></html>

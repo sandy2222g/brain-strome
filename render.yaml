@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: final-grade-needed
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

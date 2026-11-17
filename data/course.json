@@ -1,0 +1,8 @@
+{"bands": {"A": 90, "B": 80, "C": 70, "D": 60},
+ "categories": [
+  {"name": "Homework", "weight": 20, "drop_lowest": 1, "scores": [95, 88, 40, 92, 90]},
+  {"name": "Quizzes", "weight": 15, "drop_lowest": 2, "scores": [70, 85, 55, 90, 60, 80]},
+  {"name": "Midterm", "weight": 25, "drop_lowest": 0, "scores": [78]},
+  {"name": "Project", "weight": 15, "drop_lowest": 0, "scores": [92]},
+  {"name": "Final exam", "weight": 25, "drop_lowest": 0, "scores": []}
+ ]}
