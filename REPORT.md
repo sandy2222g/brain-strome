@@ -4,3 +4,5 @@ Decisions: CART from scratch; first run used 400 plants, which gave noisy valida
 | project | branch | tests | docker | CI | pushed | deployed | blockers |
 |---|---|---|---|---|---|---|---|
 | Plant Watering Tree | plant-watering-tree | 9 pass | local build blocked (Docker Hub 429 twice); CI docker job is the check | workflow present | yes | no | deploy needs owner account |
+
+Fix: CI docker job failed because Dockerfile copied an empty, untracked data/ directory (data is generated in code). Removed that COPY line. Found by reading CI results, not by the local build, which had the empty directory on disk.
