@@ -1,0 +1,8 @@
+{"date": "2026-06-21", "places": [
+ {"name": "London", "lat": 51.5074, "lon": -0.1278, "tz": 1},
+ {"name": "New York", "lat": 40.7128, "lon": -74.006, "tz": -4},
+ {"name": "Mumbai", "lat": 19.076, "lon": 72.8777, "tz": 5.5},
+ {"name": "Sydney", "lat": -33.8688, "lon": 151.2093, "tz": 10},
+ {"name": "Reykjavik", "lat": 64.1466, "lon": -21.9426, "tz": 0},
+ {"name": "Tromso", "lat": 69.6492, "lon": 18.9553, "tz": 2}
+]}

@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Golden Hour Planner</title>
+<style>
+:root{--ink:#fff4e6;--gold:#ffb347}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.5 "Gill Sans","Trebuchet MS",sans-serif;padding:30px;
+background:linear-gradient(180deg,#0c1445 0%,#3b2a73 38%,#c2476b 70%,#ff9a3c 100%) fixed}
+main{max-width:900px;margin:auto}h1{font-weight:300;font-size:40px;letter-spacing:6px;text-transform:uppercase;margin:0}
+p.s{opacity:.8;margin:0 0 20px}.ctl{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:20px}
+label{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.8;display:block}
+input,select{background:#ffffff1f;border:1px solid #ffffff66;border-radius:20px;padding:8px 14px;color:#fff;font:inherit}select option{color:#000}
+button{background:var(--gold);border:0;border-radius:20px;padding:9px 22px;font-weight:700;cursor:pointer;color:#3a1c00}
+.glass{background:#0b0f2e66;backdrop-filter:blur(6px);border:1px solid #ffffff33;border-radius:18px;padding:18px;margin-bottom:14px}
+svg{width:100%;height:170px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.k{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.75}.v{font-size:26px;font-weight:300}.g{color:var(--gold)}.b{color:#9ec5ff}
+.base{font-size:13px;opacity:.85}#err{color:#ffd0d0}
+</style></head><body><main>
+<h1>Golden Hour</h1><p class="s">When the light is best, computed from the sun's position. No API keys, no network.</p>
+<div class="ctl"><div><label>Place</label><select id="pl"></select></div><div><label>Date</label><input id="d" type="date"></div><button id="go">Plan the light</button><span id="err"></span></div>
+<div class="glass"><svg id="arc" viewBox="0 0 800 170"></svg></div>
+<div class="grid" id="g"></div><p class="base glass" id="base"></p></main>
+<script>
+const $=i=>document.getElementById(i);let D;const m=s=>{if(!s)return null;const[h,mi]=s.split(' ')[0].split(':');return +h*60+ +mi+(s.includes('+1')?1440:0)};
+function arc(p){const x=t=>40+t/1440*720;let h='<line x1="40" x2="760" y1="130" y2="130" stroke="#fff6" />';
+const add=(w,col)=>{if(!w)return;const a=m(w[0]),b=m(w[1]);h+=`<rect x="${x(a)}" y="40" width="${Math.max(2,x(b)-x(a))}" height="90" fill="${col}" opacity=".55" />`};
+add(p.morning_golden,'#ffb347');add(p.evening_golden,'#ffb347');add(p.morning_blue,'#6aa7ff');add(p.evening_blue,'#6aa7ff');
+if(p.sunrise)h+=`<circle cx="${x(m(p.sunrise))}" cy="130" r="6" fill="#fff"/><circle cx="${x(Math.min(1440,m(p.sunset)))}" cy="130" r="6" fill="#fff"/>`;
+for(const hr of[0,6,12,18,24])h+=`<text x="${x(hr*60)}" y="155" fill="#fff" font-size="11" text-anchor="middle">${String(hr).padStart(2,'0')}:00</text>`;$('arc').innerHTML=h}
+const win=w=>w?w.join(' – '):'none today';
+async function run(){$('err').textContent='';const p=D.places[$('pl').value];
+const r=await fetch('/plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:$('d').value,lat:p.lat,lon:p.lon,tz:p.tz})});
+const j=await r.json();if(!r.ok){$('err').textContent=j.detail;return}const x=j.plan,b=j.rule_of_thumb;arc(x);
+$('g').innerHTML=x.status!=='normal'?`<div class="glass"><div class="k">Status</div><div class="v">${x.status}</div></div>`:
+`<div class="glass"><div class="k">Sunrise</div><div class="v">${x.sunrise}</div></div><div class="glass"><div class="k">Sunset</div><div class="v">${x.sunset}</div></div>
+<div class="glass"><div class="k g">Morning golden hour</div><div class="v">${win(x.morning_golden)}</div></div><div class="glass"><div class="k g">Evening golden hour</div><div class="v">${win(x.evening_golden)}</div></div>
+<div class="glass"><div class="k b">Morning blue hour</div><div class="v">${win(x.morning_blue)}</div></div><div class="glass"><div class="k b">Evening blue hour</div><div class="v">${win(x.evening_blue)}</div></div>`;
+$('base').textContent=b.sunrise_error_min===null?'A "6:00 to 18:00" rule of thumb has no answer here.':`A "6:00 to 18:00" rule of thumb would be off by ${b.sunrise_error_min} min at sunrise and ${b.sunset_error_min} min at sunset.`}
+fetch('/sample').then(r=>r.json()).then(d=>{D=d;$('pl').innerHTML=d.places.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');$('d').value=d.date;run()});
+$('go').onclick=run;
+</script></body></html>

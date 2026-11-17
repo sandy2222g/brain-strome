@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: golden-hour-planner
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
