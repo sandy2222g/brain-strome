@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hike Time Estimator</title>
+<style>
+:root{--bg:#e8e3d3;--ink:#2b2a1c;--moss:#5b6b2f;--rust:#b4532a;--line:#c9c2a8;--mute:#7d7860}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);background-image:radial-gradient(circle at 20% 10%,#0000000a 0 120px,transparent 121px),radial-gradient(circle at 80% 60%,#0000000a 0 200px,transparent 201px);color:var(--ink);font:16px/1.45 "Gill Sans","Trebuchet MS",sans-serif}
+main{max-width:860px;margin:0 auto;padding:30px 16px}h1{margin:0;font:700 2rem Georgia,serif;letter-spacing:-.5px}p{color:var(--mute)}
+.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.nums div{background:#faf7ea;padding:12px;border-left:5px solid var(--moss)}
+.nums b{display:block;font-size:1.7rem;font-family:Georgia,serif}.nums span{font-size:.8rem;color:var(--mute);text-transform:uppercase;letter-spacing:1px}
+.card{background:#faf7ea;padding:14px}svg{width:100%;height:auto;display:block}
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:.9rem}td,th{text-align:left;padding:5px 6px;border-bottom:1px solid var(--line)}th{color:var(--mute);font-weight:normal;font-size:.75rem;text-transform:uppercase;letter-spacing:1px}
+.warn{margin-top:14px;border-left:5px solid var(--rust);background:#faf7ea;padding:10px 14px}
+@media(max-width:640px){.nums{grid-template-columns:repeat(2,1fr)}}
+</style></head><body><main>
+<h1>Hike time estimator</h1><p id="sub"></p>
+<div class="nums" id="nums"></div>
+<div class="card"><svg id="prof" viewBox="0 0 800 240"></svg>
+<table><thead><tr><th>Leg</th><th>km</th><th>Climb</th><th>Time</th></tr></thead><tbody id="rows"></tbody></table></div>
+<div class="warn" id="warn"></div></main>
+<script>
+const hm=m=>`${Math.floor(m/60)} h ${String(Math.round(m%60)).padStart(2,"0")} min`;
+(async()=>{
+  const s=await (await fetch("/sample")).json();
+  const {note,...body}=s;
+  const r=await (await fetch("/estimate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})).json();
+  document.getElementById("sub").textContent=`Naismith's rule: ${s.pace_kmh} km/h plus ${s.ascent_min_per_100m} min for every 100 m climbed, with ${s.rest_min_per_hour} min of rest an hour. Sunset ${s.sunset}.`;
+  const n=(v,l)=>`<div><b>${v}</b><span>${l}</span></div>`;
+  document.getElementById("nums").innerHTML=n(hm(r.total_min),"total time")+n(r.total_km+" km","distance")+n(r.total_climb+" m","climbing")+n(r.latest_start,"latest start");
+  const P=s.points,W=800,H=240,p=30,km=P[P.length-1].km,hs=P.map(x=>x.height),lo=Math.min(...hs)-40,hi=Math.max(...hs)+40;
+  const X=k=>p+k/km*(W-2*p),Y=h=>H-p-(h-lo)/(hi-lo)*(H-2*p);
+  const line=P.map(x=>`${X(x.km)},${Y(x.height)}`).join(" ");
+  document.getElementById("prof").innerHTML=`<polygon points="${X(0)},${H-p} ${line} ${X(km)},${H-p}" fill="#5b6b2f33"/><polyline points="${line}" fill="none" stroke="#5b6b2f" stroke-width="3"/>`+P.map(x=>`<circle cx="${X(x.km)}" cy="${Y(x.height)}" r="4" fill="#b4532a"/>`).join("")+`<text x="${X(P[4].km)-20}" y="${Y(P[4].height)-10}" font-size="13">${P[4].name} ${P[4].height} m</text>`;
+  document.getElementById("rows").innerHTML=r.legs.map(l=>`<tr><td>${l.from} to ${l.to}</td><td>${l.km}</td><td>${l.climb} m</td><td>${Math.round(l.minutes)} min</td></tr>`).join("");
+  document.getElementById("warn").textContent=`Judging by distance alone you would plan ${hm(r.distance_only_min)}, which is ${Math.round(r.underestimate_min)} minutes too short. Set off by ${r.latest_start} to be down 30 minutes before sunset.`;
+})();
+</script></body></html>

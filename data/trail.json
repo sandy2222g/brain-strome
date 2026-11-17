@@ -1,0 +1,10 @@
+{"note": "Invented trail; distances in km, heights in metres.", "sunset": "16:40", "pace_kmh": 5.0, "ascent_min_per_100m": 10, "rest_min_per_hour": 5,
+ "points": [
+  {"name": "Car park", "km": 0.0, "height": 420},
+  {"name": "Mill bridge", "km": 2.1, "height": 470},
+  {"name": "Forest edge", "km": 4.0, "height": 650},
+  {"name": "Saddle", "km": 5.6, "height": 910},
+  {"name": "Summit", "km": 6.8, "height": 1180},
+  {"name": "Saddle (return)", "km": 8.0, "height": 910},
+  {"name": "Car park (return)", "km": 12.4, "height": 420}
+ ]}

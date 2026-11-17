@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: hike-time-estimator
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
