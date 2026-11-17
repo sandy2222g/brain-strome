@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hash Table Lab</title>
+<style>
+:root{--bg:#f2f2ee;--ink:#0b0b0b;--red:#e5322d;--blue:#1d4ed8;--grn:#0a8f5a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Helvetica Neue",Arial,sans-serif}
+header{background:var(--ink);color:var(--bg);padding:28px 18px}header div{max-width:900px;margin:0 auto}h1{margin:0;font-size:46px;letter-spacing:-2px;text-transform:uppercase;line-height:1}h1 span{color:var(--red)}header p{margin:8px 0 0;max-width:600px;opacity:.8}
+main{max-width:900px;margin:0 auto;padding:24px 18px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:3px solid var(--ink)}
+.col{padding:14px;border-right:3px solid var(--ink)}.col:last-child{border:0}.col h2{margin:0;font-size:18px;text-transform:uppercase}.col p{margin:2px 0 12px;font-size:13px;opacity:.75}
+.row{display:grid;grid-template-columns:44px 1fr 60px;gap:8px;align-items:center;margin:5px 0;font-size:13px;font-variant-numeric:tabular-nums}.bar{height:16px;background:var(--c);min-width:2px}
+.note{margin-top:18px;font-size:14px;max-width:700px}@media(max-width:700px){.grid{grid-template-columns:1fr}.col{border-right:0;border-bottom:3px solid var(--ink)}}
+</style></head><body><header><div><h1>Hash table <span>lab</span></h1><p>Three ways to handle two keys wanting the same slot. Bars show average probes to confirm a key is missing, as the table fills up.</p></div></header>
+<main><div class="grid" id="g"></div><p class="note" id="n"></p></main><script>
+const info={chaining:['Chaining','each slot holds a list',' #1d4ed8'],linear:['Linear probing','step to the next slot',' #e5322d'],double:['Double hashing','step by a second hash',' #0a8f5a']};
+fetch('/curves').then(r=>r.json()).then(d=>{const max=Math.log(60);
+document.getElementById('g').innerHTML=Object.entries(d.curves).map(([k,v])=>`<div class="col" style="--c:${info[k][2].trim()}"><h2>${info[k][0]}</h2><p>${info[k][1]}</p>`+d.loads.map((a,i)=>`<div class="row"><span>${Math.round(a*100)}%</span><div class="bar" style="width:${Math.max(1,Math.log(1+v.measured[i])/Math.log(61)*100)}%"></div><b>${v.measured[i].toFixed(1)}</b></div>`).join('')+'</div>').join('');
+document.getElementById('n').textContent='Bars use a log scale. At 90% full, linear probing needs about '+d.curves.linear.measured[5].toFixed(0)+' probes against '+d.curves.double.measured[5].toFixed(0)+' for double hashing. Measured on 1,009-slot tables; the textbook formula (an average over very large tables) predicts 50.5 for linear probing, so our 32 is lower.'});
+</script></body></html>

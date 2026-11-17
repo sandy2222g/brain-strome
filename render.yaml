@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: hash-table-lab
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
