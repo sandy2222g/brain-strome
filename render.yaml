@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: check-digit-validator
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

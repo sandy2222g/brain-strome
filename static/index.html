@@ -1,0 +1,29 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Check Digit Validator</title>
+<style>
+:root{--w:#fff;--k:#0c0c0c;--or:#ff5a1f;--g:#12875a;--mut:#767676}
+*{box-sizing:border-box}body{margin:0;background:var(--w);color:var(--k);font:16px/1.5 "Helvetica Neue",Arial,sans-serif}
+main{max-width:880px;margin:0 auto;padding:30px 20px}
+.bc{height:48px;background:repeating-linear-gradient(90deg,var(--k) 0 3px,var(--w) 3px 5px,var(--k) 5px 6px,var(--w) 6px 10px,var(--k) 10px 14px,var(--w) 14px 16px);margin-bottom:12px}
+h1{font:800 40px/1 "Helvetica Neue",Arial,sans-serif;margin:0;letter-spacing:-1.5px}h1 b{color:var(--or)}.sub{color:var(--mut);margin:6px 0 20px}
+.tabs{display:flex;gap:0;margin-bottom:10px;flex-wrap:wrap}.tabs button{font:700 14px "Courier New",monospace;border:2px solid var(--k);background:var(--w);padding:6px 16px;cursor:pointer;margin-right:-2px;text-transform:uppercase}.tabs button.on{background:var(--k);color:var(--w)}
+input{width:100%;font:700 28px "Courier New",monospace;border:3px solid var(--k);padding:12px 14px;letter-spacing:2px;outline:none}
+.res{margin-top:10px;padding:12px 16px;font:800 22px "Helvetica Neue",Arial,sans-serif;color:#fff}.res.ok{background:var(--g)}.res.no{background:var(--or)}
+h2{font:700 12px "Courier New",monospace;letter-spacing:3px;text-transform:uppercase;margin:30px 0 8px;color:var(--mut)}
+table{width:100%;border-collapse:collapse;font:15px "Courier New",monospace}th,td{border:2px solid var(--k);padding:8px 12px;text-align:right}th{background:var(--k);color:var(--w);font-weight:400}td:first-child,th:first-child{text-align:left;font-weight:700}
+td.p{background:#ffe3d6}td.f{background:#d6f3e6}.note{font-size:13px;color:var(--mut);margin-top:8px}
+</style></head><body><main>
+<div class="bc"></div><h1>Is that number <b>real</b>?</h1><p class="sub">The last digit of a card, book, barcode or bank account is a check on all the others. Type a number, change one digit, watch it fail.</p>
+<div class="tabs" id="tabs"></div><input id="v" autocomplete="off" spellcheck="false"><div class="res" id="res"></div>
+<h2>How many typing mistakes does each scheme catch?</h2><div id="tb"></div>
+<p class="note">Each cell: share of 4,000 random valid numbers where the mistake was noticed. Orange = misses more than 5%.</p>
+</main><script>
+const $=i=>document.getElementById(i);let ex,scheme='luhn',tm;
+async function go(){const r=await fetch(`/validate?scheme=${scheme}&value=${encodeURIComponent($('v').value)}`);const j=await r.json();
+$('res').className='res '+(j.valid?'ok':'no');$('res').textContent=j.valid?'Valid: the check digit matches.':'Invalid: the check digit does not match.'}
+function tabs(){$('tabs').innerHTML=Object.keys(ex).map(s=>`<button data-s="${s}" class="${s==scheme?'on':''}">${s}</button>`).join('')}
+fetch('/examples').then(r=>r.json()).then(d=>{ex=d.examples;tabs();$('v').value=ex[scheme];go();
+$('tabs').onclick=e=>{if(e.target.dataset.s){scheme=e.target.dataset.s;$('v').value=ex[scheme];tabs();go()}};$('v').oninput=()=>{clearTimeout(tm);tm=setTimeout(go,120)}});
+fetch('/experiment?trials=4000').then(r=>r.json()).then(d=>{const kinds=[['substitution','one digit wrong'],['transposition','two digits swapped'],['twin','a doubled pair changed (11 to 22)']];
+$('tb').innerHTML='<table><tr><th>scheme</th>'+kinds.map(k=>`<th>${k[1]}</th>`).join('')+'</tr>'+Object.entries(d.rates).map(([s,r])=>`<tr><td>${s}</td>`+kinds.map(k=>`<td class="${r[k[0]]<0.95?'p':'f'}">${(r[k[0]]*100).toFixed(1)}%</td>`).join('')+'</tr>').join('')+'</table>'});
+</script></body></html>
