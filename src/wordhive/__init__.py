@@ -1,0 +1,1 @@
+"""Letter-hive word solver."""
