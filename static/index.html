@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tournament Bracket Maker</title>
+<style>
+:root{--iv:#faf5e8;--bu:#6b1d2a;--go:#c9962b;--ink:#2a1a1d;--card:#fffdf6;--ln:#e3d6b8}
+*{box-sizing:border-box}body{margin:0;background:var(--iv);color:var(--ink);font:16px/1.5 "Baskerville","Palatino Linotype",Georgia,serif}
+main{max-width:1000px;margin:0 auto;padding:30px 18px}
+.top{border-bottom:4px double var(--bu);padding-bottom:10px;display:flex;justify-content:space-between;align-items:end;flex-wrap:wrap;gap:8px}h1{font:700 36px/1 Baskerville,Georgia,serif;margin:0;color:var(--bu);letter-spacing:1px;font-variant:small-caps}.top select{font:inherit;padding:4px 10px;border:2px solid var(--bu);background:var(--card)}
+h2{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--go);margin:24px 0 8px}
+.draw{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}.m{background:var(--card);border:1px solid var(--ln);border-left:5px solid var(--bu)}.m div{display:flex;justify-content:space-between;padding:5px 10px;font-size:15px}.m div+div{border-top:1px solid var(--ln)}.m i{font-style:normal;color:var(--go);font-weight:700}.m .bye{color:#9a8f78;font-style:italic}
+.row{display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:center;margin:4px 0;font-size:14px}.bars{display:flex;flex-direction:column;gap:2px}.b{display:flex;align-items:center;gap:6px;font-size:12px}.b span{height:12px;display:inline-block}.k1{background:var(--bu)}.k2{background:var(--go)}.k3{background:#3d6b5a}
+.leg{font-size:13px;margin:6px 0 0}.leg i{display:inline-block;width:12px;height:12px;margin:0 4px 0 12px;vertical-align:middle}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.sum div{background:var(--card);border:1px solid var(--ln);padding:12px;text-align:center}.sum b{display:block;font-size:28px;color:var(--bu)}.sum small{font-size:13px}
+@media(max-width:700px){.sum{grid-template-columns:1fr}.row{grid-template-columns:1fr}}
+</style></head><body><main>
+<div class="top"><h1>Bracket maker</h1><label>Teams <select id="n"></select></label></div>
+<h2>Round one, seeded 1 to <span id="sz"></span></h2><div class="draw" id="dr"></div>
+<h2>Who wins the trophy? Chance by format</h2><div class="sum" id="sum"></div>
+<div class="rows" id="rows" style="margin-top:14px"></div><p class="leg"><i class="k1"></i>seeded knockout<i class="k2"></i>random-draw knockout<i class="k3"></i>round robin</p>
+<p class="leg" id="rr"></p>
+</main><script>
+const $=i=>document.getElementById(i);
+async function go(){const n=$('n').value;const [b,s]=await Promise.all([fetch('/bracket?n='+n).then(r=>r.json()),fetch('/simulate?trials=4000&n='+n).then(r=>r.json())]);
+$('sz').textContent=b.size;$('dr').innerHTML=b.first_round.map(p=>`<div class="m">`+p.map(x=>x?`<div><span>${x.name}</span><i>${x.seed}</i></div>`:'<div class="bye"><span>bye</span></div>').join('')+'</div>').join('');
+const c=s.chances,names=Object.keys(c.seeded),top=names[0];const pc=v=>(v*100).toFixed(1)+'%';
+$('sum').innerHTML=[['seeded','Seeded knockout'],['random','Random-draw knockout'],['round_robin','Round robin']].map(([k,l])=>`<div><b>${pc(c[k][top])}</b><small>${l}: chance the best team wins</small></div>`).join('');
+const mx=Math.max(...['seeded','random','round_robin'].flatMap(k=>Object.values(c[k])));
+$('rows').innerHTML=names.map(nm=>`<div class="row"><span>${nm}</span><div class="bars">${[['seeded','k1'],['random','k2'],['round_robin','k3']].map(([k,cl])=>`<div class="b"><span class="${cl}" style="width:${c[k][nm]/mx*70}%"></span>${pc(c[k][nm])}</div>`).join('')}</div></div>`).join('');
+const g=b.round_robin.reduce((a,r)=>a+r.length,0);$('rr').textContent=`A round robin for ${n} teams needs ${g} games in ${b.round_robin.length} rounds; a knockout needs ${n-1}.`}
+fetch('/teams').then(r=>r.json()).then(t=>{$('n').innerHTML=Array.from({length:t.teams.length-3},(_,i)=>i+4).map(v=>`<option${v==12?' selected':''}>${v}</option>`).join('');$('n').onchange=go;go()});
+</script></body></html>
