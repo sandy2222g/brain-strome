@@ -1,0 +1,126 @@
+{
+ "lanes": 6,
+ "capacity": 6,
+ "swimmers": [
+  {
+   "name": "Ana",
+   "time100": 100.6
+  },
+  {
+   "name": "Ben",
+   "time100": 108.3
+  },
+  {
+   "name": "Chloe",
+   "time100": 134.5
+  },
+  {
+   "name": "Dev",
+   "time100": 101.5
+  },
+  {
+   "name": "Elif",
+   "time100": 104.6
+  },
+  {
+   "name": "Femi",
+   "time100": 110.3
+  },
+  {
+   "name": "Gus",
+   "time100": 81.3
+  },
+  {
+   "name": "Hana",
+   "time100": 104.9
+  },
+  {
+   "name": "Ivo",
+   "time100": 113.4
+  },
+  {
+   "name": "Jun",
+   "time100": 125.1
+  },
+  {
+   "name": "Kai",
+   "time100": 74.8
+  },
+  {
+   "name": "Lea",
+   "time100": 89.8
+  },
+  {
+   "name": "Mo",
+   "time100": 74.5
+  },
+  {
+   "name": "Nia",
+   "time100": 126.3
+  },
+  {
+   "name": "Omar",
+   "time100": 117.9
+  },
+  {
+   "name": "Pia",
+   "time100": 71.0
+  },
+  {
+   "name": "Quin",
+   "time100": 138.7
+  },
+  {
+   "name": "Rey",
+   "time100": 137.5
+  },
+  {
+   "name": "Sol",
+   "time100": 115.1
+  },
+  {
+   "name": "Tia",
+   "time100": 112.3
+  },
+  {
+   "name": "Uma",
+   "time100": 79.3
+  },
+  {
+   "name": "Vik",
+   "time100": 69.1
+  },
+  {
+   "name": "Wen",
+   "time100": 106.0
+  },
+  {
+   "name": "Xia",
+   "time100": 72.3
+  },
+  {
+   "name": "Yara",
+   "time100": 81.7
+  },
+  {
+   "name": "Zed",
+   "time100": 85.4
+  },
+  {
+   "name": "Abe",
+   "time100": 70.2
+  },
+  {
+   "name": "Bea",
+   "time100": 101.4
+  },
+  {
+   "name": "Cy",
+   "time100": 99.7
+  },
+  {
+   "name": "Dot",
+   "time100": 128.7
+  }
+ ]
+}

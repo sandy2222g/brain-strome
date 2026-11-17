@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: swim-lane-assigner
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

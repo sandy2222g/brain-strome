@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Swim Lane Assigner</title>
+<style>
+:root{--bg:#e6f7fb;--ink:#06384a;--mute:#4d7c8c;--pool:#bfeaf4;--rope:#0aa5c9;--hot:#e8590c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Georgia,serif;padding:26px}
+main{max-width:1000px;margin:auto}h1{font-size:32px;margin:0;font-style:italic}p.s{color:var(--mute);margin:2px 0 18px}
+.ctl{display:flex;gap:14px;align-items:end;flex-wrap:wrap;margin-bottom:16px}
+label{font-size:12px;color:var(--mute);display:block}input{width:80px;padding:6px;border:2px solid var(--rope);border-radius:6px;background:#fff}
+button{background:var(--rope);color:#fff;border:0;padding:9px 16px;border-radius:6px;font-weight:700;cursor:pointer}
+.sum{display:flex;gap:12px;margin-bottom:14px}.sum div{background:#fff;border-left:6px solid var(--rope);padding:8px 14px;flex:1}
+.sum b{font-size:22px;display:block}.sum .hot{border-color:var(--hot)}
+.pool{background:var(--pool);border:3px solid var(--rope);border-radius:6px}
+.lane{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:3px dashed #fff}.lane:last-child{border:0}
+.n{width:70px;font-weight:700}.sw{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.sw span{background:#fff;border-radius:14px;padding:2px 10px;font-size:13px}.m{font-size:12px;color:var(--mute);width:150px;text-align:right}
+h2{font-size:16px;margin:18px 0 6px}#err{color:var(--hot)}
+</style></head><body><main>
+<h1>Swim Lane Assigner</h1><p class="s">Put swimmers of similar speed in the same lane — against sign-up order.</p>
+<div class="ctl"><div><label>Lanes</label><input id="l" type="number" min="1"></div><div><label>Max per lane</label><input id="c" type="number" min="1"></div><button id="go">Assign</button><span id="err"></span></div>
+<div class="sum" id="sum"></div>
+<h2>Assigned by speed</h2><div class="pool" id="a"></div>
+<h2>Sign-up order (baseline)</h2><div class="pool" id="b"></div></main>
+<script>
+let sw=[];const $=i=>document.getElementById(i);
+const lanes=(o,id)=>{$(id).innerHTML=o.lanes.map((x,i)=>`<div class="lane"><div class="n">Lane ${i+1}</div><div class="sw">${x.swimmers.map(s=>`<span>${s}</span>`).join('')}</div><div class="m">${x.fastest}–${x.slowest}s · spread ${x.spread}s</div></div>`).join('')};
+async function run(){$('err').textContent='';const r=await fetch('/assign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lanes:+$('l').value,capacity:+$('c').value,swimmers:sw})});
+const j=await r.json();if(!r.ok){$('err').textContent=j.detail;return}
+$('sum').innerHTML=`<div>Assigned total spread<b>${j.assigned.total_spread}s</b></div><div>Sign-up order<b>${j.signup_order.total_spread}s</b></div><div class="hot">Saved<b>${j.spread_saved}s</b></div>`;
+lanes(j.assigned,'a');lanes(j.signup_order,'b')}
+fetch('/sample').then(r=>r.json()).then(d=>{sw=d.swimmers;$('l').value=d.lanes;$('c').value=d.capacity;run()});$('go').onclick=run;
+</script></body></html>
