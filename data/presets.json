@@ -1,0 +1,8 @@
+[
+ {"name": "Two dice (classic board game)", "expr": "2d6", "target": 7},
+ {"name": "Roll 20 with advantage", "expr": "2d20kh1", "target": 15},
+ {"name": "Roll 20 with disadvantage", "expr": "2d20kl1", "target": 15},
+ {"name": "Character stat: 4d6 drop lowest", "expr": "4d6dl1", "target": 15},
+ {"name": "Sword hit: 1d8+3", "expr": "1d8+3", "target": 9},
+ {"name": "Fireball-style burst: 8d6", "expr": "8d6", "target": 28}
+]

@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Board Game Dice Odds</title>
+<style>
+:root{--bg:#1b1330;--ink:#f6efe0;--gold:#f2b632;--red:#e2573b;--teal:#3fc1b0;--pan:#2a1f4a;--mut:#a99fc4}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#33265c,#1b1330 60%);color:var(--ink);font:16px/1.5 "Palatino Linotype","Book Antiqua",Georgia,serif;padding:32px 20px;min-height:100vh}
+main{max-width:860px;margin:auto}h1{font-size:44px;margin:0;letter-spacing:1px}h1 span{color:var(--gold)}p.s{color:var(--mut);margin:4px 0 20px;font-style:italic}
+.pre{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}.pre button{background:var(--pan);color:var(--ink);border:1px solid #4a3d78;border-radius:99px;padding:6px 14px;font:inherit;font-size:14px;cursor:pointer}.pre button.on{background:var(--gold);color:#2b1b00;border-color:var(--gold)}
+.row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}input{font:inherit;font-size:20px;padding:10px 14px;background:var(--pan);border:2px solid #4a3d78;color:var(--ink);border-radius:10px;width:200px}input:focus{outline:none;border-color:var(--gold)}
+label{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--mut);display:block}
+.card{background:var(--pan);border-radius:18px;padding:22px;border:1px solid #4a3d78}
+.big{display:flex;gap:34px;flex-wrap:wrap;margin-bottom:12px}.big b{display:block;font-size:40px;color:var(--gold);line-height:1.1}.big small{color:var(--mut)}
+svg{width:100%;height:220px}.m{font-size:13px;color:var(--mut);margin-top:12px}.m b{color:var(--teal)}.err{color:var(--red)}
+</style></head><body><main>
+<h1>Dice <span>Odds</span></h1><p class="s">Exact probabilities, not guesses. Roll notation: 4d6, 2d20kh1 (keep highest), 4d6dl1 (drop lowest), 1d8+3.</p>
+<div class="pre" id="pre"></div>
+<div class="row"><div><label>Roll</label><input id="e" value="2d20kh1"></div><div><label>Need at least</label><input id="t" type="number" value="15"></div></div>
+<div class="card"><div class="big" id="big"></div><svg id="sv" viewBox="0 0 800 220" preserveAspectRatio="none"></svg><p class="m" id="m"></p></div></main>
+<script>
+const $=i=>document.getElementById(i);let tm;
+async function go(){const e=$('e').value,t=$('t').value;
+const r=await fetch('/odds?expr='+encodeURIComponent(e)+(t!==''?'&target='+t:''));const j=await r.json();
+if(!r.ok){$('big').innerHTML='<span class="err">'+j.detail+'</span>';$('sv').innerHTML='';$('m').textContent='';return}
+const pct=j.p_at_least!==undefined?(j.p_at_least*100).toFixed(1)+'%':'';
+$('big').innerHTML=(pct?`<div><b>${pct}</b><small>chance of ${j.target} or more (${j.p_exact})</small></div>`:'')+`<div><b>${j.mean}</b><small>average</small></div><div><b>±${j.sd}</b><small>typical spread</small></div>`;
+const mx=Math.max(...j.pmf.map(p=>p.p)),n=j.pmf.length,w=800/n;
+$('sv').innerHTML=j.pmf.map((p,i)=>{const h=p.p/mx*190,hit=j.target!==undefined&&p.value>=j.target;return `<rect x="${i*w+1}" y="${200-h}" width="${w-2}" height="${h}" fill="${hit?'#f2b632':'#4a3d78'}" rx="2"><title>${p.value}: ${(p.p*100).toFixed(2)}%</title></rect>`+(n<=26?`<text x="${i*w+w/2}" y="216" font-size="11" fill="#a99fc4" text-anchor="middle">${p.value}</text>`:'')}).join('');
+$('m').innerHTML=`Gold bars meet the target. Cross-check: ${j.trials.toLocaleString()} simulated rolls differ from the exact answer by at most <b>${(j.mc_max_diff*100).toFixed(2)} percentage points</b> on any outcome.`}
+const sch=()=>{clearTimeout(tm);tm=setTimeout(go,150)};$('e').oninput=sch;$('t').oninput=sch;
+fetch('/presets').then(r=>r.json()).then(d=>{$('pre').innerHTML=d.presets.map((p,i)=>`<button data-i="${i}">${p.name}</button>`).join('');
+$('pre').onclick=ev=>{const b=ev.target.closest('button');if(!b)return;const p=d.presets[b.dataset.i];$('e').value=p.expr;$('t').value=p.target;[...$('pre').children].forEach(x=>x.classList.toggle('on',x===b));go()}});
+go();
+</script></body></html>
